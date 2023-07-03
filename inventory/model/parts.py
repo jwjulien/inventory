@@ -33,10 +33,10 @@ from sqlalchemy.orm.collections import attribute_mapped_collection
 from sqlalchemy import Column, Integer, String, Text, DateTime, Float
 from sqlalchemy.sql import func
 
-from inventory.model.base import Base
+from inventory.model.base import BaseModel
 from inventory.model.mixins import ProxiedDictMixin
 from inventory.model.attributes import PartAttribute
-from inventory.model.categories import PartCategory
+from inventory.model.categories import Category
 
 
 
@@ -129,7 +129,7 @@ class Part(ProxiedDictMixin, Base):
 
     @staticmethod
     def GetAll(session: Session) -> List['Part']:
-        return session.execute(select(Part).order_by(Part.value)).scalars()
+        return list(session.execute(select(Part).order_by(Part.value)).scalars())
 
 
     @staticmethod

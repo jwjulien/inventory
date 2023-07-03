@@ -25,14 +25,17 @@
 import ctypes
 import os
 from importlib import metadata
+from typing import List
 
 from PySide6 import QtCore, QtGui, QtWidgets
-from sqlalchemy import create_engine
-from sqlalchemy.orm import Session
+# from sqlalchemy import create_engine
+# from sqlalchemy.orm import Session
 
 from inventory.gui.base.main_window import Ui_MainWindow
-from inventory.gui.pages.parts import PageParts
-from inventory.model import Base, Part
+# from inventory.gui.tabs.parts import TabParts
+from inventory.gui.tabs.categories import TabCategories
+from inventory.model.base import BaseModel, db
+from inventory.model.categories import Category
 
 
 
@@ -59,16 +62,18 @@ class MainWindow(QtWidgets.QMainWindow):
             ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
         # Connect to database.
-        self.engine = create_engine("sqlite:///parts.sqlite", echo=False)
-        Base.metadata.create_all(self.engine)
+        db.connect()
+        db.create_tables([Category])
 
-        # Setup pages.
-        self.ui.page_parts = PageParts(self, self.engine)
-        self.ui.stack.addWidget(self.ui.page_parts)
+        # Setup tabs.
+        # self.ui.tab_parts = TabParts(self, self.session)
+        # self.ui.tabs.addTab(self.ui.tab_parts, 'Parts')
+        self.ui.tab_categories = TabCategories(self)
+        self.ui.tabs.addTab(self.ui.tab_categories, 'Categories')
 
         # Load parts and show table.
-        self.ui.page_parts.refresh()
-        self.ui.stack.setCurrentWidget(self.ui.page_parts)
+        # self.ui.tab_parts.refresh()
+        # self.ui.tabs.setCurrentWidget(self.ui.tab_parts)
 
 
 

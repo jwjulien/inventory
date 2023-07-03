@@ -1,5 +1,5 @@
 # ======================================================================================================================
-#      File:  /inventory/gui/dialog/part_view.py
+#      File:  /inventory/gui/tabs/parts.py
 #   Project:  Inventory
 #    Author:  Jared Julien <jaredjulien@exsystems.net>
 # Copyright:  (c) 2023 Jared Julien, eX Systems
@@ -17,66 +17,56 @@
 # OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # ----------------------------------------------------------------------------------------------------------------------
-"""Dialog showing information about a single part."""
+"""Main window part list tab."""
 
 # ======================================================================================================================
 # Imports
 # ----------------------------------------------------------------------------------------------------------------------
 from PySide6 import QtCore, QtGui, QtWidgets
-
 from sqlalchemy.orm import Session
 
-from inventory.gui.base.dialog_part import Ui_DialogPart
-from inventory.model.parts import Part
-from inventory.model.categories import Category
+from inventory.gui.base.tab_parts import Ui_TabParts
+from inventory.gui.dialogs.part import PartDialog
+from inventory.gui.constants import Brushes
+from inventory.gui.models.parts import PartsTableModel
+from inventory.gui.models.filters import OrSortFilterProxyModel
+from inventory.model import Part
 
 
 
 
 # ======================================================================================================================
-# Part Dialog
+# Tab Parts Widget
 # ----------------------------------------------------------------------------------------------------------------------
-class PartDialog(QtWidgets.QDialog):
-    def __init__(self, parent, session, part: Part):
+class TabParts(QtWidgets.QWidget):
+    def __init__(self, parent, session):
         super().__init__(parent)
-        self.ui = Ui_DialogPart()
+        self.ui = Ui_TabParts()
         self.ui.setupUi(self)
 
+        # Setup model with all of the parts.
         self.session = session
-        self.part = part
+        self.model = PartsTableModel(self, self.session)
 
-        self.ui.category.clear()
-        for category in PartCategory.GetAll(self.session):
-            self.ui.category.addItem(category.full_title, category.id)
+        # Setup a proxy to handle filtering of parts.
+        self.proxy = OrSortFilterProxyModel(self.ui.parts)
+        self.proxy.setSourceModel(self.model)
+        self.proxy.setFilterKeyColumns(0, 1, 2)
+        self.proxy.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
+        self.ui.filter.textChanged.connect(lambda: self.proxy.setFilterWildcard(self.ui.filter.text()))
+        self.ui.parts.setModel(self.proxy)
 
-        self.ui.category.setCurrentText(part.category.full_title)
-        self.ui.value.setText(part.value)
-        self.ui.part_number.setText(part.number)
-        self.ui.footprint.setText(part.package)
-        self.ui.price.setValue(float(part.price))
-        self.ui.weight.setValue(float(part.weight) if part.weight else 0)
-        self.ui.threshold.setValue(int(part.threshold) if part.threshold else 0)
-        self.ui.notes.setPlainText(part.notes)
+        # Connect events.
+        self.ui.parts.doubleClicked.connect(self.selected)
 
 
-    def accept(self) -> None:
-        """When the user accepts the changes, update the provided part."""
-        self.part.category_id = self.ui.category.currentData()
-        self.part.value = self.ui.value.text()
-        self.part.number = self.ui.part_number.text()
-        self.part.package = self.ui.footprint.text()
-        self.part.price = self.ui.price.value()
-        self.part.weight = self.ui.weight.value()
-        self.part.threshold = self.ui.threshold.value()
-        self.part.notes = self.ui.notes.toPlainText()
-        self.session.commit()
-        return super().accept()
-
-
-    def reject(self) -> None:
-        # TODO: Hook close event and warn if there are changes before closing.
-        self.session.rollback()
-        return super().reject()
+    def selected(self) -> None:
+        selected = self.ui.parts.selectedIndexes()[0]
+        part = self.proxy.data(selected, QtCore.Qt.UserRole)
+        PartDialog(self, self.session, part).exec()
+        left = self.model.createIndex(selected.row(), 0)
+        right = self.model.createIndex(selected.row(), self.model.columnCount(None) - 1)
+        self.ui.parts.dataChanged(left, right, [QtCore.Qt.DisplayRole, QtCore.Qt.ForegroundRole])
 
 
 

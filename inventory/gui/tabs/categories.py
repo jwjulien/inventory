@@ -1,5 +1,5 @@
 # ======================================================================================================================
-#      File:  /inventory/gui/dialog/part_view.py
+#      File:  /inventory/gui/tabs/parts.py
 #   Project:  Inventory
 #    Author:  Jared Julien <jaredjulien@exsystems.net>
 # Copyright:  (c) 2023 Jared Julien, eX Systems
@@ -17,68 +17,63 @@
 # OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # ----------------------------------------------------------------------------------------------------------------------
-"""Dialog showing information about a single part."""
+"""Main window part list tab."""
 
 # ======================================================================================================================
 # Imports
 # ----------------------------------------------------------------------------------------------------------------------
 from PySide6 import QtCore, QtGui, QtWidgets
 
-from sqlalchemy.orm import Session
-
-from inventory.gui.base.dialog_part import Ui_DialogPart
-from inventory.model.parts import Part
+from inventory.gui.base.tab_categories import Ui_TabCategories
+from inventory.gui.dialogs.category import CategoryDialog
 from inventory.model.categories import Category
 
 
 
 
 # ======================================================================================================================
-# Part Dialog
+# Tab Categories Widget
 # ----------------------------------------------------------------------------------------------------------------------
-class PartDialog(QtWidgets.QDialog):
-    def __init__(self, parent, session, part: Part):
+class TabCategories(QtWidgets.QWidget):
+    def __init__(self, parent):
         super().__init__(parent)
-        self.ui = Ui_DialogPart()
+        self.ui = Ui_TabCategories()
         self.ui.setupUi(self)
 
-        self.session = session
-        self.part = part
+        # Load categories into TreeWidget.
+        roots = Category.select().where(Category.parent == None)
+        def recurse(category: Category, parent: QtWidgets.QTreeWidgetItem) -> QtWidgets.QTreeWidgetItem:
+            item = QtWidgets.QTreeWidgetItem(parent, [category.title, category.inherited_designator])
+            item.setData(0, QtCore.Qt.UserRole, category)
+            for child in category.children:
+                item.addChild(recurse(child, item))
+            return item
+        for root in roots:
+            self.ui.categories.addTopLevelItem(recurse(root, None))
 
-        self.ui.category.clear()
-        for category in PartCategory.GetAll(self.session):
-            self.ui.category.addItem(category.full_title, category.id)
+        self.ui.categories.setColumnWidth(0, 350)
+        self.ui.categories.expandAll()
 
-        self.ui.category.setCurrentText(part.category.full_title)
-        self.ui.value.setText(part.value)
-        self.ui.part_number.setText(part.number)
-        self.ui.footprint.setText(part.package)
-        self.ui.price.setValue(float(part.price))
-        self.ui.weight.setValue(float(part.weight) if part.weight else 0)
-        self.ui.threshold.setValue(int(part.threshold) if part.threshold else 0)
-        self.ui.notes.setPlainText(part.notes)
-
-
-    def accept(self) -> None:
-        """When the user accepts the changes, update the provided part."""
-        self.part.category_id = self.ui.category.currentData()
-        self.part.value = self.ui.value.text()
-        self.part.number = self.ui.part_number.text()
-        self.part.package = self.ui.footprint.text()
-        self.part.price = self.ui.price.value()
-        self.part.weight = self.ui.weight.value()
-        self.part.threshold = self.ui.threshold.value()
-        self.part.notes = self.ui.notes.toPlainText()
-        self.session.commit()
-        return super().accept()
+        # Connect events.
+        self.ui.categories.doubleClicked.connect(self.selected)
+        QtGui.QShortcut(QtGui.QKeySequence("Insert"), self.ui.categories, self.insert)
 
 
-    def reject(self) -> None:
-        # TODO: Hook close event and warn if there are changes before closing.
-        self.session.rollback()
-        return super().reject()
+    def selected(self) -> None:
+        # Get the currently selected category from the tree.
+        selected = self.ui.categories.selectedIndexes()[0]
+        category = selected.data(QtCore.Qt.UserRole)
+
+        # Show a dialog to let the user make changes.  Dialog will save to database if user accepts.
+        if CategoryDialog(self, category).exec():
+            # User accepted the changes - update the tree with the changed values.
+            item = self.ui.categories.itemFromIndex(selected)
+            item.setText(0, category.title)
+            item.setText(1, category.inherited_designator)
 
 
+    def insert(self) -> None:
+        print('Insert!')
 
 
 # End of File

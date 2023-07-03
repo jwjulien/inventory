@@ -1,5 +1,5 @@
 # ======================================================================================================================
-#      File:  /inventory/gui/dialog/part_view.py
+#      File:  /inventory/gui/constants.py
 #   Project:  Inventory
 #    Author:  Jared Julien <jaredjulien@exsystems.net>
 # Copyright:  (c) 2023 Jared Julien, eX Systems
@@ -17,66 +17,37 @@
 # OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # ----------------------------------------------------------------------------------------------------------------------
-"""Dialog showing information about a single part."""
+"""Constants for use across the various GUI windows."""
 
 # ======================================================================================================================
 # Imports
 # ----------------------------------------------------------------------------------------------------------------------
-from PySide6 import QtCore, QtGui, QtWidgets
-
-from sqlalchemy.orm import Session
-
-from inventory.gui.base.dialog_part import Ui_DialogPart
-from inventory.model.parts import Part
-from inventory.model.categories import Category
-
+from PySide6 import QtGui
 
 
 
 # ======================================================================================================================
-# Part Dialog
+# Common Colors
 # ----------------------------------------------------------------------------------------------------------------------
-class PartDialog(QtWidgets.QDialog):
-    def __init__(self, parent, session, part: Part):
-        super().__init__(parent)
-        self.ui = Ui_DialogPart()
-        self.ui.setupUi(self)
-
-        self.session = session
-        self.part = part
-
-        self.ui.category.clear()
-        for category in PartCategory.GetAll(self.session):
-            self.ui.category.addItem(category.full_title, category.id)
-
-        self.ui.category.setCurrentText(part.category.full_title)
-        self.ui.value.setText(part.value)
-        self.ui.part_number.setText(part.number)
-        self.ui.footprint.setText(part.package)
-        self.ui.price.setValue(float(part.price))
-        self.ui.weight.setValue(float(part.weight) if part.weight else 0)
-        self.ui.threshold.setValue(int(part.threshold) if part.threshold else 0)
-        self.ui.notes.setPlainText(part.notes)
+class Colors:
+    """Borrowed from Bootstrap."""
+    Primary = QtGui.QColor(13, 110, 253)
+    Success = QtGui.QColor(25, 135, 84)
+    Danger = QtGui.QColor(220, 53, 69)
+    Warning = QtGui.QColor(255, 193, 7)
+    Info = QtGui.QColor(13, 202, 240)
 
 
-    def accept(self) -> None:
-        """When the user accepts the changes, update the provided part."""
-        self.part.category_id = self.ui.category.currentData()
-        self.part.value = self.ui.value.text()
-        self.part.number = self.ui.part_number.text()
-        self.part.package = self.ui.footprint.text()
-        self.part.price = self.ui.price.value()
-        self.part.weight = self.ui.weight.value()
-        self.part.threshold = self.ui.threshold.value()
-        self.part.notes = self.ui.notes.toPlainText()
-        self.session.commit()
-        return super().accept()
 
-
-    def reject(self) -> None:
-        # TODO: Hook close event and warn if there are changes before closing.
-        self.session.rollback()
-        return super().reject()
+# ======================================================================================================================
+# Common Brushes
+# ----------------------------------------------------------------------------------------------------------------------
+class Brushes:
+    Primary = QtGui.QBrush(Colors.Primary)
+    Success = QtGui.QBrush(Colors.Success)
+    Danger = QtGui.QBrush(Colors.Danger)
+    Warning = QtGui.QBrush(Colors.Warning)
+    Info = QtGui.QBrush(Colors.Info)
 
 
 

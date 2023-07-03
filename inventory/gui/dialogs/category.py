@@ -1,5 +1,5 @@
 # ======================================================================================================================
-#      File:  /inventory/gui/pages/parts.py
+#      File:  /inventory/gui/dialogs/category.py
 #   Project:  Inventory
 #    Author:  Jared Julien <jaredjulien@exsystems.net>
 # Copyright:  (c) 2023 Jared Julien, eX Systems
@@ -17,60 +17,45 @@
 # OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # ----------------------------------------------------------------------------------------------------------------------
-"""Main window stacked widget part view page."""
+"""Dialog for editing category information."""
 
 # ======================================================================================================================
 # Imports
 # ----------------------------------------------------------------------------------------------------------------------
-from PySide6 import QtCore, QtGui, QtWidgets
-from sqlalchemy.orm import Session
+from PySide6 import QtWidgets
 
-from inventory.gui.base.page_parts import Ui_PageParts
-from inventory.gui.dialogs.part import PartDialog
-from inventory.model import Part
+from inventory.gui.base.dialog_category import Ui_DialogCategory
+from inventory.model.categories import Category
 
 
 
 
 # ======================================================================================================================
-# Page Parts Widget
+# Category Dialog Class
 # ----------------------------------------------------------------------------------------------------------------------
-class PageParts(QtWidgets.QWidget):
-    def __init__(self, parent, engine):
+class CategoryDialog(QtWidgets.QDialog):
+    def __init__(self, parent, category: Category):
         super().__init__(parent)
-        self.ui = Ui_PageParts()
+        self.ui = Ui_DialogCategory()
         self.ui.setupUi(self)
-        self.engine = engine
 
-        self.ui.parts.doubleClicked.connect(self.selected)
+        self.category = category
 
-
-    def refresh(self):
-        self.ui.parts.clearContents()
-        with Session(self.engine) as session:
-            for part in Part.GetAll(session):
-                idx = self.ui.parts.rowCount()
-                self.ui.parts.insertRow(idx)
-                category = QtWidgets.QTableWidgetItem(part.category.full_title)
-                category.setData(QtCore.Qt.UserRole, part.id)
-                self.ui.parts.setItem(idx, 0, category)
-                self.ui.parts.setItem(idx, 1, QtWidgets.QTableWidgetItem(part.value))
-                self.ui.parts.setItem(idx, 2, QtWidgets.QTableWidgetItem(part.package))
-                self.ui.parts.setItem(idx, 3, QtWidgets.QTableWidgetItem(str(part.quantity)))
-                self.ui.parts.setItem(idx, 4, QtWidgets.QTableWidgetItem(f'${part.price:.2f}'))
-        self.ui.parts.resizeColumnsToContents()
+        self.ui.title.setText(self.category.title)
+        self.ui.designator.setText(self.category.designator)
+        self.ui.designator.setPlaceholderText(self.category.inherited_designator)
 
 
-    def selected(self) -> None:
-        selected = self.ui.parts.selectedIndexes()
-        row = selected[0].row()
-        category = self.ui.parts.item(row, 0)
-        id = category.data(QtCore.Qt.UserRole)
-        with Session(self.engine) as session:
-            part = Part.GetById(session, id)
-            dialog = PartDialog(self, self.engine, part)
-            result = dialog.exec()
-            print(result)
+    def accept(self) -> None:
+        self.category.title = self.ui.title.text()
+        self.category.designator = self.ui.designator.text()
+
+        # Convert empty string for designator into null value.
+        if not self.category.designator:
+            self.category.designator = None
+
+        self.category.save()
+        super().accept()
 
 
 

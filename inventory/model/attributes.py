@@ -28,7 +28,7 @@ Allows arbitrary additional properties to be associated with individual parts.
 from sqlalchemy import ForeignKey
 from sqlalchemy import Column, Integer, String, Text
 
-from inventory.model.base import Base
+from inventory.model.base import BaseModel
 
 
 

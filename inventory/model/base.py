@@ -22,7 +22,12 @@
 # ======================================================================================================================
 # Import Statements
 # ----------------------------------------------------------------------------------------------------------------------
-from sqlalchemy.orm import DeclarativeBase, MappedAsDataclass
+# from sqlalchemy.orm import DeclarativeBase, MappedAsDataclass
+from peewee import Model, SqliteDatabase
+
+
+
+db = SqliteDatabase('parts.sqlite')
 
 
 
@@ -30,8 +35,10 @@ from sqlalchemy.orm import DeclarativeBase, MappedAsDataclass
 # ======================================================================================================================
 # SQLalchemy Declarative Base
 # ----------------------------------------------------------------------------------------------------------------------
-class Base(MappedAsDataclass, DeclarativeBase):
+class BaseModel(Model):
     """Base class for all ORM classes in this model."""
+    class Meta:
+        database = db
 
 
 

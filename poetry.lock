@@ -182,6 +182,16 @@ files = [
 ]
 
 [[package]]
+name = "peewee"
+version = "3.16.2"
+description = "a little orm"
+optional = false
+python-versions = "*"
+files = [
+    {file = "peewee-3.16.2.tar.gz", hash = "sha256:10769981198c7311f84a0ca8db892fa213303a8eb1305deb795a71e7bd606a91"},
+]
+
+[[package]]
 name = "pyqtdarktheme"
 version = "2.1.0"
 description = "Flat dark theme for PySide and PyQt."
@@ -359,4 +369,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.10"
-content-hash = "8b71074f0d90c5a0d08713af6bf8a802f62cb59139ed0fef69a10a5388a62d2a"
+content-hash = "02c3669497a37e1d372706cd90f736157c19ef7de114ff1e9b3318d7079cdd69"

@@ -27,31 +27,31 @@ other.
 # Imports
 # ----------------------------------------------------------------------------------------------------------------------
 # from inventory.model.attributes import PartAttribute
-from inventory.model.base import Base
-from inventory.model.categories import PartCategory
-from inventory.model.parts import Part
+# from inventory.model.base import BaseModel
+# from inventory.model.categories import PartCategory
+# from inventory.model.parts import Part
 # from inventory.model.projects import Project, Revision, BOM
-from inventory.model.storage import Area, Unit, Slot, SlotPart
+# from inventory.model.storage import Area, Unit, Slot, SlotPart
 # from inventory.model.suppliers import Supplier, PartSupplier
 
 
 
 
-__all__ = [
-    'Base',
-    'PartAttribute',
-    'PartCategory',
-    'Part',
-    'Project',
-    'Revision',
-    'BOM',
-    'Area',
-    'Unit',
-    'Slot',
-    'SlotPart',
-    'Supplier',
-    'PartSupplier'
-]
+# __all__ = [
+#     'Base',
+#     'PartAttribute',
+#     'PartCategory',
+#     'Part',
+#     'Project',
+#     'Revision',
+#     'BOM',
+#     'Area',
+#     'Unit',
+#     'Slot',
+#     'SlotPart',
+#     'Supplier',
+#     'PartSupplier'
+# ]
 
 
 
