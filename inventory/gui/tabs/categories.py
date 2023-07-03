@@ -43,13 +43,8 @@ class TabCategories(QtWidgets.QWidget):
 
         # Load categories into TreeWidget.
         roots = Category.select().where(Category.parent == None)
-        def recurse(category: Category, parent: QtWidgets.QTreeWidgetItem) -> QtWidgets.QTreeWidgetItem:
-            item = self._make_item(parent, category)
-            for child in category.children:
-                item.addChild(recurse(child, item))
-            return item
         for root in roots:
-            self.ui.categories.addTopLevelItem(recurse(root, None))
+            self.ui.categories.addTopLevelItem(self._load_tree(root, None))
 
         self._sort()
 
@@ -64,6 +59,14 @@ class TabCategories(QtWidgets.QWidget):
         QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Insert"), self.ui.categories, self.insert_child)
         QtGui.QShortcut(QtGui.QKeySequence("Ctrl+]"), self.ui.categories, self.make_child)
         QtGui.QShortcut(QtGui.QKeySequence("Ctrl+["), self.ui.categories, self.make_sibling)
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def _load_tree(self, category: Category, parent: QtWidgets.QTreeWidgetItem) -> QtWidgets.QTreeWidgetItem:
+        item = self._make_item(parent, category)
+        for child in category.children:
+            item.addChild(self._load_tree(child, item))
+        return item
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -86,18 +89,26 @@ class TabCategories(QtWidgets.QWidget):
 
         Present the user with the CategoryDialog for editing the values for an existing category.
         """
-        # Get the currently selected category from the tree.
-        selected = self.ui.categories.selectedIndexes()[0]
-        category: Category = selected.data(QtCore.Qt.UserRole)
+        # Get the currently selected category from the tree - make sure there's only 1, otherwise ignore the request.
+        selected = self.ui.categories.selectedItems()
+        if len(selected) != 1:
+            return
+        selected = selected[0]
+
+        category: Category = selected.data(0, QtCore.Qt.UserRole)
 
         # Show a dialog to let the user make changes.  Dialog will save to database if user accepts.
         if CategoryDialog(self, category).exec():
 
             # User accepted the changes - update the tree with the changed values.
-            item = self.ui.categories.itemFromIndex(selected)
-            item.setText(0, category.title)
-            item.setText(1, category.inherited_designator)
+            selected.setText(0, category.title)
+            selected.setText(1, category.inherited_designator)
 
+            selected.takeChildren()
+            for child in category.children:
+                self._load_tree(child, selected)
+
+            self.ui.categories.expandAll()
             self._sort()
 
 

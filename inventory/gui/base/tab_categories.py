@@ -35,6 +35,8 @@ class Ui_TabCategories(object):
         self.categories.setSizePolicy(sizePolicy)
         self.categories.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.categories.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        self.categories.setIndentation(12)
+        self.categories.setExpandsOnDoubleClick(False)
 
         self.horizontalLayout.addWidget(self.categories)
 

@@ -23,6 +23,7 @@
 # Import Statements
 # ----------------------------------------------------------------------------------------------------------------------
 from peewee import CharField, ForeignKeyField
+from playhouse.hybrid import hybrid_property
 
 from inventory.model.base import BaseModel
 
@@ -43,7 +44,7 @@ class Category(BaseModel):
 
 
     # Properties
-    @property
+    @hybrid_property
     def inherited_designator(self) -> str:
         """Fetch the designator for this category, which might be inherited from a parent."""
         # If assigned to this category, then that designator wins.
