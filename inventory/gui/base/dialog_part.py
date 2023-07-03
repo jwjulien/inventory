@@ -17,9 +17,11 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QAbstractButton, QApplication, QComboBox, QDialog,
     QDialogButtonBox, QDoubleSpinBox, QFormLayout, QGraphicsView,
-    QHBoxLayout, QLabel, QLineEdit, QListWidget,
-    QListWidgetItem, QPlainTextEdit, QPushButton, QSizePolicy,
-    QSpinBox, QVBoxLayout, QWidget)
+    QGroupBox, QHBoxLayout, QLabel, QLineEdit,
+    QListWidget, QListWidgetItem, QPlainTextEdit, QPushButton,
+    QSizePolicy, QSpinBox, QVBoxLayout, QWidget)
+
+from inventory.gui.widgets.attributes import AttributesWidget
 
 class Ui_DialogPart(object):
     def setupUi(self, DialogPart):
@@ -140,36 +142,9 @@ class Ui_DialogPart(object):
 
         self.formLayout.setLayout(5, QFormLayout.FieldRole, self.horizontalLayout_5)
 
-        self.layoutWidget_2 = QWidget(DialogPart)
-        self.layoutWidget_2.setObjectName(u"layoutWidget_2")
-        self.layoutWidget_2.setGeometry(QRect(10, 230, 531, 281))
-        self.verticalLayout_2 = QVBoxLayout(self.layoutWidget_2)
-        self.verticalLayout_2.setObjectName(u"verticalLayout_2")
-        self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
-        self.attributes = QListWidget(self.layoutWidget_2)
-        self.attributes.setObjectName(u"attributes")
-
-        self.verticalLayout_2.addWidget(self.attributes)
-
-        self.horizontalLayout_2 = QHBoxLayout()
-        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.add_attribute = QPushButton(self.layoutWidget_2)
-        self.add_attribute.setObjectName(u"add_attribute")
-
-        self.horizontalLayout_2.addWidget(self.add_attribute)
-
-        self.remove_attribute = QPushButton(self.layoutWidget_2)
-        self.remove_attribute.setObjectName(u"remove_attribute")
-        self.remove_attribute.setEnabled(False)
-
-        self.horizontalLayout_2.addWidget(self.remove_attribute)
-
-
-        self.verticalLayout_2.addLayout(self.horizontalLayout_2)
-
         self.layoutWidget_3 = QWidget(DialogPart)
         self.layoutWidget_3.setObjectName(u"layoutWidget_3")
-        self.layoutWidget_3.setGeometry(QRect(807, 10, 171, 201))
+        self.layoutWidget_3.setGeometry(QRect(807, 10, 172, 201))
         self.verticalLayout_3 = QVBoxLayout(self.layoutWidget_3)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.verticalLayout_3.setContentsMargins(0, 0, 0, 0)
@@ -232,6 +207,17 @@ class Ui_DialogPart(object):
 
         self.verticalLayout.addLayout(self.horizontalLayout_4)
 
+        self.group_attributes = QGroupBox(DialogPart)
+        self.group_attributes.setObjectName(u"group_attributes")
+        self.group_attributes.setGeometry(QRect(10, 220, 531, 291))
+        self.verticalLayout_2 = QVBoxLayout(self.group_attributes)
+        self.verticalLayout_2.setObjectName(u"verticalLayout_2")
+        self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
+        self.attributes = AttributesWidget(self.group_attributes)
+        self.attributes.setObjectName(u"attributes")
+
+        self.verticalLayout_2.addWidget(self.attributes)
+
 
         self.retranslateUi(DialogPart)
         self.buttonBox.accepted.connect(DialogPart.accept)
@@ -258,11 +244,10 @@ class Ui_DialogPart(object):
 #endif // QT_CONFIG(tooltip)
         self.weight.setSuffix(QCoreApplication.translate("DialogPart", u"g", None))
         self.calibrate.setText(QCoreApplication.translate("DialogPart", u"Calibrate", None))
-        self.add_attribute.setText(QCoreApplication.translate("DialogPart", u"Add Attribute", None))
-        self.remove_attribute.setText(QCoreApplication.translate("DialogPart", u"Delete Attribute", None))
         self.set_image.setText(QCoreApplication.translate("DialogPart", u"Set Image", None))
         self.remove_image.setText(QCoreApplication.translate("DialogPart", u"Remove Image", None))
         self.add_document.setText(QCoreApplication.translate("DialogPart", u"Add Document", None))
         self.remove_document.setText(QCoreApplication.translate("DialogPart", u"Remove Document", None))
+        self.group_attributes.setTitle(QCoreApplication.translate("DialogPart", u"Additional Attributes:", None))
     # retranslateUi
 

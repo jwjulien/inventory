@@ -178,48 +178,12 @@ Set to zero to disable reorder (i.e. non-stocked) or set to one to reorder when 
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget_2">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>230</y>
-     <width>531</width>
-     <height>281</height>
-    </rect>
-   </property>
-   <layout class="QVBoxLayout" name="verticalLayout_2">
-    <item>
-     <widget class="QListWidget" name="attributes"/>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
-      <item>
-       <widget class="QPushButton" name="add_attribute">
-        <property name="text">
-         <string>Add Attribute</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="remove_attribute">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>Delete Attribute</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
-   </layout>
-  </widget>
   <widget class="QWidget" name="layoutWidget_3">
    <property name="geometry">
     <rect>
      <x>807</x>
      <y>10</y>
-     <width>171</width>
+     <width>172</width>
      <height>201</height>
     </rect>
    </property>
@@ -313,7 +277,45 @@ Set to zero to disable reorder (i.e. non-stocked) or set to one to reorder when 
     </item>
    </layout>
   </widget>
+  <widget class="QGroupBox" name="group_attributes">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>220</y>
+     <width>531</width>
+     <height>291</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Additional Attributes:</string>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout_2">
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <item>
+     <widget class="AttributesWidget" name="attributes" native="true"/>
+    </item>
+   </layout>
+  </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>AttributesWidget</class>
+   <extends>QWidget</extends>
+   <header>inventory.gui.widgets.attributes</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>

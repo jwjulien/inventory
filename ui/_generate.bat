@@ -6,3 +6,5 @@ start poetry run pyside6-uic -o inventory/gui/base/tab_categories.py ui/tab_cate
 
 start poetry run pyside6-uic -o inventory/gui/base/dialog_category.py ui/dialog_category.ui
 start poetry run pyside6-uic -o inventory/gui/base/dialog_part.py ui/dialog_part.ui
+
+start poetry run pyside6-uic -o inventory/gui/base/widget_attributes.py ui/widget_attributes.ui

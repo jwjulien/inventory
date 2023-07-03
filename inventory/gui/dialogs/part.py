@@ -40,13 +40,21 @@ class PartDialog(QtWidgets.QDialog):
         self.ui = Ui_DialogPart()
         self.ui.setupUi(self)
 
-        self.part = part
-
         # Populate the categories dropdown with a sorted set of categories from the database.
         categories = list(Category.select())
         categories.sort(key=lambda category: category.full_title)
         for category in categories:
             self.ui.category.addItem(category.full_title, category)
+
+        self.load(part)
+
+        # Connect events.
+
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def load(self, part: Part):
+        self.part = part
 
         if part.category_id:
             self.ui.category.setCurrentText(part.category.full_title)
@@ -61,7 +69,10 @@ class PartDialog(QtWidgets.QDialog):
             self.ui.threshold.setValue(int(part.threshold) if part.threshold else 0)
         self.ui.notes.setPlainText(part.notes)
 
+        self.ui.attributes.setAttributes(part.attributes)
 
+
+# ----------------------------------------------------------------------------------------------------------------------
     def accept(self) -> None:
         """When the user accepts the changes, update the provided part."""
         self.part.category_id = self.ui.category.currentData()
@@ -72,14 +83,15 @@ class PartDialog(QtWidgets.QDialog):
         self.part.weight = self.ui.weight.value()
         self.part.threshold = self.ui.threshold.value()
         self.part.notes = self.ui.notes.toPlainText()
+        self.part.attributes = self.ui.attributes.attributes()
         self.part.save()
         return super().accept()
 
 
+# ----------------------------------------------------------------------------------------------------------------------
     def reject(self) -> None:
         # TODO: Hook close event and warn if there are changes before closing.
         return super().reject()
-
 
 
 
