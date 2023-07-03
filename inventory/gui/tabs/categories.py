@@ -26,6 +26,7 @@ from PySide6 import QtCore, QtGui, QtWidgets
 
 from inventory.gui.base.tab_categories import Ui_TabCategories
 from inventory.gui.dialogs.category import CategoryDialog
+from inventory.gui.prompts import YesNoPrompt
 from inventory.model.categories import Category
 
 
@@ -58,6 +59,7 @@ class TabCategories(QtWidgets.QWidget):
 
         # Connect events.
         self.ui.categories.doubleClicked.connect(self.edit)
+        QtGui.QShortcut(QtGui.QKeySequence("Delete"), self.ui.categories, self.delete)
         QtGui.QShortcut(QtGui.QKeySequence("Insert"), self.ui.categories, self.insert_sibling)
         QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Insert"), self.ui.categories, self.insert_child)
         QtGui.QShortcut(QtGui.QKeySequence("Ctrl+]"), self.ui.categories, self.make_child)
@@ -74,7 +76,7 @@ class TabCategories(QtWidgets.QWidget):
 
 # ----------------------------------------------------------------------------------------------------------------------
     def _sort(self) -> None:
-        """Sort the list of categories alphabetically by title."""
+        """Sort the list of categories in the tree widget alphabetically by title."""
         self.ui.categories.sortItems(0, QtCore.Qt.AscendingOrder)
 
 
@@ -100,15 +102,46 @@ class TabCategories(QtWidgets.QWidget):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
+    def delete(self) -> None:
+        """Remove the currently selected items."""
+        selection = self.ui.categories.selectedItems()
+        message = 'Are you sure you want to delete '
+        if not selection:
+            return
+        if len(selection) == 1:
+            message += selection[0].data(0, QtCore.Qt.UserRole).title
+        else:
+            message += f'{len(selection)} items'
+        message += '?\n\nWarning: Any and all children will be deleted too.'
+        if YesNoPrompt(self, 'Please confirm', message):
+            def recurse(category: Category) -> None:
+                for child in category.children:
+                    recurse(child)
+                category.delete_instance()
+
+            for item in selection:
+                # Remove the selected item from the database.
+                recurse(item.data(0, QtCore.Qt.UserRole))
+
+                # Remove the selected item from the tree.
+                if item.parent():
+                    item.parent().removeChild(item)
+                else:
+                    self.ui.categories.takeTopLevelItem(self.ui.categories.indexOfTopLevelItem(item))
+
+
+# ----------------------------------------------------------------------------------------------------------------------
     def insert_sibling(self) -> None:
         selected = self.ui.categories.selectedItems()
-        if not selected:
-            return
-        selected = selected[-1]
-        selected_category = selected.data(0, QtCore.Qt.UserRole)
+        if selected:
+            selected = selected[-1]
+            selected_category = selected.data(0, QtCore.Qt.UserRole)
 
-        # To be a sibling, we want parent to be the same parent as selected.
-        parent = selected_category.parent
+            # To be a sibling, we want parent to be the same parent as selected.
+            parent = selected_category.parent
+        else:
+            parent = None
+
         category = Category(parent=parent)
 
         if CategoryDialog(self, category).exec():
