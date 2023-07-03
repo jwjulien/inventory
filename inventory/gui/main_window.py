@@ -26,13 +26,15 @@ import ctypes
 import os
 from importlib import metadata
 
-from PySide6 import  QtGui, QtWidgets
+from PySide6 import QtCore, QtGui, QtWidgets
+import PySide6.QtGui
 
 from inventory.gui.base.main_window import Ui_MainWindow
 # from inventory.gui.tabs.parts import TabParts
 from inventory.gui.tabs.categories import TabCategories
 from inventory.model.base import BaseModel, db
 from inventory.model.categories import Category
+from inventory.libraries.scanner import ScannerWorker
 
 
 
@@ -71,6 +73,27 @@ class MainWindow(QtWidgets.QMainWindow):
         # Load parts and show table.
         # self.ui.tab_parts.refresh()
         # self.ui.tabs.setCurrentWidget(self.ui.tab_parts)
+
+        # Setup a thread pool for background tasks.
+        self.threadpool = QtCore.QThreadPool(self)
+
+        # Setup the barcode scanner.
+        self._setup_scanner()
+
+
+    def _setup_scanner(self):
+        # TODO: This VID/PID should be configurable.
+        VENDOR_ID = 0x0581
+        PRODUCT_ID = 0x0103
+
+        self.scanner_worker = ScannerWorker(VENDOR_ID, PRODUCT_ID)
+        self.scanner_worker.received.connect(lambda code: print('Received:', code))
+        self.threadpool.start(self.scanner_worker)
+
+
+    def closeEvent(self, event: QtGui.QCloseEvent) -> None:
+        self.scanner_worker.stop()
+        return super().closeEvent(event)
 
 
 

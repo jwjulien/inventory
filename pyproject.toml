@@ -9,10 +9,9 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "~3.10"
 pyside6 = "^6.5.1.1"
-sqlalchemy = "^2.0.17"
-alembic = "^1.11.1"
 pyqtdarktheme = "^2.1.0"
 peewee = "^3.16.2"
+pyusb = "^1.2.1"
 
 
 [build-system]
