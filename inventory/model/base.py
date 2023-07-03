@@ -22,11 +22,17 @@
 # ======================================================================================================================
 # Import Statements
 # ----------------------------------------------------------------------------------------------------------------------
-# from sqlalchemy.orm import DeclarativeBase, MappedAsDataclass
-from peewee import Model, SqliteDatabase
+from datetime import datetime
+
+from peewee import Model, SqliteDatabase, PrimaryKeyField, DateTimeField
 
 
 
+# ======================================================================================================================
+# Global Variables
+# ----------------------------------------------------------------------------------------------------------------------
+# TODO: Should this be moved to a better location within the app?  Feels wrong that it's a global defined here.  If
+# done in MainWindow then how does it get associated with BaseModel?
 db = SqliteDatabase('parts.sqlite')
 
 
@@ -40,6 +46,19 @@ class BaseModel(Model):
     class Meta:
         database = db
 
+
+    # Common columns for all classes
+    id = PrimaryKeyField()
+    created_on = DateTimeField(default=datetime.now)
+    modified_on = DateTimeField(null=True)
+
+
+    def save(self, *args, **kwargs):
+        """Override the default save method to add a write of the current date/time to the "modified_on" field."""
+        # Only set the modified_on field when not creating brand new rows.
+        if self.id is not None:
+            self.modified_on = datetime.now()
+        super().save(*args, **kwargs)
 
 
 

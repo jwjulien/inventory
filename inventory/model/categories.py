@@ -41,12 +41,9 @@ class Category(BaseModel):
         table_name = 'categories'
 
     # Columns
-    id = PrimaryKeyField()
     parent = ForeignKeyField('self', backref='children', null=True)
     title = CharField(50)
     designator = CharField(10, null=True)
-    created_on = DateTimeField(default=datetime.now)
-    modified_on = DateTimeField(null=True)
 
 
     # Properties

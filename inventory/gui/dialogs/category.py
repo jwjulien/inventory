@@ -22,6 +22,8 @@
 # ======================================================================================================================
 # Imports
 # ----------------------------------------------------------------------------------------------------------------------
+from datetime import datetime
+
 from PySide6 import QtWidgets
 
 from inventory.gui.base.dialog_category import Ui_DialogCategory

@@ -34,6 +34,7 @@ class Ui_TabCategories(object):
         sizePolicy.setHeightForWidth(self.categories.sizePolicy().hasHeightForWidth())
         self.categories.setSizePolicy(sizePolicy)
         self.categories.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.categories.setSelectionMode(QAbstractItemView.ExtendedSelection)
 
         self.horizontalLayout.addWidget(self.categories)
 

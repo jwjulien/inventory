@@ -25,11 +25,8 @@
 import ctypes
 import os
 from importlib import metadata
-from typing import List
 
-from PySide6 import QtCore, QtGui, QtWidgets
-# from sqlalchemy import create_engine
-# from sqlalchemy.orm import Session
+from PySide6 import  QtGui, QtWidgets
 
 from inventory.gui.base.main_window import Ui_MainWindow
 # from inventory.gui.tabs.parts import TabParts
