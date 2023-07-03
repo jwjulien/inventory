@@ -30,10 +30,11 @@ from PySide6 import QtCore, QtGui, QtWidgets
 import PySide6.QtGui
 
 from inventory.gui.base.main_window import Ui_MainWindow
-# from inventory.gui.tabs.parts import TabParts
+from inventory.gui.tabs.parts import TabParts
 from inventory.gui.tabs.categories import TabCategories
-from inventory.model.base import BaseModel, db
+from inventory.model.base import db
 from inventory.model.categories import Category
+from inventory.model.parts import Part
 from inventory.libraries.scanner import ScannerWorker
 
 
@@ -62,11 +63,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Connect to database.
         db.connect()
-        db.create_tables([Category])
+        db.create_tables([Category, Part])
 
         # Setup tabs.
-        # self.ui.tab_parts = TabParts(self, self.session)
-        # self.ui.tabs.addTab(self.ui.tab_parts, 'Parts')
+        self.ui.tab_parts = TabParts(self)
+        self.ui.tabs.addTab(self.ui.tab_parts, 'Parts')
         self.ui.tab_categories = TabCategories(self)
         self.ui.tabs.addTab(self.ui.tab_categories, 'Categories')
 
@@ -87,6 +88,7 @@ class MainWindow(QtWidgets.QMainWindow):
         PRODUCT_ID = 0x0103
 
         self.scanner_worker = ScannerWorker(VENDOR_ID, PRODUCT_ID)
+        # TODO: The received event needs to be connected to a handler that will actually show the user what they scanned.
         self.scanner_worker.received.connect(lambda code: print('Received:', code))
         self.threadpool.start(self.scanner_worker)
 

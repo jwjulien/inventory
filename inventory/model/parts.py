@@ -22,20 +22,11 @@
 # ======================================================================================================================
 # Import Statements
 # ----------------------------------------------------------------------------------------------------------------------
-from datetime import datetime
-from typing import List, Optional
-
-from sqlalchemy import ForeignKey, select
-from sqlalchemy.orm import relationship, Mapped, mapped_column, Session
-from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.orm.collections import attribute_mapped_collection
-from sqlalchemy import Column, Integer, String, Text, DateTime, Float
-from sqlalchemy.sql import func
+from peewee import CharField, FloatField, ForeignKeyField, IntegerField, TextField
+from playhouse.fields import PickleField
+from playhouse.hybrid import hybrid_property
 
 from inventory.model.base import BaseModel
-from inventory.model.mixins import ProxiedDictMixin
-from inventory.model.attributes import PartAttribute
 from inventory.model.categories import Category
 
 
@@ -44,36 +35,26 @@ from inventory.model.categories import Category
 # ======================================================================================================================
 # Part Class
 # ----------------------------------------------------------------------------------------------------------------------
-class Part(ProxiedDictMixin, Base):
-    __tablename__ = 'parts'
+class Part(BaseModel):
+    class Meta:
+        table_name = 'parts'
 
     # Columns
-    id: Mapped[int] = mapped_column(init=False, primary_key=True)
-    category_id: Mapped[int] = mapped_column(ForeignKey('part_categories.id'))
-    value: Mapped[str] = mapped_column(String(50))
-    number: Mapped[str] = mapped_column(String(50))
-    package: Mapped[str] = mapped_column(String(20))
-    price: Mapped[float]
-    weight: Mapped[float]
-    threshold: Mapped[int]
-    notes: Mapped[str]
-    created_on: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
-    # TODO: Modified date is not populated until first update.  Need to either populate in a migration or find a way to
-    # gracefully handle empty dates.  This seems like it could be an issue with the sqlite implementation, specifically?
-    # modified_on: Mapped[Optional[datetime]] = mapped_column(DateTime)
-
-
-    # Relationships
-    # references = relationship('PartSupplier', backref='part')
-    locations = relationship('SlotPart', backref='part')
-    # boms = relationship('BOM', backref='part')
-    attributes = relationship(PartAttribute, collection_class=attribute_mapped_collection('key'), cascade="all, delete-orphan")
-    _proxied = association_proxy("attributes", "value", creator=lambda key, value: PartAttribute(key=key, value=value))
+    category = ForeignKeyField(Category, backref='parts')
+    value = CharField(50)
+    number = CharField(50)
+    package = CharField(20)
+    price = FloatField(null=True)
+    weight = FloatField(null=True)
+    threshold = IntegerField(default=0)
+    notes = TextField(default='')
+    attributes = PickleField(default=dict)
 
 
     # Properties
     @hybrid_property
     def quantity(self) -> int:
+        return 31
         return sum([location.quantity for location in self.locations])
 
 
@@ -90,22 +71,17 @@ class Part(ProxiedDictMixin, Base):
 
 
     @hybrid_property
+    def low_stock(self) -> bool:
+        return self.is_stocked and self.quantity < (self.threshold * 1.25)
+
+
+    @hybrid_property
     def needs_reorder(self) -> bool:
         return self.is_stocked and self.quantity < self.threshold
 
 
     @hybrid_property
-    def categories(self) -> List[PartCategory]:
-        def recurse(category):
-            categories = []
-            if category.parent:
-                categories.extend(recurse(category.parent))
-            categories.append(category)
-            return categories
-        return recurse(self.category) if self.category else []
-
-    @hybrid_property
-    def description(self) -> str:
+    def summary(self) -> str:
         parts = [category.title for category in self.categories]
         parts.append(self.value)
         for key in self:
@@ -113,39 +89,6 @@ class Part(ProxiedDictMixin, Base):
         if self.package is not None:
             parts.append(self.package)
         return ', '.join(parts)
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-    # Static methods
-    @staticmethod
-    def GetByNumber(session: Session, number: str) -> 'Part':
-        return session.query(Part).filter_by(number=number).scalar()
-
-
-    @staticmethod
-    def GetById(session: Session, id: int) -> 'Part':
-        return session.execute(select(Part).filter_by(id=str(id))).scalar()
-
-
-    @staticmethod
-    def GetAll(session: Session) -> List['Part']:
-        return list(session.execute(select(Part).order_by(Part.value)).scalars())
-
-
-    @staticmethod
-    def GetRecentlyModified(session: Session, limit: int = 15) -> List['Part']:
-        return session.query(Part).order_by(Part.modified_on.desc()).limit(limit).scalars()
-
-
-    @staticmethod
-    def GetUnstored(session: Session) -> List['Part']:
-        parts = Part.GetAll(session)
-        return [part for part in parts if not part.locations]
-
-
-    @staticmethod
-    def GetByCategoryId(session: Session, category_id: int) -> List['Part']:
-        return session.query(Part).filter_by(category_id=category_id).order_by(Part.value).scalars()
 
 
 

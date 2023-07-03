@@ -22,6 +22,8 @@
 # ======================================================================================================================
 # Import Statements
 # ----------------------------------------------------------------------------------------------------------------------
+from typing import List
+
 from peewee import CharField, ForeignKeyField
 from playhouse.hybrid import hybrid_property
 
@@ -55,6 +57,25 @@ class Category(BaseModel):
             return self.parent.inherited_designator
         # And if all else fails, None indicates that no designator was assigned.
         return None
+
+
+    @hybrid_property
+    def chain(self) -> List['Category']:
+        """Return the complete, recursive chain of categories running up the tree from this category."""
+        def recurse(category: Category) -> List[Category]:
+            if category.parent:
+                chain = recurse(category.parent)
+            else:
+                chain = []
+            chain.append(category)
+            return chain
+        return recurse(self)
+
+
+    @hybrid_property
+    def full_title(self) -> str:
+        """Fetch the full title, including titles of this category and each of it's parents moving up the tree."""
+        return ' > '.join(category.title for category in self.chain)
 
 
 

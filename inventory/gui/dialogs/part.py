@@ -24,8 +24,6 @@
 # ----------------------------------------------------------------------------------------------------------------------
 from PySide6 import QtCore, QtGui, QtWidgets
 
-from sqlalchemy.orm import Session
-
 from inventory.gui.base.dialog_part import Ui_DialogPart
 from inventory.model.parts import Part
 from inventory.model.categories import Category
@@ -37,25 +35,30 @@ from inventory.model.categories import Category
 # Part Dialog
 # ----------------------------------------------------------------------------------------------------------------------
 class PartDialog(QtWidgets.QDialog):
-    def __init__(self, parent, session, part: Part):
+    def __init__(self, parent, part: Part):
         super().__init__(parent)
         self.ui = Ui_DialogPart()
         self.ui.setupUi(self)
 
-        self.session = session
         self.part = part
 
-        self.ui.category.clear()
-        for category in PartCategory.GetAll(self.session):
-            self.ui.category.addItem(category.full_title, category.id)
+        # Populate the categories dropdown with a sorted set of categories from the database.
+        categories = list(Category.select())
+        categories.sort(key=lambda category: category.full_title)
+        for category in categories:
+            self.ui.category.addItem(category.full_title, category)
 
-        self.ui.category.setCurrentText(part.category.full_title)
+        if part.category_id:
+            self.ui.category.setCurrentText(part.category.full_title)
         self.ui.value.setText(part.value)
         self.ui.part_number.setText(part.number)
         self.ui.footprint.setText(part.package)
-        self.ui.price.setValue(float(part.price))
-        self.ui.weight.setValue(float(part.weight) if part.weight else 0)
-        self.ui.threshold.setValue(int(part.threshold) if part.threshold else 0)
+        if part.price:
+            self.ui.price.setValue(float(part.price))
+        if part.weight:
+            self.ui.weight.setValue(float(part.weight) if part.weight else 0)
+        if part.threshold:
+            self.ui.threshold.setValue(int(part.threshold) if part.threshold else 0)
         self.ui.notes.setPlainText(part.notes)
 
 
@@ -69,13 +72,12 @@ class PartDialog(QtWidgets.QDialog):
         self.part.weight = self.ui.weight.value()
         self.part.threshold = self.ui.threshold.value()
         self.part.notes = self.ui.notes.toPlainText()
-        self.session.commit()
+        self.part.save()
         return super().accept()
 
 
     def reject(self) -> None:
         # TODO: Hook close event and warn if there are changes before closing.
-        self.session.rollback()
         return super().reject()
 
 
