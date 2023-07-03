@@ -1,0 +1,14 @@
+title: Changing the categories designator does not update children
+type: Bug
+open: true
+author: Jared <jaredjulien@exsystems.net>
+entered: '2023-07-02T21:38:19.219385-04:00'
+owner: Jared <jaredjulien@exsystems.net>
+details: When a designator is modified, the inherited values in the tree are not automatically updated.
+reproduce:
+- From the Categories tab.
+- Add a new "Semiconductors" category without a designator.
+- Add a new "Microcontrollers" category under Semiconductors, also without a designator.
+- Edit Semiconductors to change the designator to "U".
+expected: The Designator for "Microcontrollers" should have been updated in the tree to "U".
+actual: The Tree does not update at all.
