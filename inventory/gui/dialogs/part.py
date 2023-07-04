@@ -40,11 +40,15 @@ class PartDialog(QtWidgets.QDialog):
         self.ui = Ui_DialogPart()
         self.ui.setupUi(self)
 
+        location_header = self.ui.locations.horizontalHeader()
+        location_header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
+        location_header.setSectionResizeMode(2, QtWidgets.QHeaderView.Stretch)
+
         # Populate the categories dropdown with a sorted set of categories from the database.
         categories = list(Category.select())
-        categories.sort(key=lambda category: category.full_title)
+        categories.sort(key=lambda category: category.full_title())
         for category in categories:
-            self.ui.category.addItem(category.full_title, category)
+            self.ui.category.addItem(category.full_title(), category)
 
         self.load(part)
 
@@ -56,8 +60,10 @@ class PartDialog(QtWidgets.QDialog):
     def load(self, part: Part):
         self.part = part
 
+        self.setWindowTitle(f'Edit {part.summary}' if part.value else 'Add new part')
+
         if part.category_id:
-            self.ui.category.setCurrentText(part.category.full_title)
+            self.ui.category.setCurrentText(part.category.full_title())
         self.ui.value.setText(part.value)
         self.ui.part_number.setText(part.number)
         self.ui.footprint.setText(part.package)
@@ -70,6 +76,15 @@ class PartDialog(QtWidgets.QDialog):
         self.ui.notes.setPlainText(part.notes)
 
         self.ui.attributes.setAttributes(part.attributes)
+
+        for location in part.locations:
+            row = self.ui.locations.rowCount()
+            self.ui.locations.insertRow(row)
+            self.ui.locations.setItem(row, 0, QtWidgets.QTableWidgetItem(str(location.quantity)))
+            count_date = location.last_counted.strftime('%Y-%m-%d') if location.last_counted else 'N/A'
+            self.ui.locations.setItem(row, 1, QtWidgets.QTableWidgetItem(count_date))
+            self.ui.locations.setItem(row, 2, QtWidgets.QTableWidgetItem(location.name))
+            self.ui.locations.item(row, 0).setTextAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
 
 
 # ----------------------------------------------------------------------------------------------------------------------

@@ -15,11 +15,12 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QAbstractButton, QApplication, QComboBox, QDialog,
-    QDialogButtonBox, QDoubleSpinBox, QFormLayout, QGraphicsView,
-    QGroupBox, QHBoxLayout, QLabel, QLineEdit,
-    QListWidget, QListWidgetItem, QPlainTextEdit, QPushButton,
-    QSizePolicy, QSpinBox, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QAbstractButton, QAbstractItemView, QApplication, QComboBox,
+    QDialog, QDialogButtonBox, QDoubleSpinBox, QFormLayout,
+    QGraphicsView, QHBoxLayout, QHeaderView, QLabel,
+    QLineEdit, QListWidget, QListWidgetItem, QPlainTextEdit,
+    QPushButton, QSizePolicy, QSpinBox, QTableWidget,
+    QTableWidgetItem, QVBoxLayout, QWidget)
 
 from inventory.gui.widgets.attributes import AttributesWidget
 
@@ -27,37 +28,53 @@ class Ui_DialogPart(object):
     def setupUi(self, DialogPart):
         if not DialogPart.objectName():
             DialogPart.setObjectName(u"DialogPart")
-        DialogPart.resize(989, 764)
-        self.buttonBox = QDialogButtonBox(DialogPart)
-        self.buttonBox.setObjectName(u"buttonBox")
-        self.buttonBox.setGeometry(QRect(630, 720, 341, 32))
-        self.buttonBox.setOrientation(Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Save)
-        self.layoutWidget = QWidget(DialogPart)
-        self.layoutWidget.setObjectName(u"layoutWidget")
-        self.layoutWidget.setGeometry(QRect(10, 10, 781, 200))
-        self.formLayout = QFormLayout(self.layoutWidget)
+        DialogPart.resize(1091, 650)
+        self.horizontalLayout_7 = QHBoxLayout(DialogPart)
+        self.horizontalLayout_7.setObjectName(u"horizontalLayout_7")
+        self.left = QWidget(DialogPart)
+        self.left.setObjectName(u"left")
+        sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(4)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.left.sizePolicy().hasHeightForWidth())
+        self.left.setSizePolicy(sizePolicy)
+        self.verticalLayout_5 = QVBoxLayout(self.left)
+        self.verticalLayout_5.setObjectName(u"verticalLayout_5")
+        self.verticalLayout_5.setContentsMargins(0, 0, 0, 0)
+        self.top = QWidget(self.left)
+        self.top.setObjectName(u"top")
+        self.horizontalLayout_2 = QHBoxLayout(self.top)
+        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
+        self.horizontalLayout_2.setContentsMargins(0, 0, 0, 0)
+        self.properties_widget = QWidget(self.top)
+        self.properties_widget.setObjectName(u"properties_widget")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sizePolicy1.setHorizontalStretch(3)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.properties_widget.sizePolicy().hasHeightForWidth())
+        self.properties_widget.setSizePolicy(sizePolicy1)
+        self.formLayout = QFormLayout(self.properties_widget)
         self.formLayout.setObjectName(u"formLayout")
         self.formLayout.setLabelAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
-        self.formLayout.setContentsMargins(0, 0, 0, 0)
-        self.lbl_category = QLabel(self.layoutWidget)
+        self.formLayout.setContentsMargins(0, 0, -1, 0)
+        self.lbl_category = QLabel(self.properties_widget)
         self.lbl_category.setObjectName(u"lbl_category")
 
         self.formLayout.setWidget(0, QFormLayout.LabelRole, self.lbl_category)
 
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.category = QComboBox(self.layoutWidget)
+        self.category = QComboBox(self.properties_widget)
         self.category.setObjectName(u"category")
-        sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(1)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.category.sizePolicy().hasHeightForWidth())
-        self.category.setSizePolicy(sizePolicy)
+        sizePolicy2 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+        sizePolicy2.setHorizontalStretch(1)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.category.sizePolicy().hasHeightForWidth())
+        self.category.setSizePolicy(sizePolicy2)
 
         self.horizontalLayout.addWidget(self.category)
 
-        self.new_category = QPushButton(self.layoutWidget)
+        self.new_category = QPushButton(self.properties_widget)
         self.new_category.setObjectName(u"new_category")
 
         self.horizontalLayout.addWidget(self.new_category)
@@ -65,47 +82,47 @@ class Ui_DialogPart(object):
 
         self.formLayout.setLayout(0, QFormLayout.FieldRole, self.horizontalLayout)
 
-        self.lbl_value = QLabel(self.layoutWidget)
+        self.lbl_value = QLabel(self.properties_widget)
         self.lbl_value.setObjectName(u"lbl_value")
 
         self.formLayout.setWidget(1, QFormLayout.LabelRole, self.lbl_value)
 
-        self.lbl_number = QLabel(self.layoutWidget)
+        self.lbl_number = QLabel(self.properties_widget)
         self.lbl_number.setObjectName(u"lbl_number")
 
         self.formLayout.setWidget(2, QFormLayout.LabelRole, self.lbl_number)
 
-        self.lbl_package = QLabel(self.layoutWidget)
+        self.lbl_package = QLabel(self.properties_widget)
         self.lbl_package.setObjectName(u"lbl_package")
 
         self.formLayout.setWidget(3, QFormLayout.LabelRole, self.lbl_package)
 
-        self.lbl_price = QLabel(self.layoutWidget)
+        self.lbl_price = QLabel(self.properties_widget)
         self.lbl_price.setObjectName(u"lbl_price")
 
         self.formLayout.setWidget(4, QFormLayout.LabelRole, self.lbl_price)
 
-        self.lbl_weight = QLabel(self.layoutWidget)
+        self.lbl_weight = QLabel(self.properties_widget)
         self.lbl_weight.setObjectName(u"lbl_weight")
 
         self.formLayout.setWidget(5, QFormLayout.LabelRole, self.lbl_weight)
 
-        self.value = QLineEdit(self.layoutWidget)
+        self.value = QLineEdit(self.properties_widget)
         self.value.setObjectName(u"value")
 
         self.formLayout.setWidget(1, QFormLayout.FieldRole, self.value)
 
-        self.part_number = QLineEdit(self.layoutWidget)
+        self.part_number = QLineEdit(self.properties_widget)
         self.part_number.setObjectName(u"part_number")
 
         self.formLayout.setWidget(2, QFormLayout.FieldRole, self.part_number)
 
-        self.footprint = QLineEdit(self.layoutWidget)
+        self.footprint = QLineEdit(self.properties_widget)
         self.footprint.setObjectName(u"footprint")
 
         self.formLayout.setWidget(3, QFormLayout.FieldRole, self.footprint)
 
-        self.price = QDoubleSpinBox(self.layoutWidget)
+        self.price = QDoubleSpinBox(self.properties_widget)
         self.price.setObjectName(u"price")
         self.price.setProperty("showGroupSeparator", True)
         self.price.setDecimals(3)
@@ -114,12 +131,12 @@ class Ui_DialogPart(object):
 
         self.formLayout.setWidget(4, QFormLayout.FieldRole, self.price)
 
-        self.lbl_reorder = QLabel(self.layoutWidget)
+        self.lbl_reorder = QLabel(self.properties_widget)
         self.lbl_reorder.setObjectName(u"lbl_reorder")
 
         self.formLayout.setWidget(6, QFormLayout.LabelRole, self.lbl_reorder)
 
-        self.threshold = QSpinBox(self.layoutWidget)
+        self.threshold = QSpinBox(self.properties_widget)
         self.threshold.setObjectName(u"threshold")
         self.threshold.setMaximum(100000)
 
@@ -127,14 +144,14 @@ class Ui_DialogPart(object):
 
         self.horizontalLayout_5 = QHBoxLayout()
         self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
-        self.weight = QDoubleSpinBox(self.layoutWidget)
+        self.weight = QDoubleSpinBox(self.properties_widget)
         self.weight.setObjectName(u"weight")
         self.weight.setDecimals(3)
         self.weight.setMaximum(1000000.000000000000000)
 
         self.horizontalLayout_5.addWidget(self.weight)
 
-        self.calibrate = QPushButton(self.layoutWidget)
+        self.calibrate = QPushButton(self.properties_widget)
         self.calibrate.setObjectName(u"calibrate")
 
         self.horizontalLayout_5.addWidget(self.calibrate)
@@ -142,25 +159,94 @@ class Ui_DialogPart(object):
 
         self.formLayout.setLayout(5, QFormLayout.FieldRole, self.horizontalLayout_5)
 
-        self.layoutWidget_3 = QWidget(DialogPart)
-        self.layoutWidget_3.setObjectName(u"layoutWidget_3")
-        self.layoutWidget_3.setGeometry(QRect(807, 10, 172, 201))
-        self.verticalLayout_3 = QVBoxLayout(self.layoutWidget_3)
+        self.notes = QPlainTextEdit(self.properties_widget)
+        self.notes.setObjectName(u"notes")
+
+        self.formLayout.setWidget(7, QFormLayout.FieldRole, self.notes)
+
+        self.lbl_notes = QLabel(self.properties_widget)
+        self.lbl_notes.setObjectName(u"lbl_notes")
+
+        self.formLayout.setWidget(7, QFormLayout.LabelRole, self.lbl_notes)
+
+
+        self.horizontalLayout_2.addWidget(self.properties_widget)
+
+        self.attributes = AttributesWidget(self.top)
+        self.attributes.setObjectName(u"attributes")
+        sizePolicy3 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sizePolicy3.setHorizontalStretch(2)
+        sizePolicy3.setVerticalStretch(0)
+        sizePolicy3.setHeightForWidth(self.attributes.sizePolicy().hasHeightForWidth())
+        self.attributes.setSizePolicy(sizePolicy3)
+
+        self.horizontalLayout_2.addWidget(self.attributes)
+
+
+        self.verticalLayout_5.addWidget(self.top)
+
+        self.locations = QTableWidget(self.left)
+        if (self.locations.columnCount() < 3):
+            self.locations.setColumnCount(3)
+        __qtablewidgetitem = QTableWidgetItem()
+        self.locations.setHorizontalHeaderItem(0, __qtablewidgetitem)
+        __qtablewidgetitem1 = QTableWidgetItem()
+        self.locations.setHorizontalHeaderItem(1, __qtablewidgetitem1)
+        __qtablewidgetitem2 = QTableWidgetItem()
+        self.locations.setHorizontalHeaderItem(2, __qtablewidgetitem2)
+        self.locations.setObjectName(u"locations")
+        self.locations.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.locations.horizontalHeader().setStretchLastSection(True)
+        self.locations.verticalHeader().setVisible(False)
+
+        self.verticalLayout_5.addWidget(self.locations)
+
+        self.suppliers = QTableWidget(self.left)
+        if (self.suppliers.columnCount() < 2):
+            self.suppliers.setColumnCount(2)
+        __qtablewidgetitem3 = QTableWidgetItem()
+        self.suppliers.setHorizontalHeaderItem(0, __qtablewidgetitem3)
+        __qtablewidgetitem4 = QTableWidgetItem()
+        self.suppliers.setHorizontalHeaderItem(1, __qtablewidgetitem4)
+        self.suppliers.setObjectName(u"suppliers")
+        self.suppliers.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.suppliers.horizontalHeader().setStretchLastSection(True)
+        self.suppliers.verticalHeader().setVisible(False)
+
+        self.verticalLayout_5.addWidget(self.suppliers)
+
+
+        self.horizontalLayout_7.addWidget(self.left)
+
+        self.right = QWidget(DialogPart)
+        self.right.setObjectName(u"right")
+        sizePolicy4 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sizePolicy4.setHorizontalStretch(1)
+        sizePolicy4.setVerticalStretch(0)
+        sizePolicy4.setHeightForWidth(self.right.sizePolicy().hasHeightForWidth())
+        self.right.setSizePolicy(sizePolicy4)
+        self.verticalLayout_4 = QVBoxLayout(self.right)
+        self.verticalLayout_4.setSpacing(15)
+        self.verticalLayout_4.setObjectName(u"verticalLayout_4")
+        self.verticalLayout_4.setContentsMargins(0, 0, 0, 0)
+        self.image_widget = QWidget(self.right)
+        self.image_widget.setObjectName(u"image_widget")
+        self.verticalLayout_3 = QVBoxLayout(self.image_widget)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.verticalLayout_3.setContentsMargins(0, 0, 0, 0)
-        self.image = QGraphicsView(self.layoutWidget_3)
+        self.image = QGraphicsView(self.image_widget)
         self.image.setObjectName(u"image")
 
         self.verticalLayout_3.addWidget(self.image)
 
         self.horizontalLayout_3 = QHBoxLayout()
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
-        self.set_image = QPushButton(self.layoutWidget_3)
+        self.set_image = QPushButton(self.image_widget)
         self.set_image.setObjectName(u"set_image")
 
         self.horizontalLayout_3.addWidget(self.set_image)
 
-        self.remove_image = QPushButton(self.layoutWidget_3)
+        self.remove_image = QPushButton(self.image_widget)
         self.remove_image.setObjectName(u"remove_image")
         self.remove_image.setEnabled(False)
 
@@ -169,37 +255,33 @@ class Ui_DialogPart(object):
 
         self.verticalLayout_3.addLayout(self.horizontalLayout_3)
 
-        self.quantities = QListWidget(DialogPart)
-        self.quantities.setObjectName(u"quantities")
-        self.quantities.setGeometry(QRect(10, 520, 531, 231))
-        self.notes = QPlainTextEdit(DialogPart)
-        self.notes.setObjectName(u"notes")
-        self.notes.setGeometry(QRect(550, 230, 431, 151))
-        self.layoutWidget_4 = QWidget(DialogPart)
-        self.layoutWidget_4.setObjectName(u"layoutWidget_4")
-        self.layoutWidget_4.setGeometry(QRect(550, 390, 431, 311))
-        self.verticalLayout = QVBoxLayout(self.layoutWidget_4)
+
+        self.verticalLayout_4.addWidget(self.image_widget)
+
+        self.document_widget = QWidget(self.right)
+        self.document_widget.setObjectName(u"document_widget")
+        self.verticalLayout = QVBoxLayout(self.document_widget)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
-        self.documents = QListWidget(self.layoutWidget_4)
+        self.documents = QListWidget(self.document_widget)
         self.documents.setObjectName(u"documents")
         self.documents.setEnabled(False)
-        sizePolicy1 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        sizePolicy1.setHorizontalStretch(0)
-        sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.documents.sizePolicy().hasHeightForWidth())
-        self.documents.setSizePolicy(sizePolicy1)
+        sizePolicy5 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy5.setHorizontalStretch(0)
+        sizePolicy5.setVerticalStretch(0)
+        sizePolicy5.setHeightForWidth(self.documents.sizePolicy().hasHeightForWidth())
+        self.documents.setSizePolicy(sizePolicy5)
 
         self.verticalLayout.addWidget(self.documents)
 
         self.horizontalLayout_4 = QHBoxLayout()
         self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
-        self.add_document = QPushButton(self.layoutWidget_4)
+        self.add_document = QPushButton(self.document_widget)
         self.add_document.setObjectName(u"add_document")
 
         self.horizontalLayout_4.addWidget(self.add_document)
 
-        self.remove_document = QPushButton(self.layoutWidget_4)
+        self.remove_document = QPushButton(self.document_widget)
         self.remove_document.setObjectName(u"remove_document")
 
         self.horizontalLayout_4.addWidget(self.remove_document)
@@ -207,16 +289,18 @@ class Ui_DialogPart(object):
 
         self.verticalLayout.addLayout(self.horizontalLayout_4)
 
-        self.group_attributes = QGroupBox(DialogPart)
-        self.group_attributes.setObjectName(u"group_attributes")
-        self.group_attributes.setGeometry(QRect(10, 220, 531, 291))
-        self.verticalLayout_2 = QVBoxLayout(self.group_attributes)
-        self.verticalLayout_2.setObjectName(u"verticalLayout_2")
-        self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
-        self.attributes = AttributesWidget(self.group_attributes)
-        self.attributes.setObjectName(u"attributes")
 
-        self.verticalLayout_2.addWidget(self.attributes)
+        self.verticalLayout_4.addWidget(self.document_widget)
+
+        self.buttonBox = QDialogButtonBox(self.right)
+        self.buttonBox.setObjectName(u"buttonBox")
+        self.buttonBox.setOrientation(Qt.Horizontal)
+        self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Save)
+
+        self.verticalLayout_4.addWidget(self.buttonBox)
+
+
+        self.horizontalLayout_7.addWidget(self.right)
 
 
         self.retranslateUi(DialogPart)
@@ -244,10 +328,20 @@ class Ui_DialogPart(object):
 #endif // QT_CONFIG(tooltip)
         self.weight.setSuffix(QCoreApplication.translate("DialogPart", u"g", None))
         self.calibrate.setText(QCoreApplication.translate("DialogPart", u"Calibrate", None))
+        self.lbl_notes.setText(QCoreApplication.translate("DialogPart", u"Notes:", None))
+        ___qtablewidgetitem = self.locations.horizontalHeaderItem(0)
+        ___qtablewidgetitem.setText(QCoreApplication.translate("DialogPart", u"Quantity", None));
+        ___qtablewidgetitem1 = self.locations.horizontalHeaderItem(1)
+        ___qtablewidgetitem1.setText(QCoreApplication.translate("DialogPart", u"Last Counted", None));
+        ___qtablewidgetitem2 = self.locations.horizontalHeaderItem(2)
+        ___qtablewidgetitem2.setText(QCoreApplication.translate("DialogPart", u"Location", None));
+        ___qtablewidgetitem3 = self.suppliers.horizontalHeaderItem(0)
+        ___qtablewidgetitem3.setText(QCoreApplication.translate("DialogPart", u"Supplier", None));
+        ___qtablewidgetitem4 = self.suppliers.horizontalHeaderItem(1)
+        ___qtablewidgetitem4.setText(QCoreApplication.translate("DialogPart", u"Part Number", None));
         self.set_image.setText(QCoreApplication.translate("DialogPart", u"Set Image", None))
         self.remove_image.setText(QCoreApplication.translate("DialogPart", u"Remove Image", None))
         self.add_document.setText(QCoreApplication.translate("DialogPart", u"Add Document", None))
         self.remove_document.setText(QCoreApplication.translate("DialogPart", u"Remove Document", None))
-        self.group_attributes.setTitle(QCoreApplication.translate("DialogPart", u"Additional Attributes:", None))
     # retranslateUi
 

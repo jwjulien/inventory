@@ -26,6 +26,7 @@ class Ui_AttributesWidget(object):
         AttributesWidget.resize(423, 313)
         self.verticalLayout = QVBoxLayout(AttributesWidget)
         self.verticalLayout.setObjectName(u"verticalLayout")
+        self.verticalLayout.setContentsMargins(0, 0, 0, 0)
         self.attributes = QTableWidget(AttributesWidget)
         if (self.attributes.columnCount() < 2):
             self.attributes.setColumnCount(2)
@@ -68,7 +69,7 @@ class Ui_AttributesWidget(object):
         ___qtablewidgetitem.setText(QCoreApplication.translate("AttributesWidget", u"Attribute", None));
         ___qtablewidgetitem1 = self.attributes.horizontalHeaderItem(1)
         ___qtablewidgetitem1.setText(QCoreApplication.translate("AttributesWidget", u"Value", None));
-        self.add.setText(QCoreApplication.translate("AttributesWidget", u"Add", None))
-        self.remove.setText(QCoreApplication.translate("AttributesWidget", u"Delete", None))
+        self.add.setText(QCoreApplication.translate("AttributesWidget", u"Add Attribute", None))
+        self.remove.setText(QCoreApplication.translate("AttributesWidget", u"Delete Attribute(s)", None))
     # retranslateUi
 

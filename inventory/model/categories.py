@@ -72,10 +72,9 @@ class Category(BaseModel):
         return recurse(self)
 
 
-    @hybrid_property
-    def full_title(self) -> str:
+    def full_title(self, separator: str = ' > ') -> str:
         """Fetch the full title, including titles of this category and each of it's parents moving up the tree."""
-        return ' > '.join(category.title for category in self.chain)
+        return separator.join(category.title for category in self.chain)
 
 
 

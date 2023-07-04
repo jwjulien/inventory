@@ -56,7 +56,6 @@ class Part(BaseModel):
     # Properties
     @hybrid_property
     def quantity(self) -> int:
-        return 31
         return sum([location.quantity for location in self.locations])
 
 
@@ -84,13 +83,13 @@ class Part(BaseModel):
 
     @hybrid_property
     def summary(self) -> str:
-        parts = [category.title for category in self.categories]
-        parts.append(self.value)
-        for key in self:
-            parts.append(self[key])
+        text = self.category.full_title(', ')
+        text += f', {self.value}'
+        for value in self.attributes.values():
+            text += f', {value}'
         if self.package is not None:
-            parts.append(self.package)
-        return ', '.join(parts)
+            text += f', {self.package}'
+        return text
 
 
 

@@ -137,10 +137,15 @@ class Location(BaseModel):
         table_name = 'locations'
 
     # Columns
-    slot = ForeignKeyField(Slot)
-    part = ForeignKeyField(Part)
+    slot = ForeignKeyField(Slot, backref='locations')
+    part = ForeignKeyField(Part, backref='locations')
     quantity = IntegerField()
     last_counted = DateTimeField(null=True)
+
+
+    @property
+    def name(self) -> str:
+        return f'{self.slot.unit.area.name} > {self.slot.unit.name} > {self.slot.name}'
 
 
 

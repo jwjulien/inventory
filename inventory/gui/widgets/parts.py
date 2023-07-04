@@ -81,7 +81,7 @@ class PartsWidget(QtWidgets.QWidget):
 # ----------------------------------------------------------------------------------------------------------------------
     def _update_row(self, row: int, part: Part) -> None:
         category = self.ui.parts.item(row, 0)
-        category.setText(part.category.full_title)
+        category.setText(part.category.full_title(', '))
         category.setData(QtCore.Qt.UserRole, part)
 
         self.ui.parts.item(row, 1).setText(part.value)

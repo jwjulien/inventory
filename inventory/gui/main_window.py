@@ -30,6 +30,7 @@ from PySide6 import QtCore, QtGui, QtWidgets
 
 from inventory.gui.base.main_window import Ui_MainWindow
 from inventory.gui.tabs.categories import TabCategories
+from inventory.gui.tabs.lost import TabLost
 from inventory.gui.tabs.parts import TabParts
 from inventory.gui.tabs.storage import TabStorage
 from inventory.model.base import db
@@ -73,10 +74,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.tabs.addTab(self.ui.tab_categories, 'Categories')
         self.ui.tab_storage = TabStorage(self)
         self.ui.tabs.addTab(self.ui.tab_storage, 'Storage')
-
-        # Load parts and show table.
-        # self.ui.tab_parts.refresh()
-        # self.ui.tabs.setCurrentWidget(self.ui.tab_parts)
+        self.ui.tab_lost = TabLost(self)
+        self.ui.tabs.addTab(self.ui.tab_lost, 'Lost')
+        tooltip = 'Shows parts that have not been assigned to any location(s) yet.'
+        self.ui.tabs.setTabToolTip(self.ui.tabs.indexOf(self.ui.tab_lost), tooltip)
+        # self.ui.tab_suppliers = TabSuppliers(self)
+        # self.ui.tabs.addTab(self.ui.tab_suppliers, 'Suppliers')
 
         # Setup a thread pool for background tasks.
         self.threadpool = QtCore.QThreadPool(self)

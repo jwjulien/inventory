@@ -1,5 +1,5 @@
 # ======================================================================================================================
-#      File:  /inventory/model/mixins.py
+#      File:  /inventory/gui/tabs/lost.py
 #   Project:  Inventory
 #    Author:  Jared Julien <jaredjulien@exsystems.net>
 # Copyright:  (c) 2023 Jared Julien, eX Systems
@@ -17,42 +17,33 @@
 # OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # ----------------------------------------------------------------------------------------------------------------------
-"""Accessory mixin classes for use by the other model classes."""
+"""A tab with a list of parts that have not been assigned to a location."""
 
 # ======================================================================================================================
-# Proxied Dict Mixin
+# Imports
 # ----------------------------------------------------------------------------------------------------------------------
-class ProxiedDictMixin:
-    """Adds obj[key] access to a mapped class.  This class basically proxies dictionary access to an attribute called
-    ``_proxied``.  The class which inherits this class should have an attribute called ``_proxied`` which points to a
-    dictionary.
-    """
-    def __len__(self):
-        return len(self._proxied)
+from PySide6 import QtWidgets
 
-    def __iter__(self):
-        return iter(self._proxied)
+from inventory.gui.base.tab_parts import Ui_TabParts
+from inventory.model.parts import Part
+from inventory.model.storage import Location
 
-    def __getitem__(self, key):
-        return self._proxied[key]
 
-    def __contains__(self, key):
-        return key in self._proxied
 
-    def __setitem__(self, key, value):
-        self._proxied[key] = value
 
-    def __delitem__(self, key):
-        del self._proxied[key]
+# ======================================================================================================================
+# Tab Lost Widget
+# ----------------------------------------------------------------------------------------------------------------------
+class TabLost(QtWidgets.QWidget):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.ui = Ui_TabParts()
+        self.ui.setupUi(self)
 
-    def get(self, key, default=None):
-        if key in self._proxied:
-            return self._proxied[key]
-        return default
-
-    def update(self, other):
-        for key, value in other.items():
-            self[key] = str(value)
+        # Setup model with all of the parts.
+        parts = Part.select()
+        lost_parts = [part for part in parts if not part.locations]
+        self.ui.parts.setParts(lost_parts)
 
 
 
