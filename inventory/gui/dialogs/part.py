@@ -22,7 +22,7 @@
 # ======================================================================================================================
 # Imports
 # ----------------------------------------------------------------------------------------------------------------------
-from PySide6 import QtCore, QtGui, QtWidgets
+from PySide6 import QtWidgets
 
 from inventory.gui.base.dialog_part import Ui_DialogPart
 from inventory.model.parts import Part
@@ -40,19 +40,14 @@ class PartDialog(QtWidgets.QDialog):
         self.ui = Ui_DialogPart()
         self.ui.setupUi(self)
 
-        location_header = self.ui.locations.horizontalHeader()
-        location_header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
-        location_header.setSectionResizeMode(2, QtWidgets.QHeaderView.Stretch)
-
         # Populate the categories dropdown with a sorted set of categories from the database.
         categories = list(Category.select())
         categories.sort(key=lambda category: category.full_title())
         for category in categories:
             self.ui.category.addItem(category.full_title(), category)
 
+        # Load part information into dialog.
         self.load(part)
-
-        # Connect events.
 
 
 
@@ -76,15 +71,7 @@ class PartDialog(QtWidgets.QDialog):
         self.ui.notes.setPlainText(part.notes)
 
         self.ui.attributes.setAttributes(part.attributes)
-
-        for location in part.locations:
-            row = self.ui.locations.rowCount()
-            self.ui.locations.insertRow(row)
-            self.ui.locations.setItem(row, 0, QtWidgets.QTableWidgetItem(str(location.quantity)))
-            count_date = location.last_counted.strftime('%Y-%m-%d') if location.last_counted else 'N/A'
-            self.ui.locations.setItem(row, 1, QtWidgets.QTableWidgetItem(count_date))
-            self.ui.locations.setItem(row, 2, QtWidgets.QTableWidgetItem(location.name))
-            self.ui.locations.item(row, 0).setTextAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
+        self.ui.locations.setPart(part)
 
 
 # ----------------------------------------------------------------------------------------------------------------------

@@ -23,7 +23,7 @@ class Ui_AttributesWidget(object):
     def setupUi(self, AttributesWidget):
         if not AttributesWidget.objectName():
             AttributesWidget.setObjectName(u"AttributesWidget")
-        AttributesWidget.resize(423, 313)
+        AttributesWidget.resize(423, 312)
         self.verticalLayout = QVBoxLayout(AttributesWidget)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
@@ -70,6 +70,6 @@ class Ui_AttributesWidget(object):
         ___qtablewidgetitem1 = self.attributes.horizontalHeaderItem(1)
         ___qtablewidgetitem1.setText(QCoreApplication.translate("AttributesWidget", u"Value", None));
         self.add.setText(QCoreApplication.translate("AttributesWidget", u"Add Attribute", None))
-        self.remove.setText(QCoreApplication.translate("AttributesWidget", u"Delete Attribute(s)", None))
+        self.remove.setText(QCoreApplication.translate("AttributesWidget", u"Remove Attribute", None))
     # retranslateUi
 

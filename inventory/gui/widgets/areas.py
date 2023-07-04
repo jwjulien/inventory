@@ -83,10 +83,18 @@ class AreasWidget(QtWidgets.QWidget):
             return
         item = selected[0]
         area: Area = item.data(QtCore.Qt.UserRole)
+
+        # Do not let the user remove an area with units mapped to it.  As a safety measure, and to prevent orphans, we
+        # instead force them to remove the units manually first.  Here, provide them with an error message and abort.
         if area.units:
-            message = 'Cannot delete an Area with Units.\n\nRemove associated Units and try again.'
-            QtWidgets.QMessageBox(icon=QtWidgets.QMessageBox.warning, title='Error', text=message).exec()
+            msg = QtWidgets.QMessageBox(self)
+            msg.setIcon(QtWidgets.QMessageBox.Warning)
+            msg.setWindowTitle('Error')
+            msg.setText('Cannot delete an Area with Units.\n\nRemove associated Units and try again.')
+            msg.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Ok)
+            msg.exec()
             return
+
         area.delete_instance()
         self.ui.areas.takeItem(self.ui.areas.row(item))
 

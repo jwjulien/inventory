@@ -52,6 +52,7 @@ class UnitsWidget(QtWidgets.QWidget):
 
         # Connect events.
         self.ui.add.clicked.connect(self.add)
+        self.ui.remove.clicked.connect(self.remove)
         self.ui.units.itemSelectionChanged.connect(self._selected)
         self.ui.units.itemChanged.connect(self._changed)
 
@@ -85,6 +86,30 @@ class UnitsWidget(QtWidgets.QWidget):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
+    def remove(self) -> None:
+        """Remove the currently selected Units."""
+        selected = self.ui.units.selectedItems()
+        if not selected:
+            return
+        item = selected[0]
+        unit: Unit = item.data(QtCore.Qt.UserRole)
+
+        # Do not let the user remove an area with units mapped to it.  As a safety measure, and to prevent orphans, we
+        # instead force them to remove the units manually first.  Here, provide them with an error message and abort.
+        if unit.slots:
+            msg = QtWidgets.QMessageBox(self)
+            msg.setIcon(QtWidgets.QMessageBox.Warning)
+            msg.setWindowTitle('Error')
+            msg.setText('Cannot delete an Unit with Slots.\n\nRemove associated Slots and try again.')
+            msg.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Ok)
+            msg.exec()
+            return
+
+        unit.delete_instance()
+        self.ui.units.removeRow(self.ui.units.row(item))
+
+
+# ----------------------------------------------------------------------------------------------------------------------
     def _append_unit(self, unit: Unit) -> int:
         row = self.ui.units.rowCount()
         self.ui.units.insertRow(row)
@@ -97,7 +122,11 @@ class UnitsWidget(QtWidgets.QWidget):
 
 # ----------------------------------------------------------------------------------------------------------------------
     def _selected(self) -> None:
-        item = self.ui.units.selectedItems()[0]
+        selected = self.ui.units.selectedItems()
+        if len(selected) != 1:
+            self.selected.emit(None)
+            return
+        item = selected[0]
         unit = self.ui.units.item(item.row(), 0).data(QtCore.Qt.UserRole)
         self.selected.emit(unit)
 

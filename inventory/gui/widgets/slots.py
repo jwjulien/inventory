@@ -80,6 +80,7 @@ class SlotsWidget(QtWidgets.QWidget):
         for slot in unit.slots:
             item = self.ui.slots.item(slot.row, slot.column)
             item.setText(slot.name)
+            # TODO: Show something to the user for slots without names so they know a slot is occupied.
             item.setData(QtCore.Qt.UserRole, slot)
             if slot.row_span > 1 or slot.column_span > 1:
                 self.ui.slots.setSpan(slot.row, slot.column, slot.row_span, slot.column_span)
@@ -99,12 +100,12 @@ class SlotsWidget(QtWidgets.QWidget):
 
             # Don't allow slots to be deleted that have parts mapped to them.
             if len(slot.locations) > 0:
-                QtWidgets.QMessageBox(
-                    icon=QtWidgets.QMessageBox.Warning,
-                    title=f'Can\'t delete {slot.name}',
-                    text=f'Cannot delete {slot.name} with parts located in it.\n\nPlease remove parts first.',
-                    buttons=QtWidgets.QMessageBox.StandardButton.Ok
-                ).exec()
+                msg = QtWidgets.QMessageBox(self)
+                msg.setIcon(QtWidgets.QMessageBox.Warning)
+                msg.setWindowTitle(f'Can\'t delete {slot.name}')
+                msg.setText(f'Cannot delete {slot.name} with parts located in it.\n\nPlease remove parts first.')
+                msg.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Ok)
+                msg.exec()
                 continue
 
             # Remove the slot from the GUI.

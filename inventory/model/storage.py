@@ -22,7 +22,7 @@
 # ======================================================================================================================
 # Import Statements
 # ----------------------------------------------------------------------------------------------------------------------
-from typing import List
+from typing import List, Tuple
 
 from peewee import CharField, DateTimeField, ForeignKeyField, IntegerField
 from playhouse.hybrid import hybrid_property
@@ -115,15 +115,27 @@ class Slot(BaseModel):
     proportion_vertical = IntegerField(default=1)
     proportion_horizontal = IntegerField(default=1)
 
+
     # Properties
     @property
     def parts(self) -> List[Part]:
         """Get a list of all of the parts located within this Slot."""
         return list(set([location.part for location in self.locations]))
 
+
     @property
     def locations(self) -> List['Location']:
         return Location.select().where(Location.slot_id == self.id)
+
+
+    @property
+    def chain(self) -> Tuple[Area, Unit, 'Slot']:
+        return (self.unit.area, self.unit, self)
+
+
+    def full_title(self, separator: str = ' > ') -> str:
+        return separator.join(item.name for item in self.chain)
+
 
 
 

@@ -141,15 +141,15 @@ class AttributesWidget(QtWidgets.QWidget):
 
 # ----------------------------------------------------------------------------------------------------------------------
     def selected(self) -> None:
-        selection = self.ui.attributes.selectedIndexes()
-        self.ui.remove.setEnabled(bool(selection))
+        selection = self.ui.attributes.selectedItems()
+        rows = set([item.row() for item in selection])
+        self.ui.remove.setEnabled(bool(rows))
+        self.ui.remove.setText('Remove Attribute' + ('s' if len(rows) > 1 else ''))
 
 
 # ----------------------------------------------------------------------------------------------------------------------
     def changed(self, item: QtWidgets.QTableWidgetItem) -> None:
-        # self.ui.attributes.sortByColumn()
-        pass
-        # TODO: Do we need to enforce a sort here?  Or is it applied automatically?
+        self.ui.attributes.sortByColumn(0, QtCore.Qt.AscendingOrder)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
