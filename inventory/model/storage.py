@@ -63,8 +63,8 @@ class Unit(BaseModel):
     # Columns
     area = ForeignKeyField(Area, backref='units')
     name = CharField(40)
-    rows = IntegerField()
-    columns = IntegerField()
+    rows = IntegerField(default=1)
+    columns = IntegerField(default=1)
 
 
     # Properties
@@ -111,6 +111,7 @@ class Slot(BaseModel):
     row = IntegerField()
     column = IntegerField()
     row_span = IntegerField(default=1)
+    column_span = IntegerField(default=1)
     proportion_vertical = IntegerField(default=1)
     proportion_horizontal = IntegerField(default=1)
 

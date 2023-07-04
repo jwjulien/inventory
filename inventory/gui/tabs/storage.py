@@ -55,14 +55,18 @@ class TabStorage(QtWidgets.QWidget):
         self.ui.units.show()
         self.ui.slots.hide()
         self.ui.parts.show()
-        self.ui.units.setUnits(area.units)
+        self.ui.units.setUnits(area, area.units)
         self.ui.parts.setParts(area.parts)
 
 
     def unit_selected(self, unit: Unit) -> None:
-        self.ui.slots.show()
-        self.ui.slots.setSlots(unit.slots)
-        self.ui.parts.setParts(unit.parts)
+        if unit is not None:
+            self.ui.slots.show()
+            self.ui.slots.setUnit(unit)
+            self.ui.parts.setParts(unit.parts)
+        else:
+            self.ui.slots.hide()
+            self.ui.parts.clear()
 
 
     def slot_selected(self, slot: Slot) -> None:

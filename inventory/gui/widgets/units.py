@@ -27,7 +27,7 @@ from typing import List
 from PySide6 import QtCore, QtWidgets
 
 from inventory.gui.base.widget_units import Ui_WidgetUnits
-from inventory.model.storage import Unit
+from inventory.model.storage import Area, Unit
 
 
 
@@ -43,6 +43,9 @@ class UnitsWidget(QtWidgets.QWidget):
         self.ui = Ui_WidgetUnits()
         self.ui.setupUi(self)
 
+        self.area: Area = None
+
+        # Set parameters for column sizes on the header (which doesn't change).
         header = self.ui.units.horizontalHeader()
         header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
         header.setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
@@ -50,34 +53,62 @@ class UnitsWidget(QtWidgets.QWidget):
         # Connect events.
         self.ui.add.clicked.connect(self.add)
         self.ui.units.itemSelectionChanged.connect(self._selected)
+        self.ui.units.itemChanged.connect(self._changed)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-    def setUnits(self, units: List[Unit]) -> None:
+    def setUnits(self, area: Area, units: List[Unit]) -> None:
+        self.area = area
+
+        self.ui.units.blockSignals(True)
+
         # Remove any existing rows.
         while self.ui.units.rowCount():
             self.ui.units.removeRow(0)
 
         # Insert the new units into the list.
         for unit in sorted(units, key=lambda unit: unit.name):
-            row = self.ui.units.rowCount()
-            self.ui.units.insertRow(row)
-            self.ui.units.setItem(row, 0, QtWidgets.QTableWidgetItem(unit.name))
-            self.ui.units.setItem(row, 1, QtWidgets.QTableWidgetItem(str(unit.rows)))
-            self.ui.units.setItem(row, 2, QtWidgets.QTableWidgetItem(str(unit.columns)))
-            self.ui.units.item(row, 0).setData(QtCore.Qt.UserRole, unit)
+            self._append_unit(unit)
+
+        self.ui.units.blockSignals(False)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
     def add(self) -> None:
-        unit = Unit()
+        if self.area is None:
+            return
+        self.ui.units.blockSignals(True)
+        unit = Unit(area=self.area)
+        row = self._append_unit(unit)
+        self.ui.units.blockSignals(False)
+        self.ui.units.edit(self.ui.units.indexFromItem(self.ui.units.item(row, 0)))
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def _append_unit(self, unit: Unit) -> int:
+        row = self.ui.units.rowCount()
+        self.ui.units.insertRow(row)
+        self.ui.units.setItem(row, 0, QtWidgets.QTableWidgetItem(unit.name))
+        self.ui.units.setItem(row, 1, QtWidgets.QTableWidgetItem(str(unit.rows)))
+        self.ui.units.setItem(row, 2, QtWidgets.QTableWidgetItem(str(unit.columns)))
+        self.ui.units.item(row, 0).setData(QtCore.Qt.UserRole, unit)
+        return row
 
 
 # ----------------------------------------------------------------------------------------------------------------------
     def _selected(self) -> None:
         item = self.ui.units.selectedItems()[0]
-        unit = item.data(QtCore.Qt.UserRole)
+        unit = self.ui.units.item(item.row(), 0).data(QtCore.Qt.UserRole)
         self.selected.emit(unit)
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def _changed(self, item: QtWidgets.QTableWidgetItem) -> None:
+        unit = self.ui.units.item(item.row(), 0).data(QtCore.Qt.UserRole)
+        unit.name = self.ui.units.item(item.row(), 0).text()
+        unit.rows = int(self.ui.units.item(item.row(), 1).text() or 0)
+        unit.columns = int(self.ui.units.item(item.row(), 2).text() or 0)
+        unit.save()
 
 
 
