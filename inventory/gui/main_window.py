@@ -27,14 +27,15 @@ import os
 from importlib import metadata
 
 from PySide6 import QtCore, QtGui, QtWidgets
-import PySide6.QtGui
 
 from inventory.gui.base.main_window import Ui_MainWindow
-from inventory.gui.tabs.parts import TabParts
 from inventory.gui.tabs.categories import TabCategories
+from inventory.gui.tabs.parts import TabParts
+from inventory.gui.tabs.storage import TabStorage
 from inventory.model.base import db
 from inventory.model.categories import Category
 from inventory.model.parts import Part
+from inventory.model.storage import Area, Unit, Slot, Location
 from inventory.libraries.scanner import ScannerWorker
 
 
@@ -63,13 +64,15 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Connect to database.
         db.connect()
-        db.create_tables([Category, Part])
+        db.create_tables([Category, Part, Area, Unit, Slot, Location])
 
         # Setup tabs.
         self.ui.tab_parts = TabParts(self)
         self.ui.tabs.addTab(self.ui.tab_parts, 'Parts')
         self.ui.tab_categories = TabCategories(self)
         self.ui.tabs.addTab(self.ui.tab_categories, 'Categories')
+        self.ui.tab_storage = TabStorage(self)
+        self.ui.tabs.addTab(self.ui.tab_storage, 'Storage')
 
         # Load parts and show table.
         # self.ui.tab_parts.refresh()

@@ -47,9 +47,9 @@
     </widget>
    </item>
    <item>
-    <widget class="QListWidget" name="parts">
+    <widget class="PartsWidget" name="parts" native="true">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>1</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -58,6 +58,14 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>PartsWidget</class>
+   <extends>QWidget</extends>
+   <header>inventory.gui.widgets.parts</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

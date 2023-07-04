@@ -54,6 +54,7 @@ class TabCategories(QtWidgets.QWidget):
 
         # Connect events.
         self.ui.categories.doubleClicked.connect(self.edit)
+        self.ui.categories.itemSelectionChanged.connect(self._selected)
         QtGui.QShortcut(QtGui.QKeySequence("Delete"), self.ui.categories, self.delete)
         QtGui.QShortcut(QtGui.QKeySequence("Insert"), self.ui.categories, self.insert_sibling)
         QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Insert"), self.ui.categories, self.insert_child)
@@ -81,6 +82,18 @@ class TabCategories(QtWidgets.QWidget):
     def _sort(self) -> None:
         """Sort the list of categories in the tree widget alphabetically by title."""
         self.ui.categories.sortItems(0, QtCore.Qt.AscendingOrder)
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def _selected(self) -> None:
+        selected = self.ui.categories.selectedItems()
+        if not selected:
+            return
+        parts = []
+        for item in selected:
+            category: Category = item.data(0, QtCore.Qt.UserRole)
+            parts.extend(category.parts)
+        self.ui.parts.setParts(parts)
 
 
 # ----------------------------------------------------------------------------------------------------------------------

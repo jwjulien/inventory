@@ -16,8 +16,9 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QAbstractItemView, QApplication, QHBoxLayout, QHeaderView,
-    QListWidget, QListWidgetItem, QSizePolicy, QTreeWidget,
-    QTreeWidgetItem, QWidget)
+    QSizePolicy, QTreeWidget, QTreeWidgetItem, QWidget)
+
+from inventory.gui.widgets.parts import PartsWidget
 
 class Ui_TabCategories(object):
     def setupUi(self, TabCategories):
@@ -40,10 +41,13 @@ class Ui_TabCategories(object):
 
         self.horizontalLayout.addWidget(self.categories)
 
-        self.parts = QListWidget(TabCategories)
+        self.parts = PartsWidget(TabCategories)
         self.parts.setObjectName(u"parts")
-        sizePolicy.setHeightForWidth(self.parts.sizePolicy().hasHeightForWidth())
-        self.parts.setSizePolicy(sizePolicy)
+        sizePolicy1 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sizePolicy1.setHorizontalStretch(1)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.parts.sizePolicy().hasHeightForWidth())
+        self.parts.setSizePolicy(sizePolicy1)
 
         self.horizontalLayout.addWidget(self.parts)
 
