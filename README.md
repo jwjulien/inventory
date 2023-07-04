@@ -4,7 +4,14 @@ There have been many version os an inventory management system for my collection
 
 The primary purpose of this tool is to allow me to catalog all of the electronic components that I have on hand.
 
+**Warning:**This tool is very much a work in progress at this time.  It is also the most complicated PySide application that I have created to date.  Further, I'm terrible at testing (read: I have not), so expect this software to be buggy.
 
+I doubt many other folks would want a tool such as this as it's got a pretty specific use case, but I'm putting it out there as, at a minimum, it may serve as a nice example application for how I like to create GUI applications using Python and PySide6.
+
+
+
+Design Goals
+------------------------------------------------------------------------------------------------------------------------
 This tool must:
 
 - Support generating/printing labels for storage location using my Dymo printer.
@@ -41,3 +48,22 @@ Why another version of this tool?
 This tool was originally a web application but has hit a bit of a development wall as the complexity and scope has increased.  I have attempted to solve the problem by building Qt based supplements and even switching frameworks on the wab side (Angular), all of which are sitting in a state of limbo.
 
 I then considered building a REST API for the web interface to support using multiple tools but ultimately decided that a standalone tool might actually be better.
+
+
+
+
+Bug Reporting
+------------------------------------------------------------------------------------------------------------------------
+For my own sanity, I am using a bug tracker, [b](https://github.com/jwjulien/b), that I created.  I'm the solo developer on the project right now and for that reason I am not tracking issues on Github.
+
+If you want to view open issues without pulling a copy of the project and installing `b` yourself, you can view the bugs as plain text YAML files located in the .bugs directory.
+
+
+
+Installation
+------------------------------------------------------------------------------------------------------------------------
+This project makes use of [poetry](https://python-poetry.org/) for managing dependencies.  With a copy of the project on your machine and Poetry installed, just run `poetry install` to get a virtual environment.
+
+Then you can run `poetry run python inventory` to launch the tool.
+
+For further help, I recommend you start from the [Poetry Docs](https://python-poetry.org/docs/) as I'm not doing anything out of the ordinary here.
