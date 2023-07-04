@@ -33,10 +33,12 @@ from inventory.gui.tabs.categories import TabCategories
 from inventory.gui.tabs.lost import TabLost
 from inventory.gui.tabs.parts import TabParts
 from inventory.gui.tabs.storage import TabStorage
+from inventory.gui.tabs.suppliers import TabSuppliers
 from inventory.model.base import db
 from inventory.model.categories import Category
 from inventory.model.parts import Part
 from inventory.model.storage import Area, Unit, Slot, Location
+from inventory.model.suppliers import Supplier, SupplierPart
 from inventory.libraries.scanner import ScannerWorker
 
 
@@ -65,7 +67,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Connect to database.
         db.connect()
-        db.create_tables([Category, Part, Area, Unit, Slot, Location])
+        db.create_tables([Category, Part, Area, Unit, Slot, Location, Supplier, SupplierPart])
 
         # Setup tabs.
         self.ui.tab_parts = TabParts(self)
@@ -78,8 +80,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.tabs.addTab(self.ui.tab_lost, 'Lost')
         tooltip = 'Shows parts that have not been assigned to any location(s) yet.'
         self.ui.tabs.setTabToolTip(self.ui.tabs.indexOf(self.ui.tab_lost), tooltip)
-        # self.ui.tab_suppliers = TabSuppliers(self)
-        # self.ui.tabs.addTab(self.ui.tab_suppliers, 'Suppliers')
+        self.ui.tab_suppliers = TabSuppliers(self)
+        self.ui.tabs.addTab(self.ui.tab_suppliers, 'Suppliers')
 
         # Setup a thread pool for background tasks.
         self.threadpool = QtCore.QThreadPool(self)

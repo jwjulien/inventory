@@ -1,5 +1,5 @@
 # ======================================================================================================================
-#      File:  /inventory/model/suppliers.py
+#      File:  /inventory/gui/dialogs/supplier.py
 #   Project:  Inventory
 #    Author:  Jared Julien <jaredjulien@exsystems.net>
 # Copyright:  (c) 2023 Jared Julien, eX Systems
@@ -17,56 +17,42 @@
 # OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # ----------------------------------------------------------------------------------------------------------------------
-"""Model support for parts suppliers."""
+"""Dialog for editing supplier information."""
 
 # ======================================================================================================================
-# Import Statements
+# Imports
 # ----------------------------------------------------------------------------------------------------------------------
-from peewee import CharField, ForeignKeyField
+from PySide6 import QtCore, QtWidgets
 
-from inventory.model.base import BaseModel
-from inventory.model.parts import Part
+from inventory.gui.base.dialog_supplier import Ui_SupplierDialog
+from inventory.model.suppliers import Supplier
 
-
-
-# ======================================================================================================================
-# Supplier
-# ----------------------------------------------------------------------------------------------------------------------
-class Supplier(BaseModel):
-    class Meta:
-        table_name = 'suppliers'
-
-    name = CharField(40)
-    website = CharField(100)
-    search = CharField(200)
-
-
-    @property
-    def parts(self):
-        """Return a list of unique parts associated with this supplier."""
-        return list(set([reference.part for reference in self.references]))
 
 
 
 # ======================================================================================================================
-# Supplier Part
+# Supplier Dialog
 # ----------------------------------------------------------------------------------------------------------------------
-class SupplierPart(BaseModel):
-    """Many-to-many relationship between a supply house and parts providing the opportunity to specify the supplier's
-    part number for the part too."""
-    class Meta:
-        table_name = 'supplier_part'
+class SupplierDialog(QtWidgets.QDialog):
+    def __init__(self, parent, supplier: Supplier):
+        super().__init__(parent)
+        self.ui = Ui_SupplierDialog()
+        self.ui.setupUi(self)
 
-    supplier = ForeignKeyField(Supplier, backref='parts')
-    part = ForeignKeyField(Part, backref='supplier')
-    number = CharField(80)
+        self.supplier = supplier
+
+        self.ui.name.setText(supplier.name)
+        self.ui.website.setText(supplier.website)
+        self.ui.search.setText(supplier.search)
 
 
-    @property
-    def url(self) -> str:
-        if self.supplier.search is None:
-            return None
-        return self.supplier.search.format(number=self.number)
+# ----------------------------------------------------------------------------------------------------------------------
+    def accept(self) -> None:
+        self.supplier.name = self.ui.name.text()
+        self.supplier.website = self.ui.website.text()
+        self.supplier.search = self.ui.search.text()
+        self.supplier.save()
+        return super().accept()
 
 
 
