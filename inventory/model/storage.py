@@ -38,7 +38,7 @@ from inventory.model.parts import Part
 # ----------------------------------------------------------------------------------------------------------------------
 class Area(BaseModel):
     class Meta:
-        table_name = 'storage_areas'
+        table_name = 'areas'
 
     # Columns
     name = CharField(40)
@@ -58,7 +58,7 @@ class Area(BaseModel):
 # ----------------------------------------------------------------------------------------------------------------------
 class Unit(BaseModel):
     class Meta:
-        table_name = 'storage_units'
+        table_name = 'units'
 
     # Columns
     area = ForeignKeyField(Area, backref='units')
@@ -103,7 +103,7 @@ class Unit(BaseModel):
 # ----------------------------------------------------------------------------------------------------------------------
 class Slot(BaseModel):
     class Meta:
-        table_name = 'storage_slots'
+        table_name = 'slots'
 
     # Columns
     unit = ForeignKeyField(Unit, backref='slots')

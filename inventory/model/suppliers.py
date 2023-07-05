@@ -49,13 +49,13 @@ class Supplier(BaseModel):
 
 
 # ======================================================================================================================
-# Supplier Part
+# Product
 # ----------------------------------------------------------------------------------------------------------------------
-class SupplierPart(BaseModel):
+class Product(BaseModel):
     """Many-to-many relationship between a supply house and parts providing the opportunity to specify the supplier's
     part number for the part too."""
     class Meta:
-        table_name = 'supplier_part'
+        table_name = 'products'
 
     supplier = ForeignKeyField(Supplier, backref='parts')
     part = ForeignKeyField(Part, backref='supplier')
