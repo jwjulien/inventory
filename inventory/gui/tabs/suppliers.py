@@ -23,6 +23,7 @@
 # Imports
 # ----------------------------------------------------------------------------------------------------------------------
 from typing import List
+import webbrowser
 
 from PySide6 import QtCore, QtWidgets
 
@@ -49,11 +50,31 @@ class TabSuppliers(QtWidgets.QWidget):
 
         self.ui.suppliers.sortItems(QtCore.Qt.AscendingOrder)
 
+        self.context_menu = QtWidgets.QMenu(self)
+        website = self.context_menu.addAction("Visit Website")
+        website.triggered.connect(self._website)
+
         # Connect events.
+        self.ui.suppliers.installEventFilter(self)
         self.ui.suppliers.doubleClicked.connect(self._edit)
         self.ui.suppliers.itemSelectionChanged.connect(self._selected)
         self.ui.add.clicked.connect(self._add)
         self.ui.remove.clicked.connect(self._remove)
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def eventFilter(self, source, event):
+        if event.type() == QtCore.QEvent.ContextMenu and source is self.ui.suppliers:
+            item = self.ui.suppliers.itemAt(event.pos())
+            if item:
+                supplier = item.data(QtCore.Qt.UserRole)
+                if supplier and supplier.website:
+                    menu = QtWidgets.QMenu()
+                    menu.addAction('Visit Website')
+                    if menu.exec(event.globalPos()):
+                        webbrowser.open(supplier.website)
+            return True
+        return super().eventFilter(source, event)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -107,6 +128,11 @@ class TabSuppliers(QtWidgets.QWidget):
                 return
             self.ui.suppliers.takeItem(self.ui.suppliers.row(item))
             supplier.delete_instance()
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def _website(self) -> None:
+        self.ui.suppliers.contextMenuEvent()
 
 
 
