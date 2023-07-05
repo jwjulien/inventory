@@ -1,5 +1,5 @@
 # ======================================================================================================================
-#      File:  /inventory/model/suppliers.py
+#      File:  /inventory/gui/dialogs/supplier_mapping.py
 #   Project:  Inventory
 #    Author:  Jared Julien <jaredjulien@exsystems.net>
 # Copyright:  (c) 2023 Jared Julien, eX Systems
@@ -17,56 +17,46 @@
 # OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # ----------------------------------------------------------------------------------------------------------------------
-"""Model support for parts suppliers."""
+"""Dialog to allow the user to set a Product, mapping a Supplier to a Part."""
 
 # ======================================================================================================================
-# Import Statements
+# Imports
 # ----------------------------------------------------------------------------------------------------------------------
-from peewee import CharField, ForeignKeyField
+from PySide6 import QtCore, QtWidgets
 
-from inventory.model.base import BaseModel
-from inventory.model.parts import Part
+from inventory.gui.base.dialog_supplier_mapping import Ui_DialogSupplierMapping
+from inventory.model.suppliers import Supplier, Product
 
-
-
-# ======================================================================================================================
-# Supplier
-# ----------------------------------------------------------------------------------------------------------------------
-class Supplier(BaseModel):
-    class Meta:
-        table_name = 'suppliers'
-
-    name = CharField(40)
-    website = CharField(100)
-    search = CharField(200)
-
-
-    @property
-    def parts(self):
-        """Return a list of unique parts associated with this supplier."""
-        return list(set([reference.part for reference in self.references]))
 
 
 
 # ======================================================================================================================
-# Product
+# Supplier Mapping Dialog
 # ----------------------------------------------------------------------------------------------------------------------
-class Product(BaseModel):
-    """Many-to-many relationship between a supply house and parts providing the opportunity to specify the supplier's
-    part number for the part too."""
-    class Meta:
-        table_name = 'products'
+class SupplierMappingDialog(QtWidgets.QDialog):
+    def __init__(self, parent, product: Product):
+        super().__init__(parent)
+        self.ui = Ui_DialogSupplierMapping()
+        self.ui.setupUi(self)
 
-    supplier = ForeignKeyField(Supplier, backref='products')
-    part = ForeignKeyField(Part, backref='products')
-    number = CharField(80)
+        self.product = product
+
+        # Load GUI
+        self.ui.supplier.clear()
+        for supplier in Supplier.select().order_by(Supplier.name):
+            self.ui.supplier.addItem(supplier.name, supplier)
+            if product.supplier_id and supplier == product.supplier:
+                self.ui.supplier.setCurrentText(supplier.name)
+
+        self.ui.number.setText(product.number)
 
 
-    @property
-    def url(self) -> str:
-        if self.supplier.search is None:
-            return None
-        return self.supplier.search.format(number=self.number)
+# ----------------------------------------------------------------------------------------------------------------------
+    def accept(self) -> None:
+        self.product.supplier = self.ui.supplier.currentData(QtCore.Qt.UserRole)
+        self.product.number = self.ui.number.text()
+        self.product.save()
+        return super().accept()
 
 
 

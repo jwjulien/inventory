@@ -1,5 +1,5 @@
 # ======================================================================================================================
-#      File:  /inventory/gui/tabs/suppliers.py
+#      File:  /inventory/gui/widgets/suppliers.py
 #   Project:  Inventory
 #    Author:  Jared Julien <jaredjulien@exsystems.net>
 # Copyright:  (c) 2023 Jared Julien, eX Systems
@@ -17,122 +17,111 @@
 # OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # ----------------------------------------------------------------------------------------------------------------------
-"""Tab listing suppliers and their associated parts."""
+"""Widget for mapping suppliers into parts."""
 
 # ======================================================================================================================
 # Imports
 # ----------------------------------------------------------------------------------------------------------------------
-from typing import List
-import webbrowser
-
 from PySide6 import QtCore, QtWidgets
 
-from inventory.gui.base.tab_suppliers import Ui_TabSuppliers
-from inventory.gui.dialogs.supplier import SupplierDialog
-from inventory.model.suppliers import Supplier
+from inventory.gui.base.widget_suppliers import Ui_SuppliersWidget
+from inventory.gui.dialogs.supplier_mapping import SupplierMappingDialog
+from inventory.model.suppliers import Supplier, Product
+from inventory.model.parts import Part
 
 
 
 
 # ======================================================================================================================
-# Tab Supplier
+# Supplier Widget
 # ----------------------------------------------------------------------------------------------------------------------
-class TabSuppliers(QtWidgets.QWidget):
+class SuppliersWidget(QtWidgets.QWidget):
     def __init__(self, parent):
         super().__init__(parent)
-        self.ui = Ui_TabSuppliers()
+        self.ui = Ui_SuppliersWidget()
         self.ui.setupUi(self)
 
-        # Add suppliers to the list widget.
-        suppliers: List[Supplier] = Supplier.select()
-        for supplier in suppliers:
-            self._add_item(supplier)
+        self.part: Part = None
 
-        self.ui.suppliers.sortItems(QtCore.Qt.AscendingOrder)
-
-        self.context_menu = QtWidgets.QMenu(self)
-        website = self.context_menu.addAction("Visit Website")
-        website.triggered.connect(self._website)
+        # Setup header to best show column contents.
+        header = self.ui.suppliers.horizontalHeader()
+        header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
+        header.setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
 
         # Connect events.
-        self.ui.suppliers.installEventFilter(self)
+        self.ui.map.clicked.connect(self._map)
+        self.ui.edit.clicked.connect(self._edit)
+        self.ui.remove.clicked.connect(self._remove)
         self.ui.suppliers.doubleClicked.connect(self._edit)
         self.ui.suppliers.itemSelectionChanged.connect(self._selected)
-        self.ui.add.clicked.connect(self._add)
-        self.ui.remove.clicked.connect(self._remove)
+
+        # TODO: What about a context menu or button to open a search for an item using the supplier.search url, when
+        # available.
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-    def eventFilter(self, source, event):
-        if event.type() == QtCore.QEvent.ContextMenu and source is self.ui.suppliers:
-            item = self.ui.suppliers.itemAt(event.pos())
-            if item:
-                supplier = item.data(QtCore.Qt.UserRole)
-                if supplier and supplier.website:
-                    menu = QtWidgets.QMenu()
-                    menu.addAction('Visit Website')
-                    if menu.exec(event.globalPos()):
-                        webbrowser.open(supplier.website)
-            return True
-        return super().eventFilter(source, event)
+    def setPart(self, part: Part):
+        self.part = part
+
+        for supplier in self.part.products:
+            row = self._insert_row()
+            self._update_row(row, supplier)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-    def _add_item(self, supplier: Supplier) -> QtWidgets.QListWidgetItem:
-        item = QtWidgets.QListWidgetItem(supplier.name)
-        item.setData(QtCore.Qt.UserRole, supplier)
-        self.ui.suppliers.addItem(item)
-        return item
+    def _insert_row(self) -> int:
+        row = self.ui.suppliers.rowCount()
+        self.ui.suppliers.insertRow(row)
+        self.ui.suppliers.setItem(row, 0, QtWidgets.QTableWidgetItem(''))
+        self.ui.suppliers.setItem(row, 1, QtWidgets.QTableWidgetItem(''))
+        self.ui.suppliers.item(row, 0).setTextAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
+        return row
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def _update_row(self, row: int, product: Product) -> None:
+        self.ui.suppliers.item(row, 0).setText(product.supplier.name)
+        self.ui.suppliers.item(row, 1).setText(product.number)
+        self.ui.suppliers.item(row, 0).setData(QtCore.Qt.UserRole, product)
+
 
 # ----------------------------------------------------------------------------------------------------------------------
     def _selected(self) -> None:
         selected = self.ui.suppliers.selectedItems()
-        suppliers = [item.data(QtCore.Qt.UserRole) for item in selected]
-        parts = [part for supplier in suppliers for part in supplier.parts]
-        self.ui.parts.setParts(parts)
+        rows = list(set([item.row() for item in selected]))
+        self.ui.remove.setEnabled(bool(rows))
+        self.ui.edit.setEnabled(bool(rows))
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def _map(self) -> None:
+        product = Product(part=self.part)
+        if SupplierMappingDialog(self, product).exec():
+            row = self._insert_row()
+            self._update_row(row, product)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
     def _edit(self) -> None:
         selected = self.ui.suppliers.selectedItems()
-        if len(selected) != 1:
+        if not selected:
             return
         item = selected[0]
-        supplier = item.data(QtCore.Qt.UserRole)
-        if SupplierDialog(self, supplier).exec():
-            item.setText(supplier.name)
-            self.ui.suppliers.sortItems(QtCore.Qt.AscendingOrder)
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-    def _add(self) -> None:
-        supplier = Supplier()
-        if SupplierDialog(self, supplier).exec():
-            self._add_item(supplier)
-            self.ui.suppliers.sortItems(QtCore.Qt.AscendingOrder)
+        supplier = self.ui.suppliers.item(item.row(), 0).data(QtCore.Qt.UserRole)
+        if not supplier:
+            return
+        if SupplierMappingDialog(self, supplier).exec():
+            self._update_row(item.row(), supplier)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
     def _remove(self) -> None:
         selected = self.ui.suppliers.selectedItems()
-        if not selected:
-            return
-        for item in selected:
-            supplier = item.data(QtCore.Qt.UserRole)
-            if supplier.parts:
-                msg = QtWidgets.QMessageBox(self)
-                msg.setIcon(QtWidgets.QMessageBox.Critical)
-                msg.setWindowTitle('Error')
-                msg.setText('Cannot remove a supplier that\nhas parts associated with it.')
-                msg.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Ok)
-                return
-            self.ui.suppliers.takeItem(self.ui.suppliers.row(item))
+        rows = set([item.row() for item in selected])
+        for row in sorted(rows, reverse=True):
+            supplier: Supplier = self.ui.suppliers.item(row, 0).data(QtCore.Qt.UserRole)
             supplier.delete_instance()
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-    def _website(self) -> None:
-        self.ui.suppliers.contextMenuEvent()
+            self.ui.suppliers.removeRow(row)
 
 
 

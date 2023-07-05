@@ -15,15 +15,15 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QAbstractButton, QAbstractItemView, QApplication, QComboBox,
-    QDialog, QDialogButtonBox, QDoubleSpinBox, QFormLayout,
-    QGraphicsView, QHBoxLayout, QHeaderView, QLabel,
-    QLineEdit, QListWidget, QListWidgetItem, QPlainTextEdit,
-    QPushButton, QSizePolicy, QSpinBox, QTableWidget,
-    QTableWidgetItem, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QAbstractButton, QApplication, QComboBox, QDialog,
+    QDialogButtonBox, QDoubleSpinBox, QFormLayout, QGraphicsView,
+    QHBoxLayout, QLabel, QLineEdit, QListWidget,
+    QListWidgetItem, QPlainTextEdit, QPushButton, QSizePolicy,
+    QSpinBox, QVBoxLayout, QWidget)
 
 from inventory.gui.widgets.attributes import AttributesWidget
 from inventory.gui.widgets.location import LocationWidget
+from inventory.gui.widgets.suppliers import SuppliersWidget
 
 class Ui_DialogPart(object):
     def setupUi(self, DialogPart):
@@ -201,22 +201,10 @@ class Ui_DialogPart(object):
 
         self.verticalLayout_5.addWidget(self.locations)
 
-        self.suppliers = QTableWidget(self.left)
-        if (self.suppliers.columnCount() < 2):
-            self.suppliers.setColumnCount(2)
-        __qtablewidgetitem = QTableWidgetItem()
-        self.suppliers.setHorizontalHeaderItem(0, __qtablewidgetitem)
-        __qtablewidgetitem1 = QTableWidgetItem()
-        self.suppliers.setHorizontalHeaderItem(1, __qtablewidgetitem1)
+        self.suppliers = SuppliersWidget(self.left)
         self.suppliers.setObjectName(u"suppliers")
-        sizePolicy6 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        sizePolicy6.setHorizontalStretch(0)
-        sizePolicy6.setVerticalStretch(1)
-        sizePolicy6.setHeightForWidth(self.suppliers.sizePolicy().hasHeightForWidth())
-        self.suppliers.setSizePolicy(sizePolicy6)
-        self.suppliers.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.suppliers.horizontalHeader().setStretchLastSection(True)
-        self.suppliers.verticalHeader().setVisible(False)
+        sizePolicy5.setHeightForWidth(self.suppliers.sizePolicy().hasHeightForWidth())
+        self.suppliers.setSizePolicy(sizePolicy5)
 
         self.verticalLayout_5.addWidget(self.suppliers)
 
@@ -225,11 +213,11 @@ class Ui_DialogPart(object):
 
         self.right = QWidget(DialogPart)
         self.right.setObjectName(u"right")
-        sizePolicy7 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
-        sizePolicy7.setHorizontalStretch(1)
-        sizePolicy7.setVerticalStretch(0)
-        sizePolicy7.setHeightForWidth(self.right.sizePolicy().hasHeightForWidth())
-        self.right.setSizePolicy(sizePolicy7)
+        sizePolicy6 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sizePolicy6.setHorizontalStretch(1)
+        sizePolicy6.setVerticalStretch(0)
+        sizePolicy6.setHeightForWidth(self.right.sizePolicy().hasHeightForWidth())
+        self.right.setSizePolicy(sizePolicy6)
         self.verticalLayout_4 = QVBoxLayout(self.right)
         self.verticalLayout_4.setSpacing(15)
         self.verticalLayout_4.setObjectName(u"verticalLayout_4")
@@ -271,11 +259,11 @@ class Ui_DialogPart(object):
         self.documents = QListWidget(self.document_widget)
         self.documents.setObjectName(u"documents")
         self.documents.setEnabled(False)
-        sizePolicy8 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        sizePolicy8.setHorizontalStretch(0)
-        sizePolicy8.setVerticalStretch(0)
-        sizePolicy8.setHeightForWidth(self.documents.sizePolicy().hasHeightForWidth())
-        self.documents.setSizePolicy(sizePolicy8)
+        sizePolicy7 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy7.setHorizontalStretch(0)
+        sizePolicy7.setVerticalStretch(0)
+        sizePolicy7.setHeightForWidth(self.documents.sizePolicy().hasHeightForWidth())
+        self.documents.setSizePolicy(sizePolicy7)
 
         self.verticalLayout.addWidget(self.documents)
 
@@ -334,10 +322,6 @@ class Ui_DialogPart(object):
         self.weight.setSuffix(QCoreApplication.translate("DialogPart", u"g", None))
         self.calibrate.setText(QCoreApplication.translate("DialogPart", u"Calibrate", None))
         self.lbl_notes.setText(QCoreApplication.translate("DialogPart", u"Notes:", None))
-        ___qtablewidgetitem = self.suppliers.horizontalHeaderItem(0)
-        ___qtablewidgetitem.setText(QCoreApplication.translate("DialogPart", u"Supplier", None));
-        ___qtablewidgetitem1 = self.suppliers.horizontalHeaderItem(1)
-        ___qtablewidgetitem1.setText(QCoreApplication.translate("DialogPart", u"Part Number", None));
         self.set_image.setText(QCoreApplication.translate("DialogPart", u"Set Image", None))
         self.remove_image.setText(QCoreApplication.translate("DialogPart", u"Remove Image", None))
         self.add_document.setText(QCoreApplication.translate("DialogPart", u"Add Document", None))

@@ -72,6 +72,7 @@ class PartDialog(QtWidgets.QDialog):
 
         self.ui.attributes.setAttributes(part.attributes)
         self.ui.locations.setPart(part)
+        self.ui.suppliers.setPart(part)
 
 
 # ----------------------------------------------------------------------------------------------------------------------

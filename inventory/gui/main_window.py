@@ -38,7 +38,7 @@ from inventory.model.base import db
 from inventory.model.categories import Category
 from inventory.model.parts import Part
 from inventory.model.storage import Area, Unit, Slot, Location
-from inventory.model.suppliers import Supplier, SupplierPart
+from inventory.model.suppliers import Supplier, Product
 from inventory.libraries.scanner import ScannerWorker
 
 
@@ -67,7 +67,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Connect to database.
         db.connect()
-        db.create_tables([Category, Part, Area, Unit, Slot, Location, Supplier, SupplierPart])
+        db.create_tables([Category, Part, Area, Unit, Slot, Location, Supplier, Product])
 
         # Setup tabs.
         self.ui.tab_parts = TabParts(self)

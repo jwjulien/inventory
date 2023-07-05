@@ -248,32 +248,13 @@ Set to zero to disable reorder (i.e. non-stocked) or set to one to reorder when 
        </widget>
       </item>
       <item>
-       <widget class="QTableWidget" name="suppliers">
+       <widget class="SuppliersWidget" name="suppliers" native="true">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
           <horstretch>0</horstretch>
           <verstretch>1</verstretch>
          </sizepolicy>
         </property>
-        <property name="selectionBehavior">
-         <enum>QAbstractItemView::SelectRows</enum>
-        </property>
-        <attribute name="horizontalHeaderStretchLastSection">
-         <bool>true</bool>
-        </attribute>
-        <attribute name="verticalHeaderVisible">
-         <bool>false</bool>
-        </attribute>
-        <column>
-         <property name="text">
-          <string>Supplier</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>Part Number</string>
-         </property>
-        </column>
        </widget>
       </item>
      </layout>
@@ -420,6 +401,12 @@ Set to zero to disable reorder (i.e. non-stocked) or set to one to reorder when 
    <class>LocationWidget</class>
    <extends>QWidget</extends>
    <header>inventory.gui.widgets.location</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>SuppliersWidget</class>
+   <extends>QWidget</extends>
+   <header>inventory.gui.widgets.suppliers</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
