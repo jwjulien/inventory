@@ -45,7 +45,7 @@ class Part(BaseModel):
     category = ForeignKeyField(Category, backref='parts')
     value = CharField(50)
     number = CharField(50)
-    package = CharField(20)
+    package = CharField(20, null=True)
     price = FloatField(null=True)
     weight = FloatField(null=True)
     threshold = IntegerField(default=0)

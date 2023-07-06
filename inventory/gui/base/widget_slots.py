@@ -15,9 +15,9 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QGroupBox, QHeaderView, QPushButton,
-    QSizePolicy, QTableWidget, QTableWidgetItem, QVBoxLayout,
-    QWidget)
+from PySide6.QtWidgets import (QApplication, QGroupBox, QHBoxLayout, QHeaderView,
+    QPushButton, QSizePolicy, QTableWidget, QTableWidgetItem,
+    QVBoxLayout, QWidget)
 
 class Ui_WidgetSlots(object):
     def setupUi(self, WidgetSlots):
@@ -31,7 +31,6 @@ class Ui_WidgetSlots(object):
         self.groupBox.setObjectName(u"groupBox")
         self.verticalLayout = QVBoxLayout(self.groupBox)
         self.verticalLayout.setObjectName(u"verticalLayout")
-        self.verticalLayout.setContentsMargins(6, 6, 6, 6)
         self.slots = QTableWidget(self.groupBox)
         self.slots.setObjectName(u"slots")
         self.slots.setAlternatingRowColors(True)
@@ -39,11 +38,21 @@ class Ui_WidgetSlots(object):
 
         self.verticalLayout.addWidget(self.slots)
 
+        self.horizontalLayout = QHBoxLayout()
+        self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.remove = QPushButton(self.groupBox)
         self.remove.setObjectName(u"remove")
         self.remove.setEnabled(False)
 
-        self.verticalLayout.addWidget(self.remove)
+        self.horizontalLayout.addWidget(self.remove)
+
+        self.move = QPushButton(self.groupBox)
+        self.move.setObjectName(u"move")
+
+        self.horizontalLayout.addWidget(self.move)
+
+
+        self.verticalLayout.addLayout(self.horizontalLayout)
 
 
         self.verticalLayout_2.addWidget(self.groupBox)
@@ -58,5 +67,6 @@ class Ui_WidgetSlots(object):
         WidgetSlots.setWindowTitle(QCoreApplication.translate("WidgetSlots", u"Form", None))
         self.groupBox.setTitle(QCoreApplication.translate("WidgetSlots", u"Slots:", None))
         self.remove.setText(QCoreApplication.translate("WidgetSlots", u"Remove", None))
+        self.move.setText(QCoreApplication.translate("WidgetSlots", u"Move", None))
     # retranslateUi
 

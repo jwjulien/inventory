@@ -112,8 +112,6 @@ class Slot(BaseModel):
     column = IntegerField()
     row_span = IntegerField(default=1)
     column_span = IntegerField(default=1)
-    proportion_vertical = IntegerField(default=1)
-    proportion_horizontal = IntegerField(default=1)
 
 
     # Properties

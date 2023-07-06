@@ -29,6 +29,7 @@ from inventory.model.parts import Part
 
 
 
+
 # ======================================================================================================================
 # Supplier
 # ----------------------------------------------------------------------------------------------------------------------
@@ -44,7 +45,8 @@ class Supplier(BaseModel):
     @property
     def parts(self):
         """Return a list of unique parts associated with this supplier."""
-        return list(set([reference.part for reference in self.references]))
+        return list(set([product.part for product in self.products]))
+
 
 
 

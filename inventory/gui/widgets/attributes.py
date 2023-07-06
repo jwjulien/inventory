@@ -51,7 +51,7 @@ class AttributeKeyValidator(QtGui.QValidator):
             return QtGui.QValidator.State.Intermediate
         if text in self.invalid:
             return QtGui.QValidator.State.Invalid
-        matches = re.match('^[a-z][a-z0-9]*$', text)
+        matches = re.match('^[a-zA-Z_][a-zA-Z0-9_]*$', text)
         if matches is None:
             return QtGui.QValidator.State.Invalid
         return QtGui.QValidator.State.Acceptable
@@ -59,7 +59,7 @@ class AttributeKeyValidator(QtGui.QValidator):
 
 # ----------------------------------------------------------------------------------------------------------------------
     def fixup(self, text: str) -> str:
-        return re.sub('[^a-zA-Z0-9]', '', text).lower()
+        return re.sub('[^a-zA-Z0-9_]', '', text)
 
 
 

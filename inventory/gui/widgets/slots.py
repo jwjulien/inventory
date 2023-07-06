@@ -45,6 +45,7 @@ class SlotsWidget(QtWidgets.QWidget):
 
         # Setup column spacing in table.
         self.ui.slots.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
+        self.ui.slots.setWordWrap(True)
 
         # TODO: Thinking I want a custom context menu to adjust spans on slots over multiple rows/columns.
 

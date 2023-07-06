@@ -15,8 +15,8 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QFrame, QGridLayout, QHBoxLayout,
-    QSizePolicy, QSplitter, QWidget)
+from PySide6.QtWidgets import (QApplication, QGridLayout, QSizePolicy, QSplitter,
+    QWidget)
 
 from inventory.gui.widgets.areas import AreasWidget
 from inventory.gui.widgets.parts import PartsWidget
@@ -33,47 +33,39 @@ class Ui_TabStorage(object):
         self.splitter = QSplitter(TabStorage)
         self.splitter.setObjectName(u"splitter")
         self.splitter.setOrientation(Qt.Vertical)
-        self.frame = QFrame(self.splitter)
-        self.frame.setObjectName(u"frame")
-        sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        self.storage = QSplitter(self.splitter)
+        self.storage.setObjectName(u"storage")
+        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(3)
-        sizePolicy.setHeightForWidth(self.frame.sizePolicy().hasHeightForWidth())
-        self.frame.setSizePolicy(sizePolicy)
-        self.horizontalLayout = QHBoxLayout(self.frame)
-        self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
-        self.areas = AreasWidget(self.frame)
+        sizePolicy.setVerticalStretch(4)
+        sizePolicy.setHeightForWidth(self.storage.sizePolicy().hasHeightForWidth())
+        self.storage.setSizePolicy(sizePolicy)
+        self.storage.setOrientation(Qt.Horizontal)
+        self.areas = AreasWidget(self.storage)
         self.areas.setObjectName(u"areas")
         sizePolicy1 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
         sizePolicy1.setHorizontalStretch(2)
         sizePolicy1.setVerticalStretch(3)
         sizePolicy1.setHeightForWidth(self.areas.sizePolicy().hasHeightForWidth())
         self.areas.setSizePolicy(sizePolicy1)
-
-        self.horizontalLayout.addWidget(self.areas)
-
-        self.units = UnitsWidget(self.frame)
+        self.storage.addWidget(self.areas)
+        self.units = UnitsWidget(self.storage)
         self.units.setObjectName(u"units")
         sizePolicy2 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
         sizePolicy2.setHorizontalStretch(3)
         sizePolicy2.setVerticalStretch(3)
         sizePolicy2.setHeightForWidth(self.units.sizePolicy().hasHeightForWidth())
         self.units.setSizePolicy(sizePolicy2)
-
-        self.horizontalLayout.addWidget(self.units)
-
-        self.slots = SlotsWidget(self.frame)
+        self.storage.addWidget(self.units)
+        self.slots = SlotsWidget(self.storage)
         self.slots.setObjectName(u"slots")
         sizePolicy3 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
-        sizePolicy3.setHorizontalStretch(6)
+        sizePolicy3.setHorizontalStretch(7)
         sizePolicy3.setVerticalStretch(3)
         sizePolicy3.setHeightForWidth(self.slots.sizePolicy().hasHeightForWidth())
         self.slots.setSizePolicy(sizePolicy3)
-
-        self.horizontalLayout.addWidget(self.slots)
-
-        self.splitter.addWidget(self.frame)
+        self.storage.addWidget(self.slots)
+        self.splitter.addWidget(self.storage)
         self.parts = PartsWidget(self.splitter)
         self.parts.setObjectName(u"parts")
         sizePolicy4 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)

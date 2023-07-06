@@ -61,7 +61,8 @@ class PartDialog(QtWidgets.QDialog):
             self.ui.category.setCurrentText(part.category.full_title())
         self.ui.value.setText(part.value)
         self.ui.part_number.setText(part.number)
-        self.ui.footprint.setText(part.package)
+        if self.part.package is not None:
+            self.ui.footprint.setText(part.package)
         if part.price:
             self.ui.price.setValue(float(part.price))
         if part.weight:
@@ -82,6 +83,8 @@ class PartDialog(QtWidgets.QDialog):
         self.part.value = self.ui.value.text()
         self.part.number = self.ui.part_number.text()
         self.part.package = self.ui.footprint.text()
+        if not self.part.package:
+            self.part.package = None
         self.part.price = self.ui.price.value()
         self.part.weight = self.ui.weight.value()
         self.part.threshold = self.ui.threshold.value()
