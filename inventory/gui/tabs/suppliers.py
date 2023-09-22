@@ -30,6 +30,7 @@ from PySide6 import QtCore, QtWidgets
 from inventory.gui.base.tab_suppliers import Ui_TabSuppliers
 from inventory.gui.dialogs.supplier import SupplierDialog
 from inventory.model.suppliers import Supplier
+from inventory.model.parts import Part
 
 
 
@@ -88,8 +89,10 @@ class TabSuppliers(QtWidgets.QWidget):
     def _selected(self) -> None:
         selected = self.ui.suppliers.selectedItems()
         suppliers = [item.data(QtCore.Qt.UserRole) for item in selected]
-        parts = [part for supplier in suppliers for part in supplier.parts]
+        parts: List[Part] = [part for supplier in suppliers for part in supplier.parts]
         self.ui.parts.setParts(parts)
+        restock = [part for part in parts if part.needs_reorder]
+        self.ui.restock.setParts(restock)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
