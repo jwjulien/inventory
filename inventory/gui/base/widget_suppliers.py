@@ -66,6 +66,12 @@ class Ui_SuppliersWidget(object):
 
         self.verticalLayout.addWidget(self.remove)
 
+        self.search = QPushButton(SuppliersWidget)
+        self.search.setObjectName(u"search")
+        self.search.setEnabled(False)
+
+        self.verticalLayout.addWidget(self.search)
+
         self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         self.verticalLayout.addItem(self.verticalSpacer)
@@ -88,5 +94,6 @@ class Ui_SuppliersWidget(object):
         self.map.setText(QCoreApplication.translate("SuppliersWidget", u"Add New", None))
         self.edit.setText(QCoreApplication.translate("SuppliersWidget", u"Edit", None))
         self.remove.setText(QCoreApplication.translate("SuppliersWidget", u"Remove", None))
+        self.search.setText(QCoreApplication.translate("SuppliersWidget", u"Web Search", None))
     # retranslateUi
 

@@ -22,6 +22,8 @@
 # ======================================================================================================================
 # Imports
 # ----------------------------------------------------------------------------------------------------------------------
+import webbrowser
+
 from PySide6 import QtCore, QtWidgets
 
 from inventory.gui.base.widget_suppliers import Ui_SuppliersWidget
@@ -52,6 +54,7 @@ class SuppliersWidget(QtWidgets.QWidget):
         self.ui.map.clicked.connect(self._map)
         self.ui.edit.clicked.connect(self._edit)
         self.ui.remove.clicked.connect(self._remove)
+        self.ui.search.clicked.connect(self._search)
         self.ui.suppliers.doubleClicked.connect(self._edit)
         self.ui.suppliers.itemSelectionChanged.connect(self._selected)
 
@@ -91,6 +94,8 @@ class SuppliersWidget(QtWidgets.QWidget):
         rows = list(set([item.row() for item in selected]))
         self.ui.remove.setEnabled(bool(rows))
         self.ui.edit.setEnabled(bool(rows))
+        searchable = all([len(rows) == 1, self.ui.suppliers.item(rows[0], 0).data(QtCore.Qt.UserRole).supplier.search])
+        self.ui.search.setEnabled(searchable)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -122,6 +127,16 @@ class SuppliersWidget(QtWidgets.QWidget):
             supplier: Supplier = self.ui.suppliers.item(row, 0).data(QtCore.Qt.UserRole)
             supplier.delete_instance()
             self.ui.suppliers.removeRow(row)
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def _search(self) -> None:
+        """Search for this part on the supplier's site."""
+        selected = self.ui.suppliers.selectedItems()
+        rows = list(set([item.row() for item in selected]))
+        assert len(rows) == 1
+        product: Product = self.ui.suppliers.item(rows[0], 0).data(QtCore.Qt.UserRole)
+        webbrowser.open(product.supplier.search.format(number=product.number))
 
 
 
