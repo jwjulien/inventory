@@ -60,7 +60,7 @@ class Part(BaseModel):
 
 
     @hybrid_property
-    def liability(self) -> float:
+    def worth(self) -> float:
         if self.price is not None:
             return self.quantity * self.price
         return 0

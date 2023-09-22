@@ -23,7 +23,7 @@ class Ui_WidgetParts(object):
     def setupUi(self, WidgetParts):
         if not WidgetParts.objectName():
             WidgetParts.setObjectName(u"WidgetParts")
-        WidgetParts.resize(890, 621)
+        WidgetParts.resize(890, 654)
         self.verticalLayout = QVBoxLayout(WidgetParts)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
@@ -93,6 +93,6 @@ class Ui_WidgetParts(object):
         ___qtablewidgetitem5 = self.parts.horizontalHeaderItem(5)
         ___qtablewidgetitem5.setText(QCoreApplication.translate("WidgetParts", u"Price", None));
         ___qtablewidgetitem6 = self.parts.horizontalHeaderItem(6)
-        ___qtablewidgetitem6.setText(QCoreApplication.translate("WidgetParts", u"Liability", None));
+        ___qtablewidgetitem6.setText(QCoreApplication.translate("WidgetParts", u"Worth", None));
     # retranslateUi
 
