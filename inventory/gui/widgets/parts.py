@@ -100,7 +100,7 @@ class PartsWidget(QtWidgets.QWidget):
             quantity.setForeground(brush)
 
         self.ui.parts.item(row, 5).setText(f'${part.price:.3f}')
-        self.ui.parts.item(row, 6).setText(f'${part.liability:.2f}')
+        self.ui.parts.item(row, 6).setText(f'${part.worth:.2f}')
 
 
 # ----------------------------------------------------------------------------------------------------------------------

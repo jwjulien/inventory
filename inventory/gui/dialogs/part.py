@@ -22,7 +22,7 @@
 # ======================================================================================================================
 # Imports
 # ----------------------------------------------------------------------------------------------------------------------
-from PySide6 import QtWidgets
+from PySide6 import QtCore, QtWidgets
 
 from inventory.gui.base.dialog_part import Ui_DialogPart
 from inventory.model.parts import Part
@@ -46,6 +46,9 @@ class PartDialog(QtWidgets.QDialog):
         for category in categories:
             self.ui.category.addItem(category.full_title(), category)
 
+        # Connect events.
+        self.ui.category.currentIndexChanged.connect(self._category_changed)
+
         # Load part information into dialog.
         self.load(part)
 
@@ -56,6 +59,8 @@ class PartDialog(QtWidgets.QDialog):
         self.part = part
 
         self.setWindowTitle(f'Edit {part.summary}' if part.value else 'Add new part')
+
+        self.ui.attributes.setAttributes(part.attributes)
 
         if part.category_id:
             self.ui.category.setCurrentText(part.category.full_title())
@@ -71,7 +76,6 @@ class PartDialog(QtWidgets.QDialog):
             self.ui.threshold.setValue(int(part.threshold) if part.threshold else 0)
         self.ui.notes.setPlainText(part.notes)
 
-        self.ui.attributes.setAttributes(part.attributes)
         self.ui.locations.setPart(part)
         self.ui.suppliers.setPart(part)
 
@@ -98,6 +102,16 @@ class PartDialog(QtWidgets.QDialog):
     def reject(self) -> None:
         # TODO: Hook close event and warn if there are changes before closing.
         return super().reject()
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def _category_changed(self) -> None:
+        """Fires when the category selection was changed by the user."""
+        # Get a list of attributes that are attributes to other parts in this category to offer as suggestions.
+        category = self.ui.category.currentData(QtCore.Qt.UserRole)
+        attributes = sorted(set([attribute for part in category.parts for attribute in part.attributes]))
+        self.ui.attributes.setSuggestions(attributes)
+
 
 
 

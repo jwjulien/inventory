@@ -51,7 +51,7 @@ class AttributeKeyValidator(QtGui.QValidator):
             return QtGui.QValidator.State.Intermediate
         if text in self.invalid:
             return QtGui.QValidator.State.Invalid
-        matches = re.match('^[a-zA-Z_][a-zA-Z0-9_]*$', text)
+        matches = re.match('^[a-zA-Z_][a-zA-Z0-9_]{0,20}$', text)
         if matches is None:
             return QtGui.QValidator.State.Invalid
         return QtGui.QValidator.State.Acceptable
@@ -59,7 +59,7 @@ class AttributeKeyValidator(QtGui.QValidator):
 
 # ----------------------------------------------------------------------------------------------------------------------
     def fixup(self, text: str) -> str:
-        return re.sub('[^a-zA-Z0-9_]', '', text)
+        return re.sub('[^a-zA-Z0-9_]{1,20}$', '', text)
 
 
 
@@ -69,22 +69,35 @@ class AttributeKeyValidator(QtGui.QValidator):
 # ----------------------------------------------------------------------------------------------------------------------
 class AttributeKeyEditor(QtWidgets.QStyledItemDelegate):
     """A delegate for editing the key column that applies the above validator class."""
+    def __init__(self, parent):
+        super().__init__(parent)
+        self._options = []
+
+
+# ----------------------------------------------------------------------------------------------------------------------
     def createEditor(self,
                      parent: QtWidgets.QWidget,
                      option: QtWidgets.QStyleOptionViewItem,
                      index: QtCore.QModelIndex
                      ) -> QtWidgets.QWidget:
-        editor = super().createEditor(parent, option, index)
-        editor.setMaxLength(20)
+        combo = QtWidgets.QComboBox(parent)
+        combo.addItems(self._options)
+        combo.setEditable(True)
 
         # Gather a list of existing keys that do not belong to this row.
         existing = [self.parent().item(row, 0).text() for row in range(self.parent().rowCount()) if row != index.row()]
 
         # Setup a validator to keep an eye on the text that the user enters.
-        validator = AttributeKeyValidator(editor, existing)
-        editor.setValidator(validator)
+        validator = AttributeKeyValidator(combo, existing)
+        combo.setValidator(validator)
 
-        return editor
+        return combo
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def setOptions(self, options: List[str]) -> None:
+        """Set a list of options to be used in the combo box delegate for this editor."""
+        self._options = options
 
 
 
@@ -99,7 +112,8 @@ class AttributesWidget(QtWidgets.QWidget):
         self.ui.setupUi(self)
 
         # Setup a delegate for editing key column.
-        self.ui.attributes.setItemDelegateForColumn(0, AttributeKeyEditor(self.ui.attributes))
+        self._delegate = AttributeKeyEditor(self.ui.attributes)
+        self.ui.attributes.setItemDelegateForColumn(0, self._delegate)
 
         # Connect events.
         self.ui.add.clicked.connect(self.add)
@@ -133,10 +147,27 @@ class AttributesWidget(QtWidgets.QWidget):
     def attributes(self) -> Dict[str, str]:
         attributes = {}
         for row in range(self.ui.attributes.rowCount()):
-            key = self.ui.attributes.item(row, 0).text()
-            value = self.ui.attributes.item(row, 1).text()
+            # Skip any attributes that don't have a key/value pair set (they raise AttributeError on call to `text`).
+            try:
+                key = self.ui.attributes.item(row, 0).text()
+                value = self.ui.attributes.item(row, 1).text()
+            except AttributeError:
+                continue
             attributes[key] = value
         return attributes
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def setSuggestions(self, suggestions: List[str]) -> None:
+        """Set a list of suggestions for possible attributes when adding new ones to the widget."""
+        # Remove existing values from the list of suggestions.
+        current = [self.ui.attributes.item(row, 0).text() for row in range(self.ui.attributes.rowCount())]
+        for text in current:
+            if text in suggestions:
+                suggestions.remove(text)
+
+        # Pass the remaining suggestion(s) to the delegate.
+        self._delegate.setOptions(suggestions)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
