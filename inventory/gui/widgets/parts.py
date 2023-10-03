@@ -39,6 +39,8 @@ from inventory.model.parts import Part
 # ----------------------------------------------------------------------------------------------------------------------
 class PartsWidget(QtWidgets.QWidget):
     """Presents a table of parts with a QLineEdit that can be used to filter the current view."""
+    selected = QtCore.Signal(Part)
+
     def __init__(self, parent):
         super().__init__(parent)
         self.ui = Ui_WidgetParts()
@@ -52,6 +54,7 @@ class PartsWidget(QtWidgets.QWidget):
         self.ui.add.clicked.connect(self.add)
         self.ui.parts.doubleClicked.connect(self.edit)
         self.ui.filter.textChanged.connect(self.filter)
+        self.ui.parts.itemSelectionChanged.connect(self._part_selected)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -101,6 +104,20 @@ class PartsWidget(QtWidgets.QWidget):
 
         self.ui.parts.item(row, 5).setText(f'${part.price:.3f}')
         self.ui.parts.item(row, 6).setText(f'${part.worth:.2f}')
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def _part_selected(self) -> None:
+        self.selected.emit(self.selectedPart())
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def selectedPart(self) -> Part:
+        """Get the currently selected Part, or None if no part is selected."""
+        rows = list(set([index.row() for index in self.ui.parts.selectedIndexes()]))
+        if len(rows) == 1:
+            return self.ui.parts.item(rows[0], 0).data(QtCore.Qt.UserRole)
+        return None
 
 
 # ----------------------------------------------------------------------------------------------------------------------

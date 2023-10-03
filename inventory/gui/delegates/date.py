@@ -1,5 +1,5 @@
 # ======================================================================================================================
-#      File:  /inventory/model/base.py
+#      File:  /inventory/gui/delegates/date.py
 #   Project:  Inventory
 #    Author:  Jared Julien <jaredjulien@exsystems.net>
 # Copyright:  (c) 2023 Jared Julien, eX Systems
@@ -17,50 +17,59 @@
 # OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # ----------------------------------------------------------------------------------------------------------------------
-"""Declarative base singleton for use by all ORM classes in this model."""
+"""Date entry delegate specifically for editing in QTreeWidget (might also work in QTableWidget...)."""
 
 # ======================================================================================================================
-# Import Statements
+# Imports
 # ----------------------------------------------------------------------------------------------------------------------
-from datetime import datetime
-
-from peewee import Model, SqliteDatabase, PrimaryKeyField, DateTimeField
-
-
-
-
-# ======================================================================================================================
-# Global Variables
-# ----------------------------------------------------------------------------------------------------------------------
-# TODO: Should this be moved to a better location within the app?  Feels wrong that it's a global defined here,
-# particularly the filename  If done in MainWindow then how does it get associated with BaseModel?
-db = SqliteDatabase('parts.dev.sqlite')
+from typing import Union
+from PySide6 import QtCore, QtGui, QtWidgets
+import PySide6.QtCore
+import PySide6.QtWidgets
 
 
 
 
 # ======================================================================================================================
-# SQLalchemy Declarative Base
+# Date Delegate Class
 # ----------------------------------------------------------------------------------------------------------------------
-class BaseModel(Model):
-    """Base class for all ORM classes in this model."""
-    class Meta:
-        database = db
+class DateDelegate(QtWidgets.QStyledItemDelegate):
+    def __init__(self, parent, tree: QtWidgets.QTreeWidget):
+        super().__init__(parent)
+        self.tree = tree
 
 
-    # Common columns for all classes
-    id = PrimaryKeyField()
-    created_on = DateTimeField(default=datetime.now)
-    modified_on = DateTimeField(null=True)
+    def createEditor(self,
+                     parent: QtWidgets.QListWidget,
+                     option: QtWidgets.QStyleOptionViewItem,
+                     index: QtCore.QModelIndex
+                     )-> QtWidgets.QDateEdit:
+        """Create the DateEdit editor view."""
+        editor = QtWidgets.QDateEdit(parent)
+        item = self.tree.itemAt(0, index.row())
+        editor.setDisplayFormat('MM/dd/yy')
+        revision = item.data(0, QtCore.Qt.UserRole)
+        editor.setDate(revision.date)
+        return editor
 
 
-    def save(self, *args, **kwargs):
-        """Override the default save method to add a write of the current date/time to the "modified_on" field."""
-        # Only set the modified_on field when not creating brand new rows.
-        if self.id is not None:
-            self.modified_on = datetime.now()
-        super().save(*args, **kwargs)
+# # ----------------------------------------------------------------------------------------------------------------------
+#     def setEditorData(self, editor: QtWidgets.QDateEdit, index: QtCore.QModelIndex) -> None:
+#         """Set the ComboBox's current index."""
+#         item = self.parent().itemAt(0, index.row())
+#         revision = item.data(0, QtCore.Qt.UserRole)
+#         editor.setDate(revision.date)
 
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def setModelData(self,
+                     editor: QtWidgets.QDateEdit,
+                     model: QtCore.QAbstractItemModel,
+                     index: QtCore.QModelIndex
+                     ) -> None:
+        """Set the table's model's data when finished editing."""
+        value = editor.date().toPython().strftime('%m/%d/%y')
+        model.setData(index, value)
 
 
 

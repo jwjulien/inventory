@@ -32,11 +32,13 @@ from inventory.gui.base.main_window import Ui_MainWindow
 from inventory.gui.tabs.categories import TabCategories
 from inventory.gui.tabs.lost import TabLost
 from inventory.gui.tabs.parts import TabParts
+from inventory.gui.tabs.projects import TabProjects
 from inventory.gui.tabs.storage import TabStorage
 from inventory.gui.tabs.suppliers import TabSuppliers
 from inventory.model.base import db
 from inventory.model.categories import Category
 from inventory.model.parts import Part
+from inventory.model.projects import Project, Revision, Material
 from inventory.model.storage import Area, Unit, Slot, Location
 from inventory.model.suppliers import Supplier, Product
 from inventory.libraries.scanner import ScannerWorker
@@ -67,21 +69,23 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Connect to database.
         db.connect()
-        db.create_tables([Category, Part, Area, Unit, Slot, Location, Supplier, Product])
+        db.create_tables([Category, Part, Area, Unit, Slot, Location, Supplier, Product, Project, Revision, Material])
 
         # Setup tabs.
         self.ui.tab_parts = TabParts(self)
-        self.ui.tabs.addTab(self.ui.tab_parts, 'Parts')
+        self.ui.tabs.addTab(self.ui.tab_parts, 'All Parts')
         self.ui.tab_categories = TabCategories(self)
-        self.ui.tabs.addTab(self.ui.tab_categories, 'Categories')
+        self.ui.tabs.addTab(self.ui.tab_categories, 'By Category')
+        self.ui.tab_projects = TabProjects(self)
+        self.ui.tabs.addTab(self.ui.tab_projects, 'By Project')
         self.ui.tab_storage = TabStorage(self)
-        self.ui.tabs.addTab(self.ui.tab_storage, 'Storage')
+        self.ui.tabs.addTab(self.ui.tab_storage, 'By Location')
+        self.ui.tab_suppliers = TabSuppliers(self)
+        self.ui.tabs.addTab(self.ui.tab_suppliers, 'By Supplier')
         self.ui.tab_lost = TabLost(self)
-        self.ui.tabs.addTab(self.ui.tab_lost, 'Lost')
+        self.ui.tabs.addTab(self.ui.tab_lost, 'Lost Parts')
         tooltip = 'Shows parts that have not been assigned to any location(s) yet.'
         self.ui.tabs.setTabToolTip(self.ui.tabs.indexOf(self.ui.tab_lost), tooltip)
-        self.ui.tab_suppliers = TabSuppliers(self)
-        self.ui.tabs.addTab(self.ui.tab_suppliers, 'Suppliers')
 
         # Setup a thread pool for background tasks.
         self.threadpool = QtCore.QThreadPool(self)

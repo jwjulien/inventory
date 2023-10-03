@@ -1,5 +1,5 @@
 # ======================================================================================================================
-#      File:  /inventory/model/base.py
+#      File:  /inventory/gui/dialogs/part_select.py
 #   Project:  Inventory
 #    Author:  Jared Julien <jaredjulien@exsystems.net>
 # Copyright:  (c) 2023 Jared Julien, eX Systems
@@ -17,49 +17,44 @@
 # OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # ----------------------------------------------------------------------------------------------------------------------
-"""Declarative base singleton for use by all ORM classes in this model."""
+"""A dialog for selecting a part from a list."""
 
 # ======================================================================================================================
-# Import Statements
+# Imports
 # ----------------------------------------------------------------------------------------------------------------------
-from datetime import datetime
+from typing import List
 
-from peewee import Model, SqliteDatabase, PrimaryKeyField, DateTimeField
+from PySide6 import QtCore, QtWidgets
 
-
-
-
-# ======================================================================================================================
-# Global Variables
-# ----------------------------------------------------------------------------------------------------------------------
-# TODO: Should this be moved to a better location within the app?  Feels wrong that it's a global defined here,
-# particularly the filename  If done in MainWindow then how does it get associated with BaseModel?
-db = SqliteDatabase('parts.dev.sqlite')
+from inventory.gui.base.dialog_part_select import Ui_PartSelectDialog
+from inventory.model.parts import Part
 
 
 
 
 # ======================================================================================================================
-# SQLalchemy Declarative Base
+# Part Select Dialog Class
 # ----------------------------------------------------------------------------------------------------------------------
-class BaseModel(Model):
-    """Base class for all ORM classes in this model."""
-    class Meta:
-        database = db
+class PartSelectDialog(QtWidgets.QDialog):
+    """A dialog to assist with selecting a single part from a provided list."""
+    def __init__(self, parent, parts: List[Part]):
+        super().__init__(parent)
+        self.ui = Ui_PartSelectDialog()
+        self.ui.setupUi(self)
+        self.ui.parts.setParts(parts)
+        self.ui.parts.selected.connect(self._selection_changed)
+        self._selection_changed(None)
 
 
-    # Common columns for all classes
-    id = PrimaryKeyField()
-    created_on = DateTimeField(default=datetime.now)
-    modified_on = DateTimeField(null=True)
+# ----------------------------------------------------------------------------------------------------------------------
+    def _selection_changed(self, part: Part) -> None:
+        self.ui.buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setEnabled(bool(part))
 
 
-    def save(self, *args, **kwargs):
-        """Override the default save method to add a write of the current date/time to the "modified_on" field."""
-        # Only set the modified_on field when not creating brand new rows.
-        if self.id is not None:
-            self.modified_on = datetime.now()
-        super().save(*args, **kwargs)
+# ----------------------------------------------------------------------------------------------------------------------
+    def part(self) -> Part:
+        """Return the currently selected Part."""
+        return self.ui.parts.selectedPart()
 
 
 

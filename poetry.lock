@@ -12,6 +12,17 @@ files = [
 ]
 
 [[package]]
+name = "packaging"
+version = "23.2"
+description = "Core utilities for Python packages"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "packaging-23.2-py3-none-any.whl", hash = "sha256:8c491190033a9af7e1d931d0b5dacc2ef47509b34dd0de67ed209b5203fc88c7"},
+    {file = "packaging-23.2.tar.gz", hash = "sha256:048fb0e9405036518eaaf48a55953c750c11e1a1b68e0dd1a9d62ed0c092cfc5"},
+]
+
+[[package]]
 name = "peewee"
 version = "3.16.2"
 description = "a little orm"
@@ -104,6 +115,37 @@ files = [
 ]
 
 [[package]]
+name = "qtawesome"
+version = "1.2.3"
+description = "FontAwesome icons in PyQt and PySide applications"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "QtAwesome-1.2.3-py3-none-any.whl", hash = "sha256:0e8402af52f99f7f7a9d97adfdd715483028202ce8cb00216d9fa14fa8cbfcef"},
+    {file = "QtAwesome-1.2.3.tar.gz", hash = "sha256:0db96484f3ac7a53c88279736b39b6f881a3f6bbd2163d4f0d043b74b1ef9131"},
+]
+
+[package.dependencies]
+qtpy = "*"
+
+[[package]]
+name = "qtpy"
+version = "2.4.0"
+description = "Provides an abstraction layer on top of the various Qt bindings (PyQt5/6 and PySide2/6)."
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "QtPy-2.4.0-py3-none-any.whl", hash = "sha256:4d4f045a41e09ac9fa57fcb47ef05781aa5af294a0a646acc1b729d14225e741"},
+    {file = "QtPy-2.4.0.tar.gz", hash = "sha256:db2d508167aa6106781565c8da5c6f1487debacba33519cedc35fa8997d424d4"},
+]
+
+[package.dependencies]
+packaging = "*"
+
+[package.extras]
+test = ["pytest (>=6,!=7.0.0,!=7.0.1)", "pytest-cov (>=3.0.0)", "pytest-qt"]
+
+[[package]]
 name = "shiboken6"
 version = "6.5.1.1"
 description = "Python/C++ bindings helper module"
@@ -131,4 +173,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.10"
-content-hash = "e242542c7f9c365bb4b6ae974b8e3e6eea03abb781f1e201950f7ab777ddd441"
+content-hash = "0146bee48458ae1cb328d0d80db157e53a2505ae8f0445ff3578e6ebae8742cd"

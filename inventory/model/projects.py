@@ -22,121 +22,87 @@
 # ======================================================================================================================
 # Import Statements
 # ----------------------------------------------------------------------------------------------------------------------
-import collections
+from typing import Dict, List
 
-from sqlalchemy import  ForeignKey
-from sqlalchemy.orm import relationship
-from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy import Column, Integer, String, Text, DateTime
+from peewee import CharField, DateField, ForeignKeyField, TextField
+from playhouse.hybrid import hybrid_property
 
-from inventory.model.base import Base
+from inventory.model.base import BaseModel
+from inventory.model.parts import Part
 
 
 
 
 # ======================================================================================================================
-# Project Class
+# Project Model
 # ----------------------------------------------------------------------------------------------------------------------
-class Project(Base):
-    """A project is quite simply that, a physical widget that has been designed in-house.  Projects untimately contain
+class Project(BaseModel):
+    """A project is quite simply that, a physical widget that has been designed in-house.  Projects ultimately contain
     a list of parts that make of the bill of materials.  The BOM is a complete listing of what is required to construct
     the physical widget.  The project contains revisions to track the various design iterations and their associated
     BOMs."""
-    __tablename__ = 'projects'
+    class Meta:
+        table_name = 'projects'
 
-    # -----[ Columns ]--------------------------------------------------------------------------------------------------
-    id = Column(Integer, primary_key=True)
-    title = Column(String(40))
-    description = Column(Text)
-    created_on = Column(DateTime)
-    modified_on = Column(DateTime)
-
-    # -----[ Relationships ]--------------------------------------------------------------------------------------------
-    revisions = relationship('Revision', backref='project', order_by='Revision.version')
-
-    # -----[ Static Methods ]-------------------------------------------------------------------------------------------
-    @staticmethod
-    def GetAll(session):
-        """Return all of the projects in the database."""
-        return session.query(Project).order_by(Project.title).all()
-
-    @staticmethod
-    def GetById(session, id):
-        """Return a single project with the corresponding ID."""
-        return session.query(Project).filter_by(id=id).first()
+    title = CharField(40)
+    description = TextField()
 
 
 
 
 # ======================================================================================================================
-# Project Revision Class
+# Project Revision Model
 # ----------------------------------------------------------------------------------------------------------------------
-class Revision(Base):
+class Revision(BaseModel):
     """A revision is a version of a project.  Various project iterations, or versions, may have slightly different
     bill of materials lists so versions must be tracked independently."""
-    __tablename__ = 'revisions'
+    class Meta:
+        table_name = 'revisions'
 
-    # -----[ Columns ]--------------------------------------------------------------------------------------------------
-    id = Column(Integer, primary_key=True)
-    project_id = Column(Integer, ForeignKey('projects.id'))
-    version = Column(String(32))
-    created_on = Column(DateTime)
-    modified_on = Column(DateTime)
+    project = ForeignKeyField(Project, backref='revisions')
+    version = CharField(32)
+    date = DateField()
 
-    # -----[ Relationships ]--------------------------------------------------------------------------------------------
-    boms = relationship('BOM', backref='revision', order_by='BOM.designator')
 
-    # -----[ Properties ]-----------------------------------------------------------------------------------------------
     @hybrid_property
     def total_cost(self):
-        """Hybrid property that returns the total cost of the project by summing the price of each individual
-        component."""
-        return sum([bom.part.price or 0 for bom in self.boms])
+        """The sum of all parts associated with a Revision of a Project."""
+        return sum([bom.part.price or 0 for bom in self.lines])
+
 
     @hybrid_property
-    def parts(self):
+    def parts(self) -> Dict[Part, List['Material']]:
         """Hybrid property that groups bom entries into a dictionary where the keys are unique parts and the values
         are a list of bom entries.  Useful when view BOMs as parts are generally grouped showing a list of designators
         rather than individual parts."""
-        grouped = collections.OrderedDict()
-        # Ordered dict will remember the order that the entries are placed into it.  We would prefer for the parts
-        # without designators to be located at the end of the list so resort the parts accordingly.
-        for bom in sorted(self.boms, key=lambda bom: (bom.designator is None, bom.designator)):
-            if bom.part not in grouped:
-                grouped[bom.part] = []
-            grouped[bom.part].append(bom)
+        grouped = {}
+        for material in sorted(self.materials, key=lambda material: (material.designator is None, material.designator)):
+            if material.part not in grouped:
+                grouped[material.part] = []
+            grouped[material.part].append(material)
         return grouped
 
-    # -----[ Static Methods ]-------------------------------------------------------------------------------------------
-    @staticmethod
-    def GetById(session, id):
-        """Return a single project revision with the corresponding ID."""
-        return session.query(Revision).filter_by(id=id).first()
+
+    def lookup_material(self, designator: str) -> 'Material':
+        for material in self.materials:
+            if material.designator == designator:
+                return material
+        raise KeyError(f'Designator "{designator}" does not exist on {self.project.title} version {self.version}')
 
 
 
 
 # ======================================================================================================================
-# Project Revision BOM Entry Class
+# Project Revision Material Model
 # ----------------------------------------------------------------------------------------------------------------------
-class BOM(Base):
-    """A BOM (in this sense) is a single entry that maps a part to a project revision.  The mapping contains an
-    additional attribute to designate the corresponding part in the schematic."""
-    __tablename__ = 'boms'
+class Material(BaseModel):
+    """A single entry from a bill of materials for a Project Revision."""
+    class Meta:
+        table_name = 'materials'
 
-    # -----[ Columns ]--------------------------------------------------------------------------------------------------
-    id = Column(Integer, primary_key=True)
-    revision_id = Column(Integer, ForeignKey("revisions.id"))
-    part_id = Column(Integer, ForeignKey("parts.id"))
-    designator = Column(String(10))
-    created_on = Column(DateTime)
-    modified_on = Column(DateTime)
-
-    # -----[ Static Methods ]-------------------------------------------------------------------------------------------
-    @staticmethod
-    def GetById(session, id):
-        """Return a single BOM entry with the corresponding ID."""
-        return session.query(BOM).filter_by(id=id).first()
+    revision = ForeignKeyField(Revision, backref='materials')
+    part = ForeignKeyField(Part, backref='materials')
+    designator = CharField(10)
 
 
 
