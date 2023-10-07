@@ -28,7 +28,8 @@ from PySide6 import QtCore, QtWidgets
 import qtawesome
 
 from inventory.gui.base.widget_projects import Ui_WidgetProjects
-from inventory.model.projects import Project
+from inventory.gui.wizards.bom_import import BomImportWizard
+from inventory.model.projects import Project, Revision
 
 
 
@@ -38,6 +39,7 @@ from inventory.model.projects import Project
 # ----------------------------------------------------------------------------------------------------------------------
 class ProjectsWidget(QtWidgets.QWidget):
     selected = QtCore.Signal(Project)
+    imported = QtCore.Signal(Revision)
 
     def __init__(self, parent):
         super().__init__(parent)
@@ -49,7 +51,8 @@ class ProjectsWidget(QtWidgets.QWidget):
         self.ui.remove.setEnabled(False)
 
         # Connect events.
-        self.ui.add.clicked.connect(self.add)
+        self.ui.add.clicked.connect(self._add_new)
+        self.ui.import_bom.clicked.connect(self._import)
         self.ui.remove.clicked.connect(self.remove)
         self.ui.projects.itemSelectionChanged.connect(self._selected)
         self.ui.projects.itemChanged.connect(self._changed)
@@ -62,18 +65,28 @@ class ProjectsWidget(QtWidgets.QWidget):
 
         # Insert the new projects into the list.
         for project in sorted(projects, key=lambda project: project.title):
-            self._add_item(project)
+            self.add(project)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-    def add(self) -> None:
+    def _add_new(self) -> None:
         project = Project()
-        item = self._add_item(project)
+        item = self.add(project)
         self.ui.projects.editItem(item)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-    def _add_item(self, project: Project) -> QtWidgets.QListWidgetItem:
+    def select(self, project: Project) -> None:
+        """"Programmatically select the specified project."""
+        for row in range(self.ui.projects.topLevelItemCount()):
+            item = self.ui.projects.topLevelItem(row)
+            if project == item.data(0, QtCore.Qt.UserRole):
+                item.setSelected(True)
+                break
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def add(self, project: Project) -> QtWidgets.QListWidgetItem:
         item = QtWidgets.QTreeWidgetItem()
         item.setText(0, project.title)
         item.setText(1, project.description)
@@ -108,11 +121,20 @@ class ProjectsWidget(QtWidgets.QWidget):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
+    def _import(self) -> None:
+        dialog = BomImportWizard(self)
+        if dialog.exec():
+            self.imported.emit(dialog.committed_revision)
+
+
+# ----------------------------------------------------------------------------------------------------------------------
     def _selected(self) -> None:
-        item = self.ui.projects.selectedItems()[0]
-        project = item.data(0, QtCore.Qt.UserRole)
-        self.selected.emit(project)
-        self.ui.remove.setEnabled(bool(item))
+        selected = self.ui.projects.selectedItems()
+        self.ui.remove.setEnabled(bool(selected))
+        if selected:
+            item = selected[0]
+            project = item.data(0, QtCore.Qt.UserRole)
+            self.selected.emit(project)
 
 
 # ----------------------------------------------------------------------------------------------------------------------

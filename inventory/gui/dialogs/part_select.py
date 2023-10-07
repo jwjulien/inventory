@@ -52,6 +52,12 @@ class PartSelectDialog(QtWidgets.QDialog):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
+    def setFilter(self, text: str) -> None:
+        """Set the current filter text for this selection."""
+        self.ui.parts.setFilter(text)
+
+
+# ----------------------------------------------------------------------------------------------------------------------
     def part(self) -> Part:
         """Return the currently selected Part."""
         return self.ui.parts.selectedPart()

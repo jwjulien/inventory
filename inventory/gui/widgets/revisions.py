@@ -58,7 +58,7 @@ class RevisionsWidget(QtWidgets.QWidget):
         # Connect events.
         self.ui.add.clicked.connect(self.add)
         self.ui.remove.clicked.connect(self.remove)
-        self.ui.view_bom.clicked.connect(self.select)
+        self.ui.view_bom.clicked.connect(self._view_bom)
         self.ui.revisions.itemSelectionChanged.connect(self._selected)
         self.ui.revisions.itemChanged.connect(self._changed)
 
@@ -73,6 +73,15 @@ class RevisionsWidget(QtWidgets.QWidget):
         # Insert the new revisions into the list.
         for revision in sorted(project.revisions, key=lambda revision: revision.version):
             self._add_item(revision)
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def select(self, revision: Revision) -> None:
+        for row in range(self.ui.revisions.topLevelItemCount()):
+            item = self.ui.revisions.topLevelItem(row)
+            if revision == item.data(0, QtCore.Qt.UserRole):
+                item.setSelected(True)
+                break
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -104,7 +113,8 @@ class RevisionsWidget(QtWidgets.QWidget):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-    def select(self) -> None:
+    def _view_bom(self) -> None:
+        """User has clicked the View BOM button.  Switch views and show the BOM."""
         items = self.ui.revisions.selectedItems()
         if len(items) == 1:
             revision = items[0].data(0, QtCore.Qt.UserRole)

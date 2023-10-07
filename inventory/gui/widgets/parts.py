@@ -68,6 +68,11 @@ class PartsWidget(QtWidgets.QWidget):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
+    def setFilter(self, text: str) -> None:
+        self.ui.filter.setText(text)
+
+
+# ----------------------------------------------------------------------------------------------------------------------
     def clear(self) -> None:
         # Remove any existing rows.
         while self.ui.parts.rowCount():
@@ -127,6 +132,7 @@ class PartsWidget(QtWidgets.QWidget):
             row = self.ui.parts.rowCount()
             self._insert_row(row)
             self._update_row(row, part)
+            self.ui.parts.selectRow(row)
 
 
 # ----------------------------------------------------------------------------------------------------------------------

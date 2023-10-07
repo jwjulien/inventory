@@ -33,6 +33,11 @@ class Ui_WidgetProjects(object):
 
         self.horizontalLayout.addWidget(self.add)
 
+        self.import_bom = QPushButton(WidgetProjects)
+        self.import_bom.setObjectName(u"import_bom")
+
+        self.horizontalLayout.addWidget(self.import_bom)
+
         self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         self.horizontalLayout.addItem(self.horizontalSpacer)
@@ -68,6 +73,7 @@ class Ui_WidgetProjects(object):
     def retranslateUi(self, WidgetProjects):
         WidgetProjects.setWindowTitle(QCoreApplication.translate("WidgetProjects", u"Form", None))
         self.add.setText(QCoreApplication.translate("WidgetProjects", u"Add Project", None))
+        self.import_bom.setText(QCoreApplication.translate("WidgetProjects", u"Import BOM", None))
         self.remove.setText(QCoreApplication.translate("WidgetProjects", u"Remove Project", None))
         ___qtreewidgetitem = self.projects.headerItem()
         ___qtreewidgetitem.setText(1, QCoreApplication.translate("WidgetProjects", u"Description", None));

@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>BomImportWizard</class>
+ <widget class="QDialog" name="BomImportWizard">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>783</width>
+    <height>470</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QStackedWidget" name="stack">
+     <property name="currentIndex">
+      <number>3</number>
+     </property>
+     <widget class="QWidget" name="page_browse">
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QLabel" name="instructions_1">
+         <property name="text">
+          <string>Select a Markdown format BOM to get started.</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="FileSelectWidget" name="file_select" native="true"/>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page_project">
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QGroupBox" name="group_project">
+         <property name="title">
+          <string>Project</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout">
+          <item row="0" column="0">
+           <widget class="QRadioButton" name="radio_project_existing">
+            <property name="text">
+             <string>Use Exiting</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QRadioButton" name="radio_project_new">
+            <property name="text">
+             <string>Make New</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLineEdit" name="project_editor">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="placeholderText">
+             <string>Project Title</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QComboBox" name="project_combo"/>
+          </item>
+          <item row="3" column="1">
+           <widget class="QPlainTextEdit" name="project_description">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="placeholderText">
+             <string>Project description</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0" colspan="2">
+           <widget class="Line" name="line_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page_revision">
+      <layout class="QVBoxLayout" name="verticalLayout_5">
+       <item>
+        <widget class="QLabel" name="project_name">
+         <property name="text">
+          <string>Project Name</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="group_revision">
+         <property name="title">
+          <string>Revision</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_2">
+          <item row="0" column="0">
+           <widget class="QRadioButton" name="radio_revision_existing">
+            <property name="text">
+             <string>Use Exiting</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QRadioButton" name="radio_revision_new">
+            <property name="text">
+             <string>Make New</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QDateEdit" name="revision_date">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QComboBox" name="revision_combo"/>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLineEdit" name="revision_editor">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="placeholderText">
+             <string>Revision name</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0" colspan="2">
+           <widget class="Line" name="line">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>232</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page_materials">
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <item>
+        <widget class="QLabel" name="bom_title">
+         <property name="text">
+          <string>BOM Title</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QTreeWidget" name="materials">
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
+         <property name="rootIsDecorated">
+          <bool>false</bool>
+         </property>
+         <attribute name="headerDefaultSectionSize">
+          <number>200</number>
+         </attribute>
+         <column>
+          <property name="text">
+           <string>Designator</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>BOM Description</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>BOM Part Number</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Part Summary</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Part Number</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QWidget" name="widget" native="true">
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QPushButton" name="back">
+        <property name="text">
+         <string>Back</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="next">
+        <property name="text">
+         <string>Next</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>FileSelectWidget</class>
+   <extends>QWidget</extends>
+   <header>inventory.gui.widgets.file_select</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

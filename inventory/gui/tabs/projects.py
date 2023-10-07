@@ -28,7 +28,6 @@ from PySide6 import QtCore, QtWidgets
 import qtawesome
 
 from inventory.gui.base.tab_projects import Ui_TabProjects
-from inventory.gui.dialogs.part import PartDialog
 from inventory.gui.dialogs.part_select import PartSelectDialog
 from inventory.model.projects import Project, Revision, Material
 from inventory.model.parts import Part
@@ -57,6 +56,7 @@ class TabProjects(QtWidgets.QWidget):
 
         # Connect events.
         self.ui.projects.selected.connect(self._project_selected)
+        self.ui.projects.imported.connect(self._bom_imported)
         self.ui.revisions.selected.connect(self._revision_selected)
         self.ui.back.clicked.connect(self._show_projects)
         self.ui.add_material.clicked.connect(self._add_material)
@@ -69,6 +69,15 @@ class TabProjects(QtWidgets.QWidget):
     def _project_selected(self, project: Project) -> None:
         self.ui.revisions.setEnabled(bool(project))
         self.ui.revisions.setProject(project)
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def _bom_imported(self, revision: Revision) -> None:
+        # Refresh projects to possibly include a new addition.
+        self.ui.projects.setProjects(Project.select())
+        self.ui.projects.select(revision.project)
+        self.ui.revisions.select(revision)
+        self._revision_selected(revision)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
