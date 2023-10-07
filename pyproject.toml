@@ -14,7 +14,10 @@ peewee = "^3.16.2"
 pyusb = "^1.2.1"
 timeago = "^1.0.16"
 qtawesome = "^1.2.3"
+click = "^8.1.7"
 
+[tool.poetry.scripts]
+ui = "scripts.gui:generate"
 
 [build-system]
 requires = ["poetry-core"]
