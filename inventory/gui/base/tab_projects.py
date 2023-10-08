@@ -101,6 +101,7 @@ class Ui_TabProjects(object):
         self.materials.setAlternatingRowColors(True)
         self.materials.setSelectionMode(QAbstractItemView.SingleSelection)
         self.materials.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.materials.setSortingEnabled(True)
         self.materials.horizontalHeader().setDefaultSectionSize(200)
         self.materials.horizontalHeader().setStretchLastSection(True)
         self.materials.verticalHeader().setVisible(False)

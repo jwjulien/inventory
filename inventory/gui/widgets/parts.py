@@ -73,6 +73,14 @@ class PartsWidget(QtWidgets.QWidget):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
+    def setSelectedPart(self, part: Part) -> None:
+        for row in range(self.ui.parts.rowCount()):
+            if self.ui.parts.item(row, 0).data(QtCore.Qt.UserRole) == part:
+                self.ui.parts.selectRow(row)
+                break
+
+
+# ----------------------------------------------------------------------------------------------------------------------
     def clear(self) -> None:
         # Remove any existing rows.
         while self.ui.parts.rowCount():

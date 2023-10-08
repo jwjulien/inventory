@@ -74,7 +74,7 @@ class MaterialsWidget(QtWidgets.QWidget):
         self.ui.materials.item(row, 0).setText(material.revision.project.title)
         self.ui.materials.item(row, 0).setToolTip(material.revision.project.description)
         self.ui.materials.item(row, 1).setText(
-            "{material.revision.version} ({material.revision.date.strftime('%Y-%m-%d')})")
+            f"{material.revision.version} ({material.revision.date.strftime('%Y-%m-%d')})")
         self.ui.materials.item(row, 2).setText(material.designator)
 
 

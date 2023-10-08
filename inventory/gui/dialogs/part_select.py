@@ -58,6 +58,12 @@ class PartSelectDialog(QtWidgets.QDialog):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
+    def setPart(self, part: Part) -> None:
+        """Set the currently selected row in the parts table to the specified part."""
+        self.ui.parts.setSelectedPart(part)
+
+
+# ----------------------------------------------------------------------------------------------------------------------
     def part(self) -> Part:
         """Return the currently selected Part."""
         return self.ui.parts.selectedPart()
