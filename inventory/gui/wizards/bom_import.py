@@ -305,7 +305,7 @@ class BomImportWizard(QtWidgets.QDialog):
             for revision in self.project.revisions:
                 self.ui.revision_combo.addItem(revision.version, revision)
                 if self.bom and revision.version.lower() == self.bom.revision.lower():
-                    self.found = True
+                    found = True
                     self.ui.radio_revision_existing.setChecked(True)
                     self._use_existing_revision()
                     self.ui.revision_combo.setCurrentText(revision.version)
@@ -334,14 +334,33 @@ class BomImportWizard(QtWidgets.QDialog):
 
         elif index == 3: # Commit Changes
             self.committed_revision = self.revision
+
+            # Attempt to gather any Materials already associated with this revision.
+            materials = list(Material.select().where(Material.revision_id == self.committed_revision.id))
+
+            # Save the revision and project.
             self.committed_revision.project.save()
             self.committed_revision.save()
+
+            # Walk through materials and update the database.
             for row in range(self.ui.materials.topLevelItemCount()):
                 item = self.ui.materials.topLevelItem(row)
                 line: LineItem = item.data(0, QtCore.Qt.UserRole)
-                if line.part:
-                    # TODO: If merging an existing BOM these Materials may already exist... need to lookup.
-                    Material.create(revision=self.committed_revision, part=line.part, designator=line.designator)
+                if not line.part:
+                    continue
+
+                # Search for an existing material with this designator already in the BOM..
+                for material in materials:
+                    # Match existing materials by their designator.
+                    if material.designator == line.designator:
+                        material.part = line.part
+                        material.save()
+                        break
+                else:
+                    # No Material exists yet, so we need to create a new one.
+                    material = Material.create(revision=self.committed_revision, part=line.part, designator=line.designator)
+
+            # We're done.  Accept (and close) this dialog.
             self.accept()
 
 

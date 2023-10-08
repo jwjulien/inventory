@@ -28,7 +28,7 @@ class Ui_BomImportWizard(object):
     def setupUi(self, BomImportWizard):
         if not BomImportWizard.objectName():
             BomImportWizard.setObjectName(u"BomImportWizard")
-        BomImportWizard.resize(783, 470)
+        BomImportWizard.resize(1067, 470)
         self.verticalLayout = QVBoxLayout(BomImportWizard)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.stack = QStackedWidget(BomImportWizard)
@@ -203,14 +203,14 @@ class Ui_BomImportWizard(object):
 
         self.retranslateUi(BomImportWizard)
 
-        self.stack.setCurrentIndex(3)
+        self.stack.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(BomImportWizard)
     # setupUi
 
     def retranslateUi(self, BomImportWizard):
-        BomImportWizard.setWindowTitle(QCoreApplication.translate("BomImportWizard", u"Dialog", None))
+        BomImportWizard.setWindowTitle(QCoreApplication.translate("BomImportWizard", u"BOM Import Wizard", None))
         self.instructions_1.setText(QCoreApplication.translate("BomImportWizard", u"Select a Markdown format BOM to get started.", None))
         self.group_project.setTitle(QCoreApplication.translate("BomImportWizard", u"Project", None))
         self.radio_project_existing.setText(QCoreApplication.translate("BomImportWizard", u"Use Exiting", None))

@@ -83,11 +83,18 @@ class TabProjects(QtWidgets.QWidget):
 # ----------------------------------------------------------------------------------------------------------------------
     def _revision_selected(self, revision: Revision) -> None:
         self._selected_revision = revision
-        self.ui.materials.clearContents()
+        self._clear_materials()
         for material in revision.materials:
             self._append_material(material)
         self.ui.title.setText(f'{revision.project.title} Hardware Version {revision.version} Bill of Materials')
         self.ui.stack.setCurrentWidget(self.ui.page_parts)
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def _clear_materials(self) -> None:
+        """Remove all of the materials currently displayed in the BOM table."""
+        while self.ui.materials.rowCount():
+            self.ui.materials.removeRow(0)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
