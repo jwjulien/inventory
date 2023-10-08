@@ -19,10 +19,11 @@ from PySide6.QtWidgets import (QAbstractButton, QApplication, QComboBox, QDialog
     QDialogButtonBox, QDoubleSpinBox, QFormLayout, QGraphicsView,
     QHBoxLayout, QLabel, QLineEdit, QListWidget,
     QListWidgetItem, QPlainTextEdit, QPushButton, QSizePolicy,
-    QSpinBox, QVBoxLayout, QWidget)
+    QSpinBox, QTabWidget, QVBoxLayout, QWidget)
 
 from inventory.gui.widgets.attributes import AttributesWidget
 from inventory.gui.widgets.location import LocationWidget
+from inventory.gui.widgets.materials import MaterialsWidget
 from inventory.gui.widgets.suppliers import SuppliersWidget
 
 class Ui_DialogPart(object):
@@ -191,33 +192,64 @@ class Ui_DialogPart(object):
 
         self.verticalLayout_5.addWidget(self.top)
 
-        self.locations = LocationWidget(self.left)
-        self.locations.setObjectName(u"locations")
-        sizePolicy5 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        self.tabs = QTabWidget(self.left)
+        self.tabs.setObjectName(u"tabs")
+        sizePolicy5 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         sizePolicy5.setHorizontalStretch(0)
-        sizePolicy5.setVerticalStretch(1)
-        sizePolicy5.setHeightForWidth(self.locations.sizePolicy().hasHeightForWidth())
-        self.locations.setSizePolicy(sizePolicy5)
+        sizePolicy5.setVerticalStretch(2)
+        sizePolicy5.setHeightForWidth(self.tabs.sizePolicy().hasHeightForWidth())
+        self.tabs.setSizePolicy(sizePolicy5)
+        self.tabs.setTabPosition(QTabWidget.West)
+        self.tab_locations = QWidget()
+        self.tab_locations.setObjectName(u"tab_locations")
+        self.verticalLayout_2 = QVBoxLayout(self.tab_locations)
+        self.verticalLayout_2.setObjectName(u"verticalLayout_2")
+        self.locations = LocationWidget(self.tab_locations)
+        self.locations.setObjectName(u"locations")
+        sizePolicy6 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sizePolicy6.setHorizontalStretch(0)
+        sizePolicy6.setVerticalStretch(1)
+        sizePolicy6.setHeightForWidth(self.locations.sizePolicy().hasHeightForWidth())
+        self.locations.setSizePolicy(sizePolicy6)
 
-        self.verticalLayout_5.addWidget(self.locations)
+        self.verticalLayout_2.addWidget(self.locations)
 
-        self.suppliers = SuppliersWidget(self.left)
+        self.tabs.addTab(self.tab_locations, "")
+        self.tab_projects = QWidget()
+        self.tab_projects.setObjectName(u"tab_projects")
+        self.verticalLayout_7 = QVBoxLayout(self.tab_projects)
+        self.verticalLayout_7.setObjectName(u"verticalLayout_7")
+        self.materials = MaterialsWidget(self.tab_projects)
+        self.materials.setObjectName(u"materials")
+
+        self.verticalLayout_7.addWidget(self.materials)
+
+        self.tabs.addTab(self.tab_projects, "")
+        self.tab_suppliers = QWidget()
+        self.tab_suppliers.setObjectName(u"tab_suppliers")
+        self.verticalLayout_6 = QVBoxLayout(self.tab_suppliers)
+        self.verticalLayout_6.setObjectName(u"verticalLayout_6")
+        self.suppliers = SuppliersWidget(self.tab_suppliers)
         self.suppliers.setObjectName(u"suppliers")
-        sizePolicy5.setHeightForWidth(self.suppliers.sizePolicy().hasHeightForWidth())
-        self.suppliers.setSizePolicy(sizePolicy5)
+        sizePolicy6.setHeightForWidth(self.suppliers.sizePolicy().hasHeightForWidth())
+        self.suppliers.setSizePolicy(sizePolicy6)
 
-        self.verticalLayout_5.addWidget(self.suppliers)
+        self.verticalLayout_6.addWidget(self.suppliers)
+
+        self.tabs.addTab(self.tab_suppliers, "")
+
+        self.verticalLayout_5.addWidget(self.tabs)
 
 
         self.horizontalLayout_7.addWidget(self.left)
 
         self.right = QWidget(DialogPart)
         self.right.setObjectName(u"right")
-        sizePolicy6 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
-        sizePolicy6.setHorizontalStretch(1)
-        sizePolicy6.setVerticalStretch(0)
-        sizePolicy6.setHeightForWidth(self.right.sizePolicy().hasHeightForWidth())
-        self.right.setSizePolicy(sizePolicy6)
+        sizePolicy7 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sizePolicy7.setHorizontalStretch(1)
+        sizePolicy7.setVerticalStretch(0)
+        sizePolicy7.setHeightForWidth(self.right.sizePolicy().hasHeightForWidth())
+        self.right.setSizePolicy(sizePolicy7)
         self.verticalLayout_4 = QVBoxLayout(self.right)
         self.verticalLayout_4.setSpacing(15)
         self.verticalLayout_4.setObjectName(u"verticalLayout_4")
@@ -259,11 +291,11 @@ class Ui_DialogPart(object):
         self.documents = QListWidget(self.document_widget)
         self.documents.setObjectName(u"documents")
         self.documents.setEnabled(False)
-        sizePolicy7 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        sizePolicy7.setHorizontalStretch(0)
-        sizePolicy7.setVerticalStretch(0)
-        sizePolicy7.setHeightForWidth(self.documents.sizePolicy().hasHeightForWidth())
-        self.documents.setSizePolicy(sizePolicy7)
+        sizePolicy8 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy8.setHorizontalStretch(0)
+        sizePolicy8.setVerticalStretch(0)
+        sizePolicy8.setHeightForWidth(self.documents.sizePolicy().hasHeightForWidth())
+        self.documents.setSizePolicy(sizePolicy8)
 
         self.verticalLayout.addWidget(self.documents)
 
@@ -300,6 +332,9 @@ class Ui_DialogPart(object):
         self.buttonBox.accepted.connect(DialogPart.accept)
         self.buttonBox.rejected.connect(DialogPart.reject)
 
+        self.tabs.setCurrentIndex(0)
+
+
         QMetaObject.connectSlotsByName(DialogPart)
     # setupUi
 
@@ -322,6 +357,9 @@ class Ui_DialogPart(object):
         self.weight.setSuffix(QCoreApplication.translate("DialogPart", u"g", None))
         self.calibrate.setText(QCoreApplication.translate("DialogPart", u"Calibrate", None))
         self.lbl_notes.setText(QCoreApplication.translate("DialogPart", u"Notes:", None))
+        self.tabs.setTabText(self.tabs.indexOf(self.tab_locations), QCoreApplication.translate("DialogPart", u"Locations", None))
+        self.tabs.setTabText(self.tabs.indexOf(self.tab_projects), QCoreApplication.translate("DialogPart", u"Projects", None))
+        self.tabs.setTabText(self.tabs.indexOf(self.tab_suppliers), QCoreApplication.translate("DialogPart", u"Suppliers", None))
         self.set_image.setText(QCoreApplication.translate("DialogPart", u"Set Image", None))
         self.remove_image.setText(QCoreApplication.translate("DialogPart", u"Remove Image", None))
         self.add_document.setText(QCoreApplication.translate("DialogPart", u"Add Document", None))

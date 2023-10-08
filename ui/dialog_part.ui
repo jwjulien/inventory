@@ -238,23 +238,63 @@ Set to zero to disable reorder (i.e. non-stocked) or set to one to reorder when 
        </widget>
       </item>
       <item>
-       <widget class="LocationWidget" name="locations" native="true">
+       <widget class="QTabWidget" name="tabs">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
           <horstretch>0</horstretch>
-          <verstretch>1</verstretch>
+          <verstretch>2</verstretch>
          </sizepolicy>
         </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="SuppliersWidget" name="suppliers" native="true">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>1</verstretch>
-         </sizepolicy>
+        <property name="tabPosition">
+         <enum>QTabWidget::West</enum>
         </property>
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        <widget class="QWidget" name="tab_locations">
+         <attribute name="title">
+          <string>Locations</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <item>
+           <widget class="LocationWidget" name="locations" native="true">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>1</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="tab_projects">
+         <attribute name="title">
+          <string>Projects</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_7">
+          <item>
+           <widget class="MaterialsWidget" name="materials" native="true"/>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="tab_suppliers">
+         <attribute name="title">
+          <string>Suppliers</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_6">
+          <item>
+           <widget class="SuppliersWidget" name="suppliers" native="true">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>1</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
        </widget>
       </item>
      </layout>
@@ -407,6 +447,12 @@ Set to zero to disable reorder (i.e. non-stocked) or set to one to reorder when 
    <class>SuppliersWidget</class>
    <extends>QWidget</extends>
    <header>inventory.gui.widgets.suppliers</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>MaterialsWidget</class>
+   <extends>QWidget</extends>
+   <header>inventory.gui.widgets.materials</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

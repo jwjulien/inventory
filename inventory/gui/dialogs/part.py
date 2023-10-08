@@ -77,6 +77,7 @@ class PartDialog(QtWidgets.QDialog):
         self.ui.notes.setPlainText(part.notes)
 
         self.ui.locations.setPart(part)
+        self.ui.materials.setPart(part)
         self.ui.suppliers.setPart(part)
 
 
