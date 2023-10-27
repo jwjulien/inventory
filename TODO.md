@@ -21,8 +21,11 @@
     - [ ] Give slots more screen space.  The splitter is nice, but bigger units with long slot names still require scrolling.  I think it might be nice to collapse the areas and units, breadcrumb style.
 - [x] Change attributes to allow capital letters.
 - [ ] Support datasheets and technical drawings.
+- [x] Support adding new categories from the parts dialog.
 - [x] When adding parts, get attributes from the same category and offer them as suggestions.
 - [ ] Update the part matching on BOM import to better match attributes with weighting for things like package and part number over category (as opposed to either summery vs part number matching as it's done now).
 - [ ] In project BOM view:
     - [ ] Allow remapping a part for a given designator.
     - [ ] Support a custom context menu for removing a Material and remapping a part.
+- [ ] Modify parts dialog [Save] to be [Apply] and [Ok] to allow saving.
+    - [ ] Don't allow locations/suppliers/projects to be added to new parts until saved (as no ID throws error).

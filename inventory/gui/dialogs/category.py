@@ -43,6 +43,14 @@ class CategoryDialog(QtWidgets.QDialog):
 
         self.category = category
 
+        if category.id:
+            self.setWindowTitle(f'Edit category {category.title}')
+        elif category.parent:
+            self.setWindowTitle(f'Add category to {category.full_title()}')
+            self.ui.title.setPlaceholderText(category.full_title())
+        else:
+            self.setWindowTitle('Add new root category')
+
         self.ui.title.setText(self.category.title)
         self.ui.designator.setText(self.category.designator)
         self.ui.designator.setPlaceholderText(self.category.inherited_designator)

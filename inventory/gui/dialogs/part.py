@@ -25,6 +25,7 @@
 from PySide6 import QtCore, QtWidgets
 
 from inventory.gui.base.dialog_part import Ui_DialogPart
+from inventory.gui.dialogs.category import CategoryDialog
 from inventory.model.parts import Part
 from inventory.model.categories import Category
 
@@ -48,9 +49,12 @@ class PartDialog(QtWidgets.QDialog):
 
         # Connect events.
         self.ui.category.currentIndexChanged.connect(self._category_changed)
+        self.ui.new_category.clicked.connect(self._add_category)
 
         # Load part information into dialog.
         self.load(part)
+
+        self._category_changed()
 
 
 
@@ -109,9 +113,25 @@ class PartDialog(QtWidgets.QDialog):
     def _category_changed(self) -> None:
         """Fires when the category selection was changed by the user."""
         # Get a list of attributes that are attributes to other parts in this category to offer as suggestions.
-        category = self.ui.category.currentData(QtCore.Qt.UserRole)
+        category: Category = self.ui.category.currentData(QtCore.Qt.UserRole)
+        self.ui.category.setToolTip(category.full_title())
         attributes = sorted(set([attribute for part in category.parts for attribute in part.attributes]))
         self.ui.attributes.setSuggestions(attributes)
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def _add_category(self) -> None:
+        """Prompt the user to add a new category to the database and then select it in the dropdown."""
+        parent = self.ui.category.currentData(QtCore.Qt.UserRole)
+        category = Category(parent=parent, title='')
+        dialog = CategoryDialog(self, category)
+        if dialog.exec():
+            category.save()
+            title = category.full_title()
+            self.ui.category.addItem(title, category)
+            self.ui.category.model().sort(0, QtCore.Qt.AscendingOrder)
+            self.ui.category.setCurrentText(title)
+
 
 
 
