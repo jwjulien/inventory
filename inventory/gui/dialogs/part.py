@@ -47,15 +47,19 @@ class PartDialog(QtWidgets.QDialog):
         for category in categories:
             self.ui.category.addItem(category.full_title(), category)
 
+        # Don't allow setting tabbed attributes until this part has an ID.
+        self.ui.tabs.setEnabled(bool(part.id))
+
         # Connect events.
         self.ui.category.currentIndexChanged.connect(self._category_changed)
         self.ui.new_category.clicked.connect(self._add_category)
+        self.ui.buttonBox.button(QtWidgets.QDialogButtonBox.StandardButton.Apply).clicked.connect(self._save)
+        self.ui.buttonBox.button(QtWidgets.QDialogButtonBox.StandardButton.Discard).clicked.connect(self.reject)
 
         # Load part information into dialog.
         self.load(part)
 
         self._category_changed()
-
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -86,8 +90,9 @@ class PartDialog(QtWidgets.QDialog):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-    def accept(self) -> None:
-        """When the user accepts the changes, update the provided part."""
+    def _save(self) -> None:
+        """Save this part."""
+        # TODO: Only allow save if part is valid - i.e. has a value and part number.
         self.part.category_id = self.ui.category.currentData()
         self.part.value = self.ui.value.text()
         self.part.number = self.ui.part_number.text()
@@ -100,6 +105,13 @@ class PartDialog(QtWidgets.QDialog):
         self.part.notes = self.ui.notes.toPlainText()
         self.part.attributes = self.ui.attributes.attributes()
         self.part.save()
+        self.ui.tabs.setEnabled(True)
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def accept(self) -> None:
+        """When the user accepts the changes, update the provided part."""
+        self._save()
         return super().accept()
 
 

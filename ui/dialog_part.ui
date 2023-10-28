@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1091</width>
+    <width>1208</width>
     <height>650</height>
    </rect>
   </property>
@@ -60,7 +60,7 @@
           <widget class="QWidget" name="properties_widget" native="true">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-             <horstretch>3</horstretch>
+             <horstretch>5</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
@@ -239,6 +239,9 @@ Set to zero to disable reorder (i.e. non-stocked) or set to one to reorder when 
       </item>
       <item>
        <widget class="QTabWidget" name="tabs">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
           <horstretch>0</horstretch>
@@ -416,12 +419,12 @@ Set to zero to disable reorder (i.e. non-stocked) or set to one to reorder when 
        </widget>
       </item>
       <item>
-       <widget class="QDialogButtonBox" name="buttonBox">
+       <widget class="QDialogButtonBox" name="buttons">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
         <property name="standardButtons">
-         <set>QDialogButtonBox::Cancel|QDialogButtonBox::Save</set>
+         <set>QDialogButtonBox::Apply|QDialogButtonBox::Discard|QDialogButtonBox::Save</set>
         </property>
        </widget>
       </item>
@@ -459,7 +462,7 @@ Set to zero to disable reorder (i.e. non-stocked) or set to one to reorder when 
  <resources/>
  <connections>
   <connection>
-   <sender>buttonBox</sender>
+   <sender>buttons</sender>
    <signal>accepted()</signal>
    <receiver>DialogPart</receiver>
    <slot>accept()</slot>
@@ -475,7 +478,7 @@ Set to zero to disable reorder (i.e. non-stocked) or set to one to reorder when 
    </hints>
   </connection>
   <connection>
-   <sender>buttonBox</sender>
+   <sender>buttons</sender>
    <signal>rejected()</signal>
    <receiver>DialogPart</receiver>
    <slot>reject()</slot>

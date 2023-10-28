@@ -30,7 +30,7 @@ class Ui_DialogPart(object):
     def setupUi(self, DialogPart):
         if not DialogPart.objectName():
             DialogPart.setObjectName(u"DialogPart")
-        DialogPart.resize(1091, 650)
+        DialogPart.resize(1208, 650)
         self.horizontalLayout_7 = QHBoxLayout(DialogPart)
         self.horizontalLayout_7.setObjectName(u"horizontalLayout_7")
         self.left = QWidget(DialogPart)
@@ -56,7 +56,7 @@ class Ui_DialogPart(object):
         self.properties_widget = QWidget(self.top)
         self.properties_widget.setObjectName(u"properties_widget")
         sizePolicy2 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
-        sizePolicy2.setHorizontalStretch(3)
+        sizePolicy2.setHorizontalStretch(5)
         sizePolicy2.setVerticalStretch(0)
         sizePolicy2.setHeightForWidth(self.properties_widget.sizePolicy().hasHeightForWidth())
         self.properties_widget.setSizePolicy(sizePolicy2)
@@ -194,6 +194,7 @@ class Ui_DialogPart(object):
 
         self.tabs = QTabWidget(self.left)
         self.tabs.setObjectName(u"tabs")
+        self.tabs.setEnabled(False)
         sizePolicy5 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         sizePolicy5.setHorizontalStretch(0)
         sizePolicy5.setVerticalStretch(2)
@@ -317,20 +318,20 @@ class Ui_DialogPart(object):
 
         self.verticalLayout_4.addWidget(self.document_widget)
 
-        self.buttonBox = QDialogButtonBox(self.right)
-        self.buttonBox.setObjectName(u"buttonBox")
-        self.buttonBox.setOrientation(Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Save)
+        self.buttons = QDialogButtonBox(self.right)
+        self.buttons.setObjectName(u"buttons")
+        self.buttons.setOrientation(Qt.Horizontal)
+        self.buttons.setStandardButtons(QDialogButtonBox.Apply|QDialogButtonBox.Discard|QDialogButtonBox.Save)
 
-        self.verticalLayout_4.addWidget(self.buttonBox)
+        self.verticalLayout_4.addWidget(self.buttons)
 
 
         self.horizontalLayout_7.addWidget(self.right)
 
 
         self.retranslateUi(DialogPart)
-        self.buttonBox.accepted.connect(DialogPart.accept)
-        self.buttonBox.rejected.connect(DialogPart.reject)
+        self.buttons.accepted.connect(DialogPart.accept)
+        self.buttons.rejected.connect(DialogPart.reject)
 
         self.tabs.setCurrentIndex(0)
 
