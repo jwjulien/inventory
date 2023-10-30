@@ -26,6 +26,7 @@ from PySide6 import QtCore, QtWidgets
 
 from inventory.gui.base.dialog_part import Ui_DialogPart
 from inventory.gui.dialogs.category import CategoryDialog
+from inventory.gui.dialogs.part_weight import PartWeightDialog
 from inventory.model.parts import Part
 from inventory.model.categories import Category
 
@@ -53,8 +54,9 @@ class PartDialog(QtWidgets.QDialog):
         # Connect events.
         self.ui.category.currentIndexChanged.connect(self._category_changed)
         self.ui.new_category.clicked.connect(self._add_category)
-        self.ui.buttonBox.button(QtWidgets.QDialogButtonBox.StandardButton.Apply).clicked.connect(self._save)
-        self.ui.buttonBox.button(QtWidgets.QDialogButtonBox.StandardButton.Discard).clicked.connect(self.reject)
+        self.ui.calibrate.clicked.connect(self._weigh_parts)
+        self.ui.buttons.button(QtWidgets.QDialogButtonBox.StandardButton.Apply).clicked.connect(self._save)
+        self.ui.buttons.button(QtWidgets.QDialogButtonBox.StandardButton.Discard).clicked.connect(self.reject)
 
         # Load part information into dialog.
         self.load(part)
@@ -143,6 +145,14 @@ class PartDialog(QtWidgets.QDialog):
             self.ui.category.addItem(title, category)
             self.ui.category.model().sort(0, QtCore.Qt.AscendingOrder)
             self.ui.category.setCurrentText(title)
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def _weigh_parts(self) -> None:
+        """Open a dialog to handle weighing parts and determine the per-part weight."""
+        dialog = PartWeightDialog(self)
+        if dialog.exec():
+            self.ui.weight.setValue(dialog.weight())
 
 
 

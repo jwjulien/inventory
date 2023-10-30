@@ -2,11 +2,11 @@
     - [ ] Make scanner actually search for what it scans.
     - [ ] Setup printer with tab to handle printing labels:
         - [ ] For storage locations.
-    - [ ] Setup scale:
-        - [ ] Bring in library from other Python kiosk.
-        - [ ] Setup dialog to handle calibrating part weight.
-        - [ ] Setup dialog for counting parts by weight.
-            - [ ] Include option to tare drawer weight.
+    - [x] Setup scale:
+        - [x] Bring in library from other Python kiosk.
+        - [x] Setup dialog to handle calibrating part weight.
+        - [x] Setup dialog for counting parts by weight.
+            - [x] Include option to tare drawer weight.
     - [ ] Setup configuration storage:
         - [ ] Drawer tare weight.
         - [ ] Scanner VID/PID.
@@ -15,6 +15,7 @@
 - Parts:
     - [x] Change attributes to allow capital letters.
     - [ ] Support datasheets and technical drawings.
+        - [ ] Documents should be n:n w/ Parts - some Parts may share Documents.
     - [ ] Support part images.
     - [x] Support adding new categories from the parts dialog.
     - [x] When adding parts, get attributes from the same category and offer them as suggestions.

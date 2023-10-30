@@ -1,5 +1,5 @@
 # ======================================================================================================================
-#      File:  /inventory/gui/dialogs/location_mapping.py
+#      File:  /inventory/gui/dialogs/part_weight.py
 #   Project:  Inventory
 #    Author:  Jared Julien <jaredjulien@exsystems.net>
 # Copyright:  (c) 2023 Jared Julien, eX Systems
@@ -17,75 +17,50 @@
 # OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # ----------------------------------------------------------------------------------------------------------------------
-"""Location mapping dialog for connecting parts with locations."""
+"""Dialog to allow the user to accurately determine a parts weight using a USB scale."""
 
 # ======================================================================================================================
 # Imports
 # ----------------------------------------------------------------------------------------------------------------------
-from datetime import datetime
-
 from PySide6 import QtCore, QtWidgets
-import timeago
+from partsscale.scale import Scale
 
-from inventory.gui.base.dialog_location_mapping import Ui_DialogLocationMapping
-from inventory.gui.dialogs.parts_counter import PartsCounterDialog
-from inventory.model.storage import Slot, Location
+from inventory.gui.base.dialog_part_weight import Ui_PartWeightDialog
 
 
 
 
 # ======================================================================================================================
-# Location Mapper Dialog Class
+# Part Weight Dialog
 # ----------------------------------------------------------------------------------------------------------------------
-class LocationMappingDialog(QtWidgets.QDialog):
-    def __init__(self, parent, location: Location):
+class PartWeightDialog(QtWidgets.QDialog):
+    def __init__(self, parent):
         super().__init__(parent)
-        self.ui = Ui_DialogLocationMapping()
+        self.ui = Ui_PartWeightDialog()
         self.ui.setupUi(self)
 
-        self.location = location
+        self.scale = Scale()
 
-        # Load GUI
-        self.ui.slot.clear()
-        for slot in sorted(Slot.select(), key=lambda slot: slot.full_title()):
-            title = slot.full_title()
-            self.ui.slot.addItem(title, slot)
-            if location.slot_id and slot == location.slot:
-                self.ui.slot.setCurrentText(title)
+        self.ui.tare.clicked.connect(self.scale.tare)
 
-        self.ui.count.setEnabled(self.location.part and bool(self.location.part.weight))
-
-        self.ui.quantity.setValue(location.quantity or 0)
-        self.ui.last_counted.setText(timeago.format(location.last_counted) if location.last_counted else 'Unknown')
-        self.last_counted: datetime = location.last_counted
-
-        # Events
-        self.ui.reset.clicked.connect(self._reset)
-        self.ui.count.clicked.connect(self._count)
+        self.timer = QtCore.QTimer()
+        self.timer.timeout.connect(self.periodic)
+        self.timer.start(125)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-    def _reset(self) -> None:
-        # Cache the updated date for now and copy it into `self.location` only when the user accepts the dialog.
-        self.last_counted = datetime.now()
-        self.ui.last_counted.setText('just now')
+    def periodic(self) -> None:
+        weight = self.scale.weight()
+        self.ui.weight.display(f'{weight:.3f}'[:5])
+        weight /= self.ui.count.value()
+        self.ui.part_weight.setValue(weight)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-    def _count(self) -> None:
-        dialog = PartsCounterDialog(self, self.location.part)
-        if dialog.exec():
-            self.ui.quantity.setValue(dialog.count())
-            self._reset()
+    def weight(self) -> float:
+        """Return the calculated weight of an individual part in grams."""
+        return self.ui.part_weight.value()
 
-
-# ----------------------------------------------------------------------------------------------------------------------
-    def accept(self) -> None:
-        self.location.slot = self.ui.slot.currentData(QtCore.Qt.UserRole)
-        self.location.quantity = self.ui.quantity.value()
-        self.location.last_counted = self.last_counted
-        self.location.save()
-        return super().accept()
 
 
 

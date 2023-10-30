@@ -1,5 +1,5 @@
 # ======================================================================================================================
-#      File:  /inventory/gui/dialogs/location_mapping.py
+#      File:  /inventory/gui/dialogs/parts_counter.py
 #   Project:  Inventory
 #    Author:  Jared Julien <jaredjulien@exsystems.net>
 # Copyright:  (c) 2023 Jared Julien, eX Systems
@@ -17,75 +17,61 @@
 # OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # ----------------------------------------------------------------------------------------------------------------------
-"""Location mapping dialog for connecting parts with locations."""
+"""Parts counter dialog uses a USB connected scale to count parts by weight."""
 
 # ======================================================================================================================
 # Imports
 # ----------------------------------------------------------------------------------------------------------------------
-from datetime import datetime
+from collections import deque
 
 from PySide6 import QtCore, QtWidgets
-import timeago
+from partsscale.scale import Scale
 
-from inventory.gui.base.dialog_location_mapping import Ui_DialogLocationMapping
-from inventory.gui.dialogs.parts_counter import PartsCounterDialog
-from inventory.model.storage import Slot, Location
+from inventory.gui.base.dialog_parts_counter import Ui_PartsCounterDialog
+from inventory.model.parts import Part
 
 
 
 
 # ======================================================================================================================
-# Location Mapper Dialog Class
+# Parts Counter Dialog
 # ----------------------------------------------------------------------------------------------------------------------
-class LocationMappingDialog(QtWidgets.QDialog):
-    def __init__(self, parent, location: Location):
+class PartsCounterDialog(QtWidgets.QDialog):
+    def __init__(self, parent, part: Part):
         super().__init__(parent)
-        self.ui = Ui_DialogLocationMapping()
+        self.ui = Ui_PartsCounterDialog()
         self.ui.setupUi(self)
 
-        self.location = location
+        self.scale = Scale()
+        self.part = part
+        self._count: int = 0
+        self._weights = deque(maxlen=10)
 
-        # Load GUI
-        self.ui.slot.clear()
-        for slot in sorted(Slot.select(), key=lambda slot: slot.full_title()):
-            title = slot.full_title()
-            self.ui.slot.addItem(title, slot)
-            if location.slot_id and slot == location.slot:
-                self.ui.slot.setCurrentText(title)
+        self.ui.part_weight.setValue(self.part.weight)
+        self.ui.drawer_weight.setValue(19.35820770263672)
 
-        self.ui.count.setEnabled(self.location.part and bool(self.location.part.weight))
+        self.ui.tare.clicked.connect(self.scale.tare)
 
-        self.ui.quantity.setValue(location.quantity or 0)
-        self.ui.last_counted.setText(timeago.format(location.last_counted) if location.last_counted else 'Unknown')
-        self.last_counted: datetime = location.last_counted
-
-        # Events
-        self.ui.reset.clicked.connect(self._reset)
-        self.ui.count.clicked.connect(self._count)
+        self.timer = QtCore.QTimer()
+        self.timer.timeout.connect(self.periodic)
+        self.timer.start(125)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-    def _reset(self) -> None:
-        # Cache the updated date for now and copy it into `self.location` only when the user accepts the dialog.
-        self.last_counted = datetime.now()
-        self.ui.last_counted.setText('just now')
+    def periodic(self) -> None:
+        self._weights.append(self.scale.weight())
+        weight = sum(self._weights) / len(self._weights)
+        if self.ui.sub_drawer.isChecked():
+            weight -= self.ui.drawer_weight.value()
+        self.ui.weight.display(f'{weight:.3f}'[:5])
+        self._count = int((weight / self.ui.part_weight.value()) + 0.5)
+        self.ui.count.display(self._count if self._count else '---')
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-    def _count(self) -> None:
-        dialog = PartsCounterDialog(self, self.location.part)
-        if dialog.exec():
-            self.ui.quantity.setValue(dialog.count())
-            self._reset()
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-    def accept(self) -> None:
-        self.location.slot = self.ui.slot.currentData(QtCore.Qt.UserRole)
-        self.location.quantity = self.ui.quantity.value()
-        self.location.last_counted = self.last_counted
-        self.location.save()
-        return super().accept()
+    def count(self) -> int:
+        """Return the current part count value."""
+        return self._count
 
 
 

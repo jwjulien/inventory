@@ -27,7 +27,6 @@ class Ui_DialogLocationMapping(object):
         DialogLocationMapping.resize(449, 160)
         self.formLayout = QFormLayout(DialogLocationMapping)
         self.formLayout.setObjectName(u"formLayout")
-        self.formLayout.setLabelAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
         self.lbl_slot = QLabel(DialogLocationMapping)
         self.lbl_slot.setObjectName(u"lbl_slot")
 
@@ -42,6 +41,31 @@ class Ui_DialogLocationMapping(object):
         self.lbl_quantity.setObjectName(u"lbl_quantity")
 
         self.formLayout.setWidget(1, QFormLayout.LabelRole, self.lbl_quantity)
+
+        self.quantity_widget = QWidget(DialogLocationMapping)
+        self.quantity_widget.setObjectName(u"quantity_widget")
+        self.horizontalLayout_2 = QHBoxLayout(self.quantity_widget)
+        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
+        self.quantity = QSpinBox(self.quantity_widget)
+        self.quantity.setObjectName(u"quantity")
+        self.quantity.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+        self.quantity.setMaximum(99999999)
+
+        self.horizontalLayout_2.addWidget(self.quantity)
+
+        self.count = QPushButton(self.quantity_widget)
+        self.count.setObjectName(u"count")
+        self.count.setEnabled(False)
+
+        self.horizontalLayout_2.addWidget(self.count)
+
+
+        self.formLayout.setWidget(1, QFormLayout.FieldRole, self.quantity_widget)
+
+        self.lbl_last_counted = QLabel(DialogLocationMapping)
+        self.lbl_last_counted.setObjectName(u"lbl_last_counted")
+
+        self.formLayout.setWidget(2, QFormLayout.LabelRole, self.lbl_last_counted)
 
         self.frame = QFrame(DialogLocationMapping)
         self.frame.setObjectName(u"frame")
@@ -66,26 +90,16 @@ class Ui_DialogLocationMapping(object):
 
         self.formLayout.setWidget(2, QFormLayout.FieldRole, self.frame)
 
+        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.formLayout.setItem(3, QFormLayout.FieldRole, self.verticalSpacer)
+
         self.buttonBox = QDialogButtonBox(DialogLocationMapping)
         self.buttonBox.setObjectName(u"buttonBox")
         self.buttonBox.setOrientation(Qt.Horizontal)
         self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
 
         self.formLayout.setWidget(4, QFormLayout.FieldRole, self.buttonBox)
-
-        self.lbl_last_counted = QLabel(DialogLocationMapping)
-        self.lbl_last_counted.setObjectName(u"lbl_last_counted")
-
-        self.formLayout.setWidget(2, QFormLayout.LabelRole, self.lbl_last_counted)
-
-        self.quantity = QSpinBox(DialogLocationMapping)
-        self.quantity.setObjectName(u"quantity")
-
-        self.formLayout.setWidget(1, QFormLayout.FieldRole, self.quantity)
-
-        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-
-        self.formLayout.setItem(3, QFormLayout.FieldRole, self.verticalSpacer)
 
 
         self.retranslateUi(DialogLocationMapping)
@@ -99,8 +113,9 @@ class Ui_DialogLocationMapping(object):
         DialogLocationMapping.setWindowTitle(QCoreApplication.translate("DialogLocationMapping", u"Configure Part Storage Location", None))
         self.lbl_slot.setText(QCoreApplication.translate("DialogLocationMapping", u"Slot:", None))
         self.lbl_quantity.setText(QCoreApplication.translate("DialogLocationMapping", u"Quantity:", None))
+        self.count.setText(QCoreApplication.translate("DialogLocationMapping", u"Count...", None))
+        self.lbl_last_counted.setText(QCoreApplication.translate("DialogLocationMapping", u"Last Counted:", None))
         self.last_counted.setText(QCoreApplication.translate("DialogLocationMapping", u"Never", None))
         self.reset.setText(QCoreApplication.translate("DialogLocationMapping", u"Reset", None))
-        self.lbl_last_counted.setText(QCoreApplication.translate("DialogLocationMapping", u"Last Counted:", None))
     # retranslateUi
 

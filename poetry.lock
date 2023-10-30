@@ -48,6 +48,24 @@ files = [
 ]
 
 [[package]]
+name = "partsscale"
+version = "2.0.0"
+description = "Python interface to the eX Systems USB scale."
+optional = false
+python-versions = ">=3.7,<4.0"
+files = [
+    {file = "partsscale-2.0.0-py3-none-any.whl", hash = "sha256:95ea52a33df5fcce15186722fc218d508cf8b4616f138398736d353b742fce37"},
+]
+
+[package.dependencies]
+click = ">=8.1.7,<9.0.0"
+pyusb = ">=1.2.1,<2.0.0"
+
+[package.source]
+type = "file"
+url = "../../Websites/Parts/Scale/PartsScale/dist/partsscale-2.0.0-py3-none-any.whl"
+
+[[package]]
 name = "peewee"
 version = "3.16.2"
 description = "a little orm"
@@ -332,4 +350,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.10"
-content-hash = "aa79e2bf209f29442dd3e15d54228e279b04279b7e98109bc5326e095b896834"
+content-hash = "5513f8f18a6970f12197f417f908d07c15a20382ff5444ec9253075e50a4d767"
