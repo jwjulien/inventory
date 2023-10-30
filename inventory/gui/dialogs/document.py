@@ -65,7 +65,7 @@ class DocumentDialog(QtWidgets.QDialog):
             if extension == '.pdf':
                 self.ui.mime.setCurrentText('application/pdf')
             elif extension == '.md':
-                self.ui.mime.setCurrentText('application/markdown')
+                self.ui.mime.setCurrentText('text/markdown')
 
 
 # ----------------------------------------------------------------------------------------------------------------------

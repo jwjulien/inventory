@@ -59,7 +59,7 @@
        </item>
        <item>
         <property name="text">
-         <string>application/markdown</string>
+         <string>text/markdown</string>
         </property>
        </item>
       </widget>

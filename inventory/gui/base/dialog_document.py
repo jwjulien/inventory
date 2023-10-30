@@ -91,7 +91,7 @@ class Ui_DocumentDialog(object):
         self.lbl_title.setText(QCoreApplication.translate("DocumentDialog", u"Title:", None))
         self.lbl_mime.setText(QCoreApplication.translate("DocumentDialog", u"Mime:", None))
         self.mime.setItemText(0, QCoreApplication.translate("DocumentDialog", u"application/pdf", None))
-        self.mime.setItemText(1, QCoreApplication.translate("DocumentDialog", u"application/markdown", None))
+        self.mime.setItemText(1, QCoreApplication.translate("DocumentDialog", u"text/markdown", None))
 
     # retranslateUi
 

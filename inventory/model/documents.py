@@ -48,7 +48,7 @@ class Document(BaseModel):
     def extension(self) -> str:
         extensions = {
             'application/pdf': '.pdf',
-            'application/markdown': '.md'
+            'text/markdown': '.md'
         }
         return extensions.get(self.mime, '.txt')
 
