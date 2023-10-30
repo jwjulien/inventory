@@ -89,6 +89,7 @@ class PartDialog(QtWidgets.QDialog):
         self.ui.locations.setPart(part)
         self.ui.materials.setPart(part)
         self.ui.suppliers.setPart(part)
+        self.ui.documents.setPart(part)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -153,7 +154,6 @@ class PartDialog(QtWidgets.QDialog):
         dialog = PartWeightDialog(self)
         if dialog.exec():
             self.ui.weight.setValue(dialog.weight())
-
 
 
 

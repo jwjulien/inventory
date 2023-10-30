@@ -329,6 +329,12 @@ Set to zero to disable reorder (i.e. non-stocked) or set to one to reorder when 
       </property>
       <item>
        <widget class="QWidget" name="image_widget" native="true">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>1</verstretch>
+         </sizepolicy>
+        </property>
         <layout class="QVBoxLayout" name="verticalLayout_3">
          <property name="leftMargin">
           <number>0</number>
@@ -370,7 +376,13 @@ Set to zero to disable reorder (i.e. non-stocked) or set to one to reorder when 
        </widget>
       </item>
       <item>
-       <widget class="QWidget" name="document_widget" native="true">
+       <widget class="DocumentListWidget" name="documents" native="true">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>1</verstretch>
+         </sizepolicy>
+        </property>
         <layout class="QVBoxLayout" name="verticalLayout">
          <property name="leftMargin">
           <number>0</number>
@@ -384,37 +396,6 @@ Set to zero to disable reorder (i.e. non-stocked) or set to one to reorder when 
          <property name="bottomMargin">
           <number>0</number>
          </property>
-         <item>
-          <widget class="QListWidget" name="documents">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_4">
-           <item>
-            <widget class="QPushButton" name="add_document">
-             <property name="text">
-              <string>Add Document</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="remove_document">
-             <property name="text">
-              <string>Remove Document</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
         </layout>
        </widget>
       </item>
@@ -456,6 +437,12 @@ Set to zero to disable reorder (i.e. non-stocked) or set to one to reorder when 
    <class>MaterialsWidget</class>
    <extends>QWidget</extends>
    <header>inventory.gui.widgets.materials</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>DocumentListWidget</class>
+   <extends>QWidget</extends>
+   <header>inventory.gui.widgets.document_list</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

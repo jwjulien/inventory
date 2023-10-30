@@ -63,6 +63,11 @@ class FileSelectWidget(QtWidgets.QWidget):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
+    def setPlaceholderText(self, text: str) -> None:
+        self.ui.editor.setPlaceholderText(text)
+
+
+# ----------------------------------------------------------------------------------------------------------------------
     def filename(self) -> str:
         """Return the filename of the file currently selected.
 
@@ -137,7 +142,7 @@ class FileSelectWidget(QtWidgets.QWidget):
             return 'Above path is not a file'
 
         # Verify that the path matches at least one of the file filters.
-        filters = [filter for pattern in self._filters.values() for filter in pattern.split(',')]
+        filters = [filter for pattern in self._filters.values() for filter in pattern.split(' ')]
         if not any([fnmatch.filter([filename], filter) for filter in filters]):
             return f'Above file is not a supported type {", ".join(filters)}'
 

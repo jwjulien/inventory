@@ -17,11 +17,12 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QAbstractButton, QApplication, QComboBox, QDialog,
     QDialogButtonBox, QDoubleSpinBox, QFormLayout, QGraphicsView,
-    QHBoxLayout, QLabel, QLineEdit, QListWidget,
-    QListWidgetItem, QPlainTextEdit, QPushButton, QSizePolicy,
-    QSpinBox, QTabWidget, QVBoxLayout, QWidget)
+    QHBoxLayout, QLabel, QLineEdit, QPlainTextEdit,
+    QPushButton, QSizePolicy, QSpinBox, QTabWidget,
+    QVBoxLayout, QWidget)
 
 from inventory.gui.widgets.attributes import AttributesWidget
+from inventory.gui.widgets.document_list import DocumentListWidget
 from inventory.gui.widgets.location import LocationWidget
 from inventory.gui.widgets.materials import MaterialsWidget
 from inventory.gui.widgets.suppliers import SuppliersWidget
@@ -257,6 +258,8 @@ class Ui_DialogPart(object):
         self.verticalLayout_4.setContentsMargins(0, 0, 0, 0)
         self.image_widget = QWidget(self.right)
         self.image_widget.setObjectName(u"image_widget")
+        sizePolicy6.setHeightForWidth(self.image_widget.sizePolicy().hasHeightForWidth())
+        self.image_widget.setSizePolicy(sizePolicy6)
         self.verticalLayout_3 = QVBoxLayout(self.image_widget)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.verticalLayout_3.setContentsMargins(0, 0, 0, 0)
@@ -284,39 +287,15 @@ class Ui_DialogPart(object):
 
         self.verticalLayout_4.addWidget(self.image_widget)
 
-        self.document_widget = QWidget(self.right)
-        self.document_widget.setObjectName(u"document_widget")
-        self.verticalLayout = QVBoxLayout(self.document_widget)
+        self.documents = DocumentListWidget(self.right)
+        self.documents.setObjectName(u"documents")
+        sizePolicy6.setHeightForWidth(self.documents.sizePolicy().hasHeightForWidth())
+        self.documents.setSizePolicy(sizePolicy6)
+        self.verticalLayout = QVBoxLayout(self.documents)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
-        self.documents = QListWidget(self.document_widget)
-        self.documents.setObjectName(u"documents")
-        self.documents.setEnabled(False)
-        sizePolicy8 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        sizePolicy8.setHorizontalStretch(0)
-        sizePolicy8.setVerticalStretch(0)
-        sizePolicy8.setHeightForWidth(self.documents.sizePolicy().hasHeightForWidth())
-        self.documents.setSizePolicy(sizePolicy8)
 
-        self.verticalLayout.addWidget(self.documents)
-
-        self.horizontalLayout_4 = QHBoxLayout()
-        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
-        self.add_document = QPushButton(self.document_widget)
-        self.add_document.setObjectName(u"add_document")
-
-        self.horizontalLayout_4.addWidget(self.add_document)
-
-        self.remove_document = QPushButton(self.document_widget)
-        self.remove_document.setObjectName(u"remove_document")
-
-        self.horizontalLayout_4.addWidget(self.remove_document)
-
-
-        self.verticalLayout.addLayout(self.horizontalLayout_4)
-
-
-        self.verticalLayout_4.addWidget(self.document_widget)
+        self.verticalLayout_4.addWidget(self.documents)
 
         self.buttons = QDialogButtonBox(self.right)
         self.buttons.setObjectName(u"buttons")
@@ -363,7 +342,5 @@ class Ui_DialogPart(object):
         self.tabs.setTabText(self.tabs.indexOf(self.tab_suppliers), QCoreApplication.translate("DialogPart", u"Suppliers", None))
         self.set_image.setText(QCoreApplication.translate("DialogPart", u"Set Image", None))
         self.remove_image.setText(QCoreApplication.translate("DialogPart", u"Remove Image", None))
-        self.add_document.setText(QCoreApplication.translate("DialogPart", u"Add Document", None))
-        self.remove_document.setText(QCoreApplication.translate("DialogPart", u"Remove Document", None))
     # retranslateUi
 

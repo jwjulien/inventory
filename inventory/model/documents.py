@@ -1,5 +1,5 @@
 # ======================================================================================================================
-#      File:  /inventory/gui/prompts.py
+#      File:  /inventory/model/documents.py
 #   Project:  Inventory
 #    Author:  Jared Julien <jaredjulien@exsystems.net>
 # Copyright:  (c) 2023 Jared Julien, eX Systems
@@ -17,57 +17,55 @@
 # OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # ----------------------------------------------------------------------------------------------------------------------
-"""Prompt dialog helpers."""
+"""Model support for documents and associating them with Parts."""
 
 # ======================================================================================================================
 # Imports
 # ----------------------------------------------------------------------------------------------------------------------
-from PySide6 import QtWidgets
+from peewee import CharField, ForeignKeyField
+from playhouse.fields import CompressedField
+
+from inventory.model.base import BaseModel
+from inventory.model.parts import Part
 
 
 
 
 # ======================================================================================================================
-# Yes/No Confirmation Dialog
+# Document Table
 # ----------------------------------------------------------------------------------------------------------------------
-def YesNoPrompt(parent: QtWidgets.QWidget, title: str, message: str) -> bool:
-    """Prompt the user with a yes/no question and return their response as a bool.
+class Document(BaseModel):
+    class Meta:
+        table_name = 'documents'
 
-    Arguments:
-        title: Title for the top of the window.
-        message: The actual prompt for the user.
+    # Columns
+    title = CharField(40)
+    mime = CharField(20)
+    content = CompressedField()
 
-    Returns:
-        True if the user said Yes or False if the user said No or closed the dialog.
-    """
-    result = QtWidgets.QMessageBox.question(
-        parent,
-        title,
-        message,
-        QtWidgets.QMessageBox.StandardButton.Yes,
-        QtWidgets.QMessageBox.StandardButton.No
-    )
-    return result == QtWidgets.QMessageBox.StandardButton.Yes
+
+    @property
+    def extension(self) -> str:
+        extensions = {
+            'application/pdf': '.pdf',
+            'application/markdown': '.md'
+        }
+        return extensions.get(self.mime, '.txt')
 
 
 
 
 # ======================================================================================================================
-# Confirmation Dialog
+# Reference Table
 # ----------------------------------------------------------------------------------------------------------------------
-def Confirmation(parent: QtWidgets.QWidget, title: str, message: str):
-    """Show the user a message in a dialog.
+class Reference(BaseModel):
+    class Meta:
+        table_name = 'references'
 
-    Arguments:
-        title: Title for the top of the window.
-        message: The actual prompt for the user.
-    """
-    QtWidgets.QMessageBox.warning(
-        parent,
-        title,
-        message,
-        QtWidgets.QMessageBox.StandardButton.Ok
-    )
+    # Columns
+    part = ForeignKeyField(Part, backref='references')
+    document = ForeignKeyField(Document, backref='references')
+    label = CharField(25)
 
 
 

@@ -14,8 +14,8 @@
         - [ ] File store location.
 - Parts:
     - [x] Change attributes to allow capital letters.
-    - [ ] Support datasheets and technical drawings.
-        - [ ] Documents should be n:n w/ Parts - some Parts may share Documents.
+    - [x] Support datasheets and technical drawings.
+        - [x] Documents should be n:n w/ Parts - some Parts may share Documents.
     - [ ] Support part images.
     - [x] Support adding new categories from the parts dialog.
     - [x] When adding parts, get attributes from the same category and offer them as suggestions.
@@ -33,6 +33,7 @@
     - [ ] Rework storage tab:
         - [ ] Make parts load on demand or only for slots.  They are very slow to load for areas with lots of parts.
         - [ ] Give slots more screen space.  The splitter is nice, but bigger units with long slot names still require scrolling.  I think it might be nice to collapse the areas and units, breadcrumb style.
+    - [ ] In LocationMappingDialog, consider swapping the lengthy dropdown for a column view or some kinda of filter/autocomplete.
 - Projects:
     - [ ] Update the part matching on BOM import to better match attributes with weighting for things like package and part number over category (as opposed to either summery vs part number matching as it's done now).
     - [ ] In project BOM view:
