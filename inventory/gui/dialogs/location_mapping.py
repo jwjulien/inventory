@@ -24,6 +24,7 @@
 # ----------------------------------------------------------------------------------------------------------------------
 from datetime import datetime
 
+from partsscale.scale import DeviceError, Scale
 from PySide6 import QtCore, QtWidgets
 import timeago
 
@@ -53,7 +54,16 @@ class LocationMappingDialog(QtWidgets.QDialog):
             if location.slot_id and slot == location.slot:
                 self.ui.slot.setCurrentText(title)
 
-        self.ui.count.setEnabled(self.location.part and bool(self.location.part.weight))
+        # Only enable the count button if there is a scale present and the part has a weight.
+        # TODO: Add a calibrate button for the part here to set a weight and then count?
+        try:
+            Scale()
+        except DeviceError:
+            self.ui.count.setEnabled(False)
+            self.ui.count.setToolTip('Scale not found')
+        else:
+            self.ui.count.setEnabled(self.location.part and bool(self.location.part.weight))
+            self.ui.count.setToolTip('No part weight defined')
 
         self.ui.quantity.setValue(location.quantity or 0)
         self.ui.last_counted.setText(timeago.format(location.last_counted) if location.last_counted else 'Unknown')

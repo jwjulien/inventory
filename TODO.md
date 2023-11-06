@@ -7,6 +7,7 @@
         - [x] Setup dialog to handle calibrating part weight.
         - [x] Setup dialog for counting parts by weight.
             - [x] Include option to tare drawer weight.
+        - [x] What happens when no scale is connected?
     - [ ] Setup configuration storage:
         - [ ] Drawer tare weight.
         - [ ] Scanner VID/PID.
@@ -24,6 +25,7 @@
     - [ ] Add ability to delete a part.
     - [ ] Perform validation on part before accepting [Save] or [Apply] from the PartDialog.
     - [ ] Disable the [Apply] and [Save] buttons in the PartsDialog until a change has been made.
+    - [ ] Change the Location Widget from side buttons to context menu.
 - Storage:
     - [ ] Give ability to move a slot to a new location/unit.
         - [ ] Ensure that the ID is preserved as that is what is tied to the barcodes.
@@ -34,6 +36,7 @@
         - [ ] Make parts load on demand or only for slots.  They are very slow to load for areas with lots of parts.
         - [ ] Give slots more screen space.  The splitter is nice, but bigger units with long slot names still require scrolling.  I think it might be nice to collapse the areas and units, breadcrumb style.
     - [ ] In LocationMappingDialog, consider swapping the lengthy dropdown for a column view or some kinda of filter/autocomplete.
+    - [ ] Add ability to define new Slot from Relocate Dialog.
 - Projects:
     - [ ] Update the part matching on BOM import to better match attributes with weighting for things like package and part number over category (as opposed to either summery vs part number matching as it's done now).
     - [ ] In project BOM view:

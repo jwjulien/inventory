@@ -22,6 +22,7 @@
 # ======================================================================================================================
 # Imports
 # ----------------------------------------------------------------------------------------------------------------------
+from partsscale.scale import Scale, DeviceError
 from PySide6 import QtCore, QtWidgets
 
 from inventory.gui.base.dialog_part import Ui_DialogPart
@@ -50,6 +51,13 @@ class PartDialog(QtWidgets.QDialog):
 
         # Don't allow setting tabbed attributes until this part has an ID.
         self.ui.tabs.setEnabled(bool(part.id))
+
+        # Disable weighing parts when no scale is present.
+        try:
+            Scale()
+        except DeviceError:
+            self.ui.calibrate.setEnabled(False)
+            self.ui.calibrate.setToolTip('Scale not found')
 
         # Connect events.
         self.ui.category.currentIndexChanged.connect(self._category_changed)

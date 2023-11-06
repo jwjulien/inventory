@@ -38,7 +38,7 @@ from inventory.gui.main_window import MainWindow
 def main() -> int:
     sys.argv += ['-platform', 'windows:darkmode=2']
     app = QtWidgets.QApplication(sys.argv)
-    qdarktheme.setup_theme('auto')
+    qdarktheme.setup_theme('auto', additional_qss="QToolTip { border: 0px; }")
     window = MainWindow()
     window.show()
     return app.exec()
