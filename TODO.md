@@ -2,7 +2,7 @@
     - [ ] Make scanner actually search for what it scans.
     - [ ] Setup printer with dialog to handle printing labels:
         - [ ] For storage locations.
-        - [ ] Develop better scheme using 1" labels and some flavor of 2D barcode.
+        - [x] Develop better scheme using 1" labels and some flavor of 2D barcode.
     - [x] Setup scale:
         - [x] Bring in library from other Python kiosk.
         - [x] Setup dialog to handle calibrating part weight.

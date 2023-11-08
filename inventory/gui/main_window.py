@@ -37,12 +37,13 @@ from inventory.gui.tabs.storage import TabStorage
 from inventory.gui.tabs.suppliers import TabSuppliers
 from inventory.model.base import db
 from inventory.model.categories import Category
-from inventory.model.documents import Document, Reference
+from inventory.model.documents import Document, Reference as DocumentReference
 from inventory.model.parts import Part
 from inventory.model.projects import Project, Revision, Material
 from inventory.model.storage import Area, Unit, Slot, Location
 from inventory.model.suppliers import Supplier, Product
 from inventory.libraries.scanner import ScannerWorker
+from inventory.libraries.references import Reference
 
 
 
@@ -72,7 +73,7 @@ class MainWindow(QtWidgets.QMainWindow):
         db.connect()
         db.create_tables([
             Category,
-            Document, Reference,
+            Document, DocumentReference,
             Part,
             Project, Revision, Material,
             Area, Unit, Slot, Location,
@@ -104,13 +105,26 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def _setup_scanner(self):
         # TODO: This VID/PID should be configurable.
+        # VENDOR_ID = 0x0581
+        # PRODUCT_ID = 0x0103
         VENDOR_ID = 0x0581
-        PRODUCT_ID = 0x0103
+        PRODUCT_ID = 0x011C
 
         self.scanner_worker = ScannerWorker(VENDOR_ID, PRODUCT_ID)
         # TODO: The received event needs to be connected to a handler that will actually show the user what they scanned.
-        self.scanner_worker.received.connect(lambda code: print('Received:', code))
+        self.scanner_worker.received.connect(self._tag_scanned)
         self.threadpool.start(self.scanner_worker)
+
+
+    def _tag_scanned(self, code: str) -> None:
+        print('Received code:', code)
+        try:
+            reference = Reference.from_str(code)
+        except ValueError:
+            print('Error parsing:', code)
+            raise
+        thing = reference.lookup()
+        print(thing.id, type(thing))
 
 
     def closeEvent(self, event: QtGui.QCloseEvent) -> None:

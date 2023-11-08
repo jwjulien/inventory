@@ -157,6 +157,21 @@ docs = ["furo", "olefile", "sphinx (>=2.4)", "sphinx-copybutton", "sphinx-inline
 tests = ["check-manifest", "coverage", "defusedxml", "markdown2", "olefile", "packaging", "pyroma", "pytest", "pytest-cov", "pytest-timeout"]
 
 [[package]]
+name = "pylibdmtx"
+version = "0.1.10"
+description = "Read and write Data Matrix barcodes from Python 2 and 3."
+optional = false
+python-versions = "*"
+files = [
+    {file = "pylibdmtx-0.1.10-py2.py3-none-any.whl", hash = "sha256:ab73df28b64b3f5e29f22e6937b93967eb77ae7fcd5be381e1142f5a7268eb9e"},
+    {file = "pylibdmtx-0.1.10-py2.py3-none-win32.whl", hash = "sha256:2adb8dd71bd138159f6433dafd8eec7420eef97aaf8e51cf0f4fdd976f109962"},
+    {file = "pylibdmtx-0.1.10-py2.py3-none-win_amd64.whl", hash = "sha256:e8b0140ab5f473c67fa4335333994a99ea9f683888ae892b1af2dc045560331b"},
+]
+
+[package.extras]
+scripts = ["Pillow (>=3.2.0)"]
+
+[[package]]
 name = "pyqtdarktheme"
 version = "2.1.0"
 description = "Flat dark theme for PySide and PyQt."
@@ -431,4 +446,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.10"
-content-hash = "6a03004a96b4c7ee5b1c0d2d054846a3265c721eb96a6c8fd64d773a79024728"
+content-hash = "7a29744b422865eab2845c8583c7dc5b84e3a9f4959087476b4faeb99aaa5524"
