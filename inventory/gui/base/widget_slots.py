@@ -22,13 +22,14 @@ class Ui_WidgetSlots(object):
     def setupUi(self, WidgetSlots):
         if not WidgetSlots.objectName():
             WidgetSlots.setObjectName(u"WidgetSlots")
-        WidgetSlots.resize(437, 573)
+        WidgetSlots.resize(838, 528)
         self.verticalLayout = QVBoxLayout(WidgetSlots)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
         self.slots = QTableWidget(WidgetSlots)
         self.slots.setObjectName(u"slots")
         self.slots.setAlternatingRowColors(True)
+        self.slots.setSelectionMode(QAbstractItemView.ContiguousSelection)
         self.slots.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
         self.slots.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
         self.slots.horizontalHeader().setDefaultSectionSize(80)

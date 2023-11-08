@@ -22,12 +22,15 @@
 # ======================================================================================================================
 # Imports
 # ----------------------------------------------------------------------------------------------------------------------
+from typing import List
+
 from PySide6 import QtCore, QtGui, QtWidgets
 
 from inventory.gui.base.widget_slots import Ui_WidgetSlots
 from inventory.gui.dialogs.parts import PartsDialog
 from inventory.gui.dialogs.print_reference import PrintReferenceDialog
 from inventory.gui.utilities import context_action
+from inventory.model.parts import Part
 from inventory.model.storage import Unit, Slot
 from inventory.libraries.references import Reference, ReferenceTarget
 
@@ -47,8 +50,6 @@ Warning = '#f0ad4e'
 # Slots Widget Class
 # ----------------------------------------------------------------------------------------------------------------------
 class SlotsWidget(QtWidgets.QWidget):
-    selected = QtCore.Signal(Slot)
-
     def __init__(self, parent):
         super().__init__(parent)
         self.ui = Ui_WidgetSlots()
@@ -62,11 +63,16 @@ class SlotsWidget(QtWidgets.QWidget):
         # Setup custom context menu.
         self.context_menu = QtWidgets.QMenu(self)
         self.context_parts = context_action(self.context_menu, 'View Parts', self._show_parts, 'fa.list')
+        self.context_menu.addSeparator()
+        self.context_merge = context_action(self.context_menu, 'Merge', self._merge, 'mdi.table-merge-cells')
+        self.context_split = context_action(self.context_menu, 'Split', self._split, 'mdi.table-split-cell')
+        self.context_menu.addSeparator()
         self.context_remove = context_action(self.context_menu, 'Remove Slot', self._remove, 'fa.trash-o')
+        self.context_menu.addSeparator()
         self.context_print = context_action(self.context_menu, 'Print Label', self._print, 'fa.barcode')
-        # TODO: Add stuffs for adding and removing column/row spans.
         self.ui.slots.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.ui.slots.customContextMenuRequested.connect(self._context_menu)
+        self.ui.slots.customContextMenuRequested.connect(
+            lambda point: self.context_menu.exec(self.ui.slots.mapToGlobal(point)))
 
         # Connect events.
         self.ui.slots.horizontalHeader().sectionResized.connect(self.ui.slots.resizeRowsToContents)
@@ -94,7 +100,9 @@ class SlotsWidget(QtWidgets.QWidget):
             for column in range(unit.columns):
                 if row == 0:
                     self.ui.slots.insertColumn(self.ui.slots.columnCount())
-                self.ui.slots.setItem(row, column, QtWidgets.QTableWidgetItem(''))
+                item = QtWidgets.QTableWidgetItem('')
+                item.setTextAlignment(QtCore.Qt.AlignVCenter | QtCore.Qt.AlignCenter)
+                self.ui.slots.setItem(row, column, item)
 
         # Fill in the assigned slot names.
         for slot in unit.slots:
@@ -118,14 +126,18 @@ class SlotsWidget(QtWidgets.QWidget):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-    def _context_menu(self, point: QtCore.QPoint) -> None:
+    def _selected_slots(self) -> List[Slot]:
+        """Returns a list of currently selected slots."""
         selected = self.ui.slots.selectedItems()
-        if len(selected) != 1:
-            return
-        slot: Slot = selected[0].data(QtCore.Qt.UserRole)
-        if not slot:
-            return
-        self.context_menu.exec(self.ui.slots.mapToGlobal(point))
+        slots = [item.data(QtCore.Qt.UserRole) for item in selected]
+        return [slot for slot in slots if slot is not None]
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def _selected_parts(self) -> List[Part]:
+        """Get a list of unique parts from the currently selected slot(s)."""
+        slots = self._selected_slots()
+        return list(set([part for slot in slots for part in slot.parts]))
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -163,7 +175,7 @@ class SlotsWidget(QtWidgets.QWidget):
 # ----------------------------------------------------------------------------------------------------------------------
     def _print(self) -> None:
         selected = self.ui.slots.selectedItems()
-        if not selected:
+        if len(selected) != 1:
             return
         slot: Slot = selected[0].data(QtCore.Qt.UserRole)
         reference = Reference(id=slot.id, target=ReferenceTarget.Slot, label=slot.name)
@@ -173,22 +185,28 @@ class SlotsWidget(QtWidgets.QWidget):
 
 # ----------------------------------------------------------------------------------------------------------------------
     def _show_parts(self) -> None:
-        selected = self.ui.slots.selectedItems()
-        if not selected:
-            return
-        slot: Slot = selected[0].data(QtCore.Qt.UserRole)
-        dialog = PartsDialog(self, slot.parts)
-        dialog.exec()
+        parts = self._selected_parts()
+        if parts:
+            dialog = PartsDialog(self, parts)
+            dialog.exec()
 
 
 # ----------------------------------------------------------------------------------------------------------------------
     def _selected(self) -> None:
-        selected = self.ui.slots.selectedItems()
-        if not selected:
-            return self.selected.emit(None)
-        item = selected[0]
-        slot = item.data(QtCore.Qt.UserRole)
-        self.selected.emit(slot)
+        items = self.ui.slots.selectedItems()
+        slots = self._selected_slots()
+        parts = self._selected_parts()
+        self.context_parts.setEnabled(bool(parts))
+        self.context_print.setEnabled(len(slots) == 1)
+        self.context_merge.setEnabled(len(slots) <= 1 and len(items) > 1)
+        def is_spanned(item: QtWidgets.QTableWidgetItem) -> bool:
+            if self.ui.slots.rowSpan(item.row(), item.column()) > 1:
+                return True
+            if self.ui.slots.columnSpan(item.row(), item.column()) > 1:
+                return True
+            return False
+        self.context_split.setEnabled(len(items) == 1 and is_spanned(items[0]))
+        self.context_remove.setEnabled(bool(slots))
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -222,6 +240,68 @@ class SlotsWidget(QtWidgets.QWidget):
         # Otherwise, restore the background to the QTableWidgetItem default background.
         else:
             item.setBackground(QtWidgets.QTableWidgetItem('').background())
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def _merge(self) -> None:
+        """Merge the currently selected cell with the open cell to the right.
+
+        When merging slots we need a selection that currently contains zero or one Slot.  If a Slot already exists, it
+        will be updated to include the new cell(s).
+        """
+        slots = self._selected_slots()
+        if len(slots) > 1:
+            return
+
+        # Get or make the Slot for this merge.
+        slot = slots[0] if slots else Slot(unit=self.unit, name='')
+
+        # Update the location and span info for this Slot.
+        items = self.ui.slots.selectedItems()
+        rows = [item.row() for item in items]
+        columns = [item.column() for item in items]
+        slot.row = min(rows)
+        slot.column = min(columns)
+        slot.column_span = max(columns) - slot.column + 1
+        slot.row_span = max(rows) - slot.row + 1
+        slot.save()
+
+        # Update the QTableWidgetItem to match the item changes.
+        self.ui.slots.setSpan(slot.row, slot.column, slot.row_span, slot.column_span)
+        item = self.ui.slots.item(slot.row, slot.column)
+        item.setText(slot.name)
+        item.setData(QtCore.Qt.UserRole, slot)
+        self._highlight_item(item)
+
+        # If this was a new slot then trigger an edit.
+        if not slot.name:
+            self.ui.slots.editItem(item)
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def _split(self) -> None:
+        """Merge the currently selected cell with the open cell below."""
+        # We can only split one cell at a time.
+        items = self.ui.slots.selectedItems()
+        if len(items) != 1:
+            return
+
+        # Ensure this slot actually spans something.
+        slot: Slot = items[0].data(QtCore.Qt.UserRole)
+        if slot.row_span <= 1 and slot.column_span <= 1:
+            return
+
+        # Update the slot back to a single cell.  To change the size the user must first split the merged cell and then
+        # re-merge.
+        slot.row_span = 1
+        slot.column_span = 1
+        slot.save()
+
+        # Update the table to revert back to individual cells.
+        self.ui.slots.setSpan(slot.row, slot.column, 1, 1)
+
+        # Update the context menu to match the new selection.
+        self._selected()
 
 
 

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>437</width>
-    <height>573</height>
+    <width>838</width>
+    <height>528</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -30,6 +30,9 @@
     <widget class="QTableWidget" name="slots">
      <property name="alternatingRowColors">
       <bool>true</bool>
+     </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::ContiguousSelection</enum>
      </property>
      <property name="verticalScrollMode">
       <enum>QAbstractItemView::ScrollPerPixel</enum>
