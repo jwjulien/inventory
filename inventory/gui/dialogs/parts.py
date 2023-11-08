@@ -1,5 +1,5 @@
 # ======================================================================================================================
-#      File:  /inventory/gui/tabs/storage.py
+#      File:  /inventory/gui/dialogs/parts.py
 #   Project:  Inventory
 #    Author:  Jared Julien <jaredjulien@exsystems.net>
 # Copyright:  (c) 2023 Jared Julien, eX Systems
@@ -17,61 +17,31 @@
 # OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # ----------------------------------------------------------------------------------------------------------------------
-"""Tab implementation for storage aras, units, slots, and (ultimately) parts."""
+"""A dialog for displaying lists of parts."""
 
 # ======================================================================================================================
 # Imports
 # ----------------------------------------------------------------------------------------------------------------------
-from PySide6 import QtWidgets
-import qtawesome
+from typing import List
 
-from inventory.gui.base.tab_storage import Ui_TabStorage
-from inventory.model.storage import Area, Unit, Slot
+from PySide6 import QtWidgets
+
+from inventory.gui.base.dialog_parts import Ui_PartsDialog
+from inventory.model.parts import Part
 
 
 
 
 # ======================================================================================================================
-# Tab Storage Class
+# Parts Dialog
 # ----------------------------------------------------------------------------------------------------------------------
-class TabStorage(QtWidgets.QWidget):
-    def __init__(self, parent):
+class PartsDialog(QtWidgets.QDialog):
+    def __init__(self, parent, parts: List[Part]):
         super().__init__(parent)
-        self.ui = Ui_TabStorage()
+        self.ui = Ui_PartsDialog()
         self.ui.setupUi(self)
 
-        areas = Area.select()
-        self.ui.areas.setAreas(areas)
-
-        self.ui.back.setIcon(qtawesome.icon('fa.arrow-left'))
-
-        self.ui.areas.selected.connect(self.area_selected)
-        self.ui.units.selected.connect(self.unit_selected)
-        self.ui.back.clicked.connect(self.show_areas)
-
-        self.ui.units.hide()
-        self.show_areas()
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-    def show_areas(self) -> None:
-        self.ui.stack.setCurrentWidget(self.ui.page_areas)
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-    def area_selected(self, area: Area) -> None:
-        self.ui.units.show()
-        self.ui.units.setUnits(area, area.units)
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-    def unit_selected(self, unit: Unit) -> None:
-        if unit is not None:
-            self.ui.title.setText(f'{unit.area.name} > {unit.name}')
-            self.ui.stack.setCurrentWidget(self.ui.page_slots)
-            self.ui.slots.setUnit(unit)
-        else:
-            self.show_areas()
+        self.ui.parts.setParts(parts)
 
 
 

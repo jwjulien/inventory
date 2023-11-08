@@ -74,28 +74,6 @@ class Unit(BaseModel):
         return list(set([part for slot in self.slots for part in slot.parts]))
 
 
-# # ----------------------------------------------------------------------------------------------------------------------
-#     # Methods
-#     def __getitem__(self, index) -> 'Row':
-#         return Row(self, index)
-
-
-
-# # ======================================================================================================================
-# # Row Class
-# # ----------------------------------------------------------------------------------------------------------------------
-# @dataclass
-# class Row:
-#     unit: Unit
-#     row: int
-
-#     def __getitem__(self, col_num: int) -> 'Slot':
-#         for slot in self.unit.slots:
-#             if slot.row == self.row_num and slot.column == col_num:
-#                 return slot
-#         return None
-
-
 
 
 # ======================================================================================================================

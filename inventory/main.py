@@ -26,6 +26,7 @@ import sys
 
 from PySide6 import QtWidgets
 import qdarktheme
+import qtawesome
 
 from inventory.gui.main_window import MainWindow
 
@@ -36,6 +37,14 @@ from inventory.gui.main_window import MainWindow
 # Main Function
 # ----------------------------------------------------------------------------------------------------------------------
 def main() -> int:
+    # Set colors for QtAwesome icons before the main window is instantiated.
+    qtawesome.set_defaults(
+        color='#E0E1E3',
+        color_active='#C9CDD0',
+        color_selected='#ACB1B6',
+        color_disabled='#9DA9B5'
+    )
+
     sys.argv += ['-platform', 'windows:darkmode=2']
     app = QtWidgets.QApplication(sys.argv)
     qdarktheme.setup_theme('auto', additional_qss="QToolTip { border: 0px; }")

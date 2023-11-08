@@ -119,7 +119,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def _tag_scanned(self, code: str) -> None:
         print('Received code:', code)
         try:
-            reference = Reference.from_str(code)
+            reference = Reference.from_str(code, label='scanner')
         except ValueError:
             print('Error parsing:', code)
             raise

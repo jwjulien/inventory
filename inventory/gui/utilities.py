@@ -1,5 +1,5 @@
 # ======================================================================================================================
-#      File:  /inventory/gui/tabs/storage.py
+#      File:  /inventory/gui/utilities.py
 #   Project:  Inventory
 #    Author:  Jared Julien <jaredjulien@exsystems.net>
 # Copyright:  (c) 2023 Jared Julien, eX Systems
@@ -17,61 +17,42 @@
 # OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # ----------------------------------------------------------------------------------------------------------------------
-"""Tab implementation for storage aras, units, slots, and (ultimately) parts."""
+"""GUI helpers."""
 
 # ======================================================================================================================
 # Imports
 # ----------------------------------------------------------------------------------------------------------------------
-from PySide6 import QtWidgets
-import qtawesome
+from typing import Callable
 
-from inventory.gui.base.tab_storage import Ui_TabStorage
-from inventory.model.storage import Area, Unit, Slot
+from PySide6 import QtGui, QtWidgets
+import qtawesome
 
 
 
 
 # ======================================================================================================================
-# Tab Storage Class
+# Context Menu Action Helper
 # ----------------------------------------------------------------------------------------------------------------------
-class TabStorage(QtWidgets.QWidget):
-    def __init__(self, parent):
-        super().__init__(parent)
-        self.ui = Ui_TabStorage()
-        self.ui.setupUi(self)
+def context_action(menu: QtWidgets.QMenu, title: str, slot: Callable, icon: str = None) -> QtGui.QAction:
+    """Add a QAction to a QMenu with a particular focus on custom context menus.
 
-        areas = Area.select()
-        self.ui.areas.setAreas(areas)
+    Arguments:
+        menu: A reference to the QMenu to which this QAction is to be added.
+        title: Textual name for the item in the context menu.
+        slot: A callback method to be connected to the `triggered` slot of the QAction.
+        icon: Optional qtawesome icon name.  If not provided, no icon will be displayed.
 
-        self.ui.back.setIcon(qtawesome.icon('fa.arrow-left'))
-
-        self.ui.areas.selected.connect(self.area_selected)
-        self.ui.units.selected.connect(self.unit_selected)
-        self.ui.back.clicked.connect(self.show_areas)
-
-        self.ui.units.hide()
-        self.show_areas()
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-    def show_areas(self) -> None:
-        self.ui.stack.setCurrentWidget(self.ui.page_areas)
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-    def area_selected(self, area: Area) -> None:
-        self.ui.units.show()
-        self.ui.units.setUnits(area, area.units)
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-    def unit_selected(self, unit: Unit) -> None:
-        if unit is not None:
-            self.ui.title.setText(f'{unit.area.name} > {unit.name}')
-            self.ui.stack.setCurrentWidget(self.ui.page_slots)
-            self.ui.slots.setUnit(unit)
-        else:
-            self.show_areas()
+    Returns:
+        The QAction instance that was created.  The action will already be added to the passed `menu`, however, if a
+        reference is needed to do things like enable.disable the specific action, then this reference should be saved
+        by the caller of this function.
+    """
+    action = QtGui.QAction(title, menu)
+    if icon is not None:
+        action.setIcon(qtawesome.icon(icon))
+    menu.addAction(action)
+    action.triggered.connect(slot)
+    return action
 
 
 

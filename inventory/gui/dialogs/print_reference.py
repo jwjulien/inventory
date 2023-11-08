@@ -1,5 +1,5 @@
 # ======================================================================================================================
-#      File:  /inventory/gui/tabs/storage.py
+#      File:  /inventory/gui/dialogs/print_reference.py
 #   Project:  Inventory
 #    Author:  Jared Julien <jaredjulien@exsystems.net>
 # Copyright:  (c) 2023 Jared Julien, eX Systems
@@ -17,61 +17,44 @@
 # OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # ----------------------------------------------------------------------------------------------------------------------
-"""Tab implementation for storage aras, units, slots, and (ultimately) parts."""
+"""A dialog to help preview and print References."""
 
 # ======================================================================================================================
 # Imports
 # ----------------------------------------------------------------------------------------------------------------------
-from PySide6 import QtWidgets
-import qtawesome
+from PySide6 import QtGui, QtWidgets
+from PIL.ImageQt import ImageQt
 
-from inventory.gui.base.tab_storage import Ui_TabStorage
-from inventory.model.storage import Area, Unit, Slot
+from inventory.gui.base.dialog_print_reference import Ui_PrintReferenceDialog
+from inventory.libraries.references import Reference
+from inventory.libraries.printer.printers import LabelWriter450
 
 
 
 
 # ======================================================================================================================
-# Tab Storage Class
+# Print Reference Dialog
 # ----------------------------------------------------------------------------------------------------------------------
-class TabStorage(QtWidgets.QWidget):
-    def __init__(self, parent):
+class PrintReferenceDialog(QtWidgets.QDialog):
+    def __init__(self, parent, reference: Reference):
         super().__init__(parent)
-        self.ui = Ui_TabStorage()
+        self.ui = Ui_PrintReferenceDialog()
         self.ui.setupUi(self)
 
-        areas = Area.select()
-        self.ui.areas.setAreas(areas)
+        self.setWindowTitle(f'Print {reference.target.name} {reference.label} Label')
+        self.ui.buttons.button(self.ui.buttons.StandardButton.Ok).setText('Print')
 
-        self.ui.back.setIcon(qtawesome.icon('fa.arrow-left'))
+        self.label = reference.barcode_label()
 
-        self.ui.areas.selected.connect(self.area_selected)
-        self.ui.units.selected.connect(self.unit_selected)
-        self.ui.back.clicked.connect(self.show_areas)
-
-        self.ui.units.hide()
-        self.show_areas()
+        qt_image = ImageQt(self.label.image())
+        self.ui.preview.setPixmap(QtGui.QPixmap.fromImage(qt_image))
 
 
-# ----------------------------------------------------------------------------------------------------------------------
-    def show_areas(self) -> None:
-        self.ui.stack.setCurrentWidget(self.ui.page_areas)
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-    def area_selected(self, area: Area) -> None:
-        self.ui.units.show()
-        self.ui.units.setUnits(area, area.units)
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-    def unit_selected(self, unit: Unit) -> None:
-        if unit is not None:
-            self.ui.title.setText(f'{unit.area.name} > {unit.name}')
-            self.ui.stack.setCurrentWidget(self.ui.page_slots)
-            self.ui.slots.setUnit(unit)
-        else:
-            self.show_areas()
+    def accept(self) -> None:
+        """Print the Reference label if the user accepts the dialog."""
+        printer = LabelWriter450()
+        self.label.print(printer)
+        super().accept()
 
 
 

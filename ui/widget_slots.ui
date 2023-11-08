@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2">
+  <layout class="QVBoxLayout" name="verticalLayout">
    <property name="leftMargin">
     <number>0</number>
    </property>
@@ -27,43 +27,25 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QGroupBox" name="groupBox">
-     <property name="title">
-      <string>Slots:</string>
+    <widget class="QTableWidget" name="slots">
+     <property name="alternatingRowColors">
+      <bool>true</bool>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <item>
-       <widget class="QTableWidget" name="slots">
-        <property name="alternatingRowColors">
-         <bool>true</bool>
-        </property>
-        <attribute name="horizontalHeaderStretchLastSection">
-         <bool>true</bool>
-        </attribute>
-       </widget>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout">
-        <item>
-         <widget class="QPushButton" name="remove">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="text">
-           <string>Remove</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="move">
-          <property name="text">
-           <string>Move</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-     </layout>
+     <property name="verticalScrollMode">
+      <enum>QAbstractItemView::ScrollPerPixel</enum>
+     </property>
+     <property name="horizontalScrollMode">
+      <enum>QAbstractItemView::ScrollPerPixel</enum>
+     </property>
+     <attribute name="horizontalHeaderDefaultSectionSize">
+      <number>80</number>
+     </attribute>
+     <attribute name="horizontalHeaderStretchLastSection">
+      <bool>true</bool>
+     </attribute>
+     <attribute name="verticalHeaderDefaultSectionSize">
+      <number>60</number>
+     </attribute>
     </widget>
    </item>
   </layout>

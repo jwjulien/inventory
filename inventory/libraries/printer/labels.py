@@ -141,6 +141,12 @@ class Label:
 
 
 # ----------------------------------------------------------------------------------------------------------------------
+    def image(self) -> Image:
+        """Return the PIL Image that represents this Label."""
+        return self._canvas
+
+
+# ----------------------------------------------------------------------------------------------------------------------
     def preview(self) -> None:
         """For debugging.  Preview this label."""
         self._canvas.show()

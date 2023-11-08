@@ -27,7 +27,11 @@ from typing import List
 from PySide6 import QtCore, QtWidgets
 
 from inventory.gui.base.widget_units import Ui_WidgetUnits
+from inventory.gui.dialogs.parts import PartsDialog
+from inventory.gui.dialogs.print_reference import PrintReferenceDialog
+from inventory.gui.utilities import context_action
 from inventory.model.storage import Area, Unit
+from inventory.libraries.references import Reference, ReferenceTarget
 
 
 
@@ -50,10 +54,19 @@ class UnitsWidget(QtWidgets.QWidget):
         header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
         header.setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
 
+        # Setup custom context menu.
+        self.context_menu = QtWidgets.QMenu(self)
+        self.context_view = context_action(self.context_menu, 'View Slots', self._show_slots, 'fa.arrow-right')
+        self.context_parts = context_action(self.context_menu, 'View All Parts', self._show_parts, 'fa.list')
+        self.context_menu.addSeparator()
+        self.context_add = context_action(self.context_menu, 'Add Unit', self._add, 'fa.plus')
+        self.context_remove = context_action(self.context_menu, 'Remove Unit', self._remove, 'fa.trash-o')
+        self.context_menu.addSeparator()
+        self.context_print = context_action(self.context_menu, 'Print Label', self._print, 'fa.barcode')
+        self.ui.units.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.ui.units.customContextMenuRequested.connect(self._context_menu)
+
         # Connect events.
-        self.ui.add.clicked.connect(self.add)
-        self.ui.remove.clicked.connect(self.remove)
-        self.ui.units.itemSelectionChanged.connect(self._selected)
         self.ui.units.itemChanged.connect(self._changed)
 
 
@@ -75,7 +88,16 @@ class UnitsWidget(QtWidgets.QWidget):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-    def add(self) -> None:
+    def _context_menu(self, point: QtCore.QPoint) -> None:
+        selected = bool(self.ui.units.selectedItems())
+        self.context_remove.setEnabled(selected)
+        self.context_view.setEnabled(selected)
+        self.context_print.setEnabled(selected)
+        self.context_menu.exec(self.ui.units.mapToGlobal(point))
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def _add(self) -> None:
         if self.area is None:
             return
         self.ui.units.blockSignals(True)
@@ -86,7 +108,7 @@ class UnitsWidget(QtWidgets.QWidget):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-    def remove(self) -> None:
+    def _remove(self) -> None:
         """Remove the currently selected Units."""
         selected = self.ui.units.selectedItems()
         if not selected:
@@ -110,6 +132,15 @@ class UnitsWidget(QtWidgets.QWidget):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
+    def _print(self) -> None:
+        selected = self.ui.units.selectedIndexes()
+        unit = self.ui.units.item(selected[0].row(), 0).data(QtCore.Qt.UserRole)
+        reference = Reference(id=unit.id, target=ReferenceTarget.Unit, label=unit.name)
+        dialog = PrintReferenceDialog(self, reference)
+        dialog.exec()
+
+
+# ----------------------------------------------------------------------------------------------------------------------
     def _append_unit(self, unit: Unit) -> int:
         row = self.ui.units.rowCount()
         self.ui.units.insertRow(row)
@@ -121,7 +152,7 @@ class UnitsWidget(QtWidgets.QWidget):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-    def _selected(self) -> None:
+    def _show_slots(self) -> None:
         selected = self.ui.units.selectedItems()
         if len(selected) != 1:
             self.selected.emit(None)
@@ -129,6 +160,17 @@ class UnitsWidget(QtWidgets.QWidget):
         item = selected[0]
         unit = self.ui.units.item(item.row(), 0).data(QtCore.Qt.UserRole)
         self.selected.emit(unit)
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def _show_parts(self) -> None:
+        selected = self.ui.units.selectedItems()
+        if not selected:
+            return
+        item = selected[0]
+        unit: Unit = self.ui.units.item(item.row(), 0).data(QtCore.Qt.UserRole)
+        dialog = PartsDialog(self, unit.parts)
+        dialog.exec()
 
 
 # ----------------------------------------------------------------------------------------------------------------------

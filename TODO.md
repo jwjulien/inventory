@@ -1,7 +1,7 @@
 - Miscellaneous:
     - [ ] Make scanner actually search for what it scans.
-    - [ ] Setup printer with dialog to handle printing labels:
-        - [ ] For storage locations.
+    - [x] Setup printer with dialog to handle printing labels:
+        - [x] For storage locations.
         - [x] Develop better scheme using 1" labels and some flavor of 2D barcode.
     - [x] Setup scale:
         - [x] Bring in library from other Python kiosk.
@@ -32,15 +32,15 @@
         - [ ] Ensure that the ID is preserved as that is what is tied to the barcodes.
     - [x] Give ability to move a part to a new slot.
         - [ ] Add ability to define new Slot from Relocate Dialog.
-    - [ ] Highlight slots without any parts assigned.
+    - [x] Highlight slots without any parts assigned.
     - [ ] Give ability to add/remove columns/rows in slots widget - context menu?
-    - [ ] Rework storage tab:
-        - [ ] Make parts load on demand or only for slots.  They are very slow to load for areas with lots of parts.
-        - [ ] Give slots more screen space.  The splitter is nice, but bigger units with long slot names still require scrolling.  I think it might be nice to collapse the areas and units, breadcrumb style.
-        - [ ] Does it make more sense to migrate Areas, Slots, etc. to dialogs instead of widgets?
+    - [x] Rework storage tab:
+        - [x] Make parts load on demand or only for slots.  They are very slow to load for areas with lots of parts.
+        - [x] Give slots more screen space.  Big units with long slot names require scrolling.
+        - [x] Does it make more sense to migrate Areas, Slots, etc. to dialogs instead of widgets?
             - Should help with loading times and make more reusable.
             - What about putting widgets into dialogs to make the best of both?
-    - [ ] In LocationMappingDialog, consider swapping the lengthy dropdown for a column view or some kinda of filter/autocomplete.
+    - [ ] In LocationMappingDialog, swap the lengthy dropdown for a column view or some kinda of filter/autocomplete.
 - Projects:
     - [ ] Update the part matching on BOM import to better match attributes with weighting for things like package and part number over category (as opposed to either summery vs part number matching as it's done now).
     - [ ] In project BOM view:

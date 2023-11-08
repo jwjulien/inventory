@@ -15,47 +15,27 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QGroupBox, QHBoxLayout, QHeaderView,
-    QPushButton, QSizePolicy, QTableWidget, QTableWidgetItem,
-    QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QAbstractItemView, QApplication, QHeaderView, QSizePolicy,
+    QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget)
 
 class Ui_WidgetSlots(object):
     def setupUi(self, WidgetSlots):
         if not WidgetSlots.objectName():
             WidgetSlots.setObjectName(u"WidgetSlots")
         WidgetSlots.resize(437, 573)
-        self.verticalLayout_2 = QVBoxLayout(WidgetSlots)
-        self.verticalLayout_2.setObjectName(u"verticalLayout_2")
-        self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
-        self.groupBox = QGroupBox(WidgetSlots)
-        self.groupBox.setObjectName(u"groupBox")
-        self.verticalLayout = QVBoxLayout(self.groupBox)
+        self.verticalLayout = QVBoxLayout(WidgetSlots)
         self.verticalLayout.setObjectName(u"verticalLayout")
-        self.slots = QTableWidget(self.groupBox)
+        self.verticalLayout.setContentsMargins(0, 0, 0, 0)
+        self.slots = QTableWidget(WidgetSlots)
         self.slots.setObjectName(u"slots")
         self.slots.setAlternatingRowColors(True)
+        self.slots.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
+        self.slots.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
+        self.slots.horizontalHeader().setDefaultSectionSize(80)
         self.slots.horizontalHeader().setStretchLastSection(True)
+        self.slots.verticalHeader().setDefaultSectionSize(60)
 
         self.verticalLayout.addWidget(self.slots)
-
-        self.horizontalLayout = QHBoxLayout()
-        self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.remove = QPushButton(self.groupBox)
-        self.remove.setObjectName(u"remove")
-        self.remove.setEnabled(False)
-
-        self.horizontalLayout.addWidget(self.remove)
-
-        self.move = QPushButton(self.groupBox)
-        self.move.setObjectName(u"move")
-
-        self.horizontalLayout.addWidget(self.move)
-
-
-        self.verticalLayout.addLayout(self.horizontalLayout)
-
-
-        self.verticalLayout_2.addWidget(self.groupBox)
 
 
         self.retranslateUi(WidgetSlots)
@@ -65,8 +45,5 @@ class Ui_WidgetSlots(object):
 
     def retranslateUi(self, WidgetSlots):
         WidgetSlots.setWindowTitle(QCoreApplication.translate("WidgetSlots", u"Form", None))
-        self.groupBox.setTitle(QCoreApplication.translate("WidgetSlots", u"Slots:", None))
-        self.remove.setText(QCoreApplication.translate("WidgetSlots", u"Remove", None))
-        self.move.setText(QCoreApplication.translate("WidgetSlots", u"Move", None))
     # retranslateUi
 

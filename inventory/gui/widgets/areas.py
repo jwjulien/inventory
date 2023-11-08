@@ -27,7 +27,11 @@ from typing import List
 from PySide6 import QtCore, QtWidgets
 
 from inventory.gui.base.widget_areas import Ui_WidgetAreas
+from inventory.gui.dialogs.print_reference import PrintReferenceDialog
+from inventory.gui.dialogs.parts import PartsDialog
+from inventory.gui.utilities import context_action
 from inventory.model.storage import Area
+from inventory.libraries.references import Reference, ReferenceTarget
 
 
 
@@ -43,9 +47,18 @@ class AreasWidget(QtWidgets.QWidget):
         self.ui = Ui_WidgetAreas()
         self.ui.setupUi(self)
 
+        # Setup custom context menu.
+        self.context_menu = QtWidgets.QMenu(self)
+        self.context_parts = context_action(self.context_menu, 'View All Parts', self._show_parts, 'fa.list')
+        self.context_menu.addSeparator()
+        self.context_add = context_action(self.context_menu, 'Add Area', self._add, 'fa.plus')
+        self.context_remove = context_action(self.context_menu, 'Remove Area', self._remove, 'fa.trash-o')
+        self.context_menu.addSeparator()
+        self.context_print = context_action(self.context_menu, 'Print Label', self._print, 'fa.barcode')
+        self.ui.areas.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.ui.areas.customContextMenuRequested.connect(self._context_menu)
+
         # Connect events.
-        self.ui.add.clicked.connect(self.add)
-        self.ui.remove.clicked.connect(self.remove)
         self.ui.areas.itemSelectionChanged.connect(self._selected)
         self.ui.areas.itemChanged.connect(self._changed)
 
@@ -61,7 +74,15 @@ class AreasWidget(QtWidgets.QWidget):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-    def add(self) -> None:
+    def _context_menu(self, point: QtCore.QPoint) -> None:
+        selected = bool(self.ui.areas.selectedItems())
+        self.context_remove.setEnabled(selected)
+        self.context_print.setEnabled(selected)
+        self.context_menu.exec(self.ui.areas.mapToGlobal(point))
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def _add(self) -> None:
         area = Area()
         item = self._add_item(area)
         self.ui.areas.editItem(item)
@@ -77,7 +98,7 @@ class AreasWidget(QtWidgets.QWidget):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-    def remove(self) -> None:
+    def _remove(self) -> None:
         selected = self.ui.areas.selectedItems()
         if not selected:
             return
@@ -97,6 +118,24 @@ class AreasWidget(QtWidgets.QWidget):
 
         area.delete_instance()
         self.ui.areas.takeItem(self.ui.areas.row(item))
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def _print(self) -> None:
+        area = self.ui.areas.selectedItems()[0].data(QtCore.Qt.UserRole)
+        reference = Reference(id=area.id, target=ReferenceTarget.Area, label=area.name)
+        dialog = PrintReferenceDialog(self, reference)
+        dialog.exec()
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def _show_parts(self) -> None:
+        selected = self.ui.areas.selectedItems()
+        if not selected:
+            return
+        area: Area = selected[0].data(QtCore.Qt.UserRole)
+        dialog = PartsDialog(self, area.parts)
+        dialog.exec()
 
 
 # ----------------------------------------------------------------------------------------------------------------------

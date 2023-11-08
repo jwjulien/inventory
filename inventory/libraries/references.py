@@ -22,6 +22,7 @@
 # ======================================================================================================================
 # Imports
 # ----------------------------------------------------------------------------------------------------------------------
+from datetime import date
 from enum import IntEnum
 from dataclasses import dataclass
 
@@ -29,6 +30,7 @@ from aztec_code_generator import AztecCode
 from PIL import Image
 from pylibdmtx import pylibdmtx
 
+from inventory.libraries.printer.labels import Dymo30346, Label
 from inventory.model.base import BaseModel
 from inventory.model.categories import Category
 from inventory.model.documents import Document, Reference as DocumentReference
@@ -70,6 +72,7 @@ class Reference:
     """A generic reference to a Part, Location, Project, Category, etc."""
     target: ReferenceTarget  # The target of this reference
     id: int                  # The unique database ID for this Reference target
+    label: str               # Textual name for this Reference to be used on the label.
     version: int = 1         # Reference version (this attribute shouldn't be set manually - let this default rule)
 
 
@@ -101,7 +104,7 @@ class Reference:
 
 # ----------------------------------------------------------------------------------------------------------------------
     @staticmethod
-    def from_str(text: str) -> 'Reference':
+    def from_str(text: str, label: str) -> 'Reference':
         """Generate a Reference to a Part, Supplier, Location, etc. from a provided string.
 
         This constructor is likely most useful when decoding previously `encode`ed References.
@@ -121,7 +124,8 @@ class Reference:
             return Reference(
                 version=1,
                 target=ReferenceTarget(parts[1]),
-                id=parts[2]
+                id=parts[2],
+                label=label
             )
         else:
             raise ValueError(f'Unsupported barcode reference version {version}')
@@ -176,6 +180,32 @@ class Reference:
         matrix = pylibdmtx.encode(data.encode('utf8'))
         image = Image.frombytes('RGB', (matrix.width, matrix.height), matrix.pixels).convert('1')
         return image
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def barcode_label(self) -> Label:
+        """This is a very opinionated method that generates a "standard" barcoded label for this inventory tool."""
+        label = Dymo30346()
+
+        # 2D scannable barcode.
+        barcode = self.datamatrix()
+        barcode = barcode.resize((label.height, label.height), Image.BICUBIC)
+        label.blit(0, 0, barcode)
+
+        # Reference information.
+        label.set_font('calibri', 26)
+        label.text(barcode.width, 0, 'Inventory Reference Tag')
+        label.text(barcode.width, 25, f'Target: {self.target.name}')
+        label.text(barcode.width, 55, f'ID: {self.id:,}')
+        if self.label:
+            label.text(barcode.width, 85, f'Label: {self.label}')
+
+        # The fine print.
+        label.set_font('calibri', 18)
+        label.text(barcode.width, 115, f'Version: {self.version}')
+        label.text(barcode.width + 230, 115, date.today().strftime('%m/%d/%y'))
+
+        return label
 
 
 
