@@ -349,14 +349,14 @@ Set to zero to disable reorder (i.e. non-stocked) or set to one to reorder when 
           <number>0</number>
          </property>
          <item>
-          <widget class="QLabel" name="image">
+          <widget class="DroppableLabel" name="image">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
              <horstretch>1</horstretch>
              <verstretch>1</verstretch>
             </sizepolicy>
            </property>
-           <property name="scaledContents">
+           <property name="acceptDrops">
             <bool>true</bool>
            </property>
            <property name="alignment">
@@ -443,6 +443,11 @@ Set to zero to disable reorder (i.e. non-stocked) or set to one to reorder when 
    <extends>QWidget</extends>
    <header>inventory.gui.widgets.document_list</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>DroppableLabel</class>
+   <extends>QLabel</extends>
+   <header>inventory.gui.widgets.droppable_label</header>
   </customwidget>
  </customwidgets>
  <resources/>

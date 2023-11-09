@@ -22,9 +22,14 @@
 # ======================================================================================================================
 # Imports
 # ----------------------------------------------------------------------------------------------------------------------
+from typing import List
+
+import io
 from partsscale.scale import Scale, DeviceError
 from PySide6 import QtCore, QtGui, QtWidgets
+from PIL import Image
 from PIL.ImageQt import ImageQt
+import requests
 
 from inventory.gui.base.dialog_part import Ui_DialogPart
 from inventory.gui.dialogs.category import CategoryDialog
@@ -64,6 +69,7 @@ class PartDialog(QtWidgets.QDialog):
         self.ui.category.currentIndexChanged.connect(self._category_changed)
         self.ui.new_category.clicked.connect(self._add_category)
         self.ui.calibrate.clicked.connect(self._weigh_parts)
+        self.ui.image.urlDropped.connect(self._dropped_image)
         self.ui.set_image.clicked.connect(self._select_image)
         self.ui.remove_image.clicked.connect(self._remove_image)
         self.ui.buttons.button(QtWidgets.QDialogButtonBox.StandardButton.Apply).clicked.connect(self._save)
@@ -183,6 +189,25 @@ class PartDialog(QtWidgets.QDialog):
         dialog = PartWeightDialog(self)
         if dialog.exec():
             self.ui.weight.setValue(dialog.weight())
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def _dropped_image(self, url: QtCore.QUrl) -> None:
+        if url.isLocalFile():
+            image = Image.open(url.toLocalFile())
+        else:
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Linux; Linux i641 x86_64) Gecko/20130401 Firefox/67.1'
+            }
+            response = requests.get(url.url(), headers=headers, timeout=5)
+            response.raise_for_status()
+            data = io.BytesIO(response.content)
+            image = Image.open(data)
+        image.thumbnail((250, 250))
+        qt_image = ImageQt(image)
+        pixmap = QtGui.QPixmap(qt_image)
+        self.ui.image.setPixmap(pixmap)
+        self.ui.remove_image.setEnabled(True)
 
 
 # ----------------------------------------------------------------------------------------------------------------------

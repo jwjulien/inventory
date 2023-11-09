@@ -23,6 +23,7 @@ from PySide6.QtWidgets import (QAbstractButton, QApplication, QComboBox, QDialog
 
 from inventory.gui.widgets.attributes import AttributesWidget
 from inventory.gui.widgets.document_list import DocumentListWidget
+from inventory.gui.widgets.droppable_label import DroppableLabel
 from inventory.gui.widgets.location import LocationWidget
 from inventory.gui.widgets.materials import MaterialsWidget
 from inventory.gui.widgets.suppliers import SuppliersWidget
@@ -263,14 +264,14 @@ class Ui_DialogPart(object):
         self.verticalLayout_3 = QVBoxLayout(self.image_widget)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.verticalLayout_3.setContentsMargins(0, 0, 0, 0)
-        self.image = QLabel(self.image_widget)
+        self.image = DroppableLabel(self.image_widget)
         self.image.setObjectName(u"image")
         sizePolicy8 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
         sizePolicy8.setHorizontalStretch(1)
         sizePolicy8.setVerticalStretch(1)
         sizePolicy8.setHeightForWidth(self.image.sizePolicy().hasHeightForWidth())
         self.image.setSizePolicy(sizePolicy8)
-        self.image.setScaledContents(True)
+        self.image.setAcceptDrops(True)
         self.image.setAlignment(Qt.AlignCenter)
 
         self.verticalLayout_3.addWidget(self.image)

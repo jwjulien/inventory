@@ -28,6 +28,9 @@
     - [ ] Disable the [Apply] and [Save] buttons in the PartsDialog until a change has been made.
     - [ ] Change the Location Widget from side buttons to context menu.
     - [ ] Attributes do strange things when adding second, third, etc.
+    - [x] Add URL fetch for part images to allow getting them from Mouser...
+        - [x] Is it possible to support drag and drop from the internets?
+    - [ ] Add a drag/drop for documents that matches what I just did for Part images!
 - Storage:
     - [x] Give ability to move a slot to a new location/unit.
         - Can be done using cut/paste - even works between units.
