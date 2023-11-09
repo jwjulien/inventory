@@ -27,6 +27,7 @@
     - [ ] Perform validation on part before accepting [Save] or [Apply] from the PartDialog.
     - [ ] Disable the [Apply] and [Save] buttons in the PartsDialog until a change has been made.
     - [ ] Change the Location Widget from side buttons to context menu.
+    - [ ] Attributes do strange things when adding second, third, etc.
 - Storage:
     - [x] Give ability to move a slot to a new location/unit.
         - Can be done using cut/paste - even works between units.
@@ -52,3 +53,5 @@
 - New tabs/features:
     - [ ] A feature to view parts from a supplier that are single-sourced (with quantities visible).
         - Such that when looking to fill up an order with a supplier, with whom I place infrequent orders, it might be easy to find additional items to stock up on or to tip over the free shipping threshold.
+    - [ ] Need to refresh parts when switching tabs.
+        - [ ] Lazy load them too, then.  May speed up loading time.

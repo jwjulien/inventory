@@ -22,12 +22,15 @@
 # ======================================================================================================================
 # Import Statements
 # ----------------------------------------------------------------------------------------------------------------------
-from typing import List
+from typing import Iterator, List, TYPE_CHECKING
 
 from peewee import CharField, ForeignKeyField
 from playhouse.hybrid import hybrid_property
 
 from inventory.model.base import BaseModel
+
+if TYPE_CHECKING:
+    from inventory.model.parts import Part
 
 
 
@@ -40,9 +43,12 @@ class Category(BaseModel):
         table_name = 'categories'
 
     # Columns
-    parent = ForeignKeyField('self', backref='children', null=True)
-    title = CharField(50)
-    designator = CharField(10, null=True)
+    parent: 'Category' = ForeignKeyField('self', backref='children', null=True)
+    title: str = CharField(50)
+    designator: str = CharField(10, null=True)
+
+    children: List['Category']
+    parts: List['Part']
 
 
     # Properties
@@ -72,9 +78,16 @@ class Category(BaseModel):
         return recurse(self)
 
 
+    def all_parts(self) -> Iterator['Part']:
+        for part in self.parts:
+            yield part
+        for child in self.children:
+            yield from child.all_parts()
+
+
     def full_title(self, separator: str = ' > ') -> str:
         """Fetch the full title, including titles of this category and each of it's parents moving up the tree."""
-        return separator.join(category.title for category in self.chain)
+        return separator.join(category.title for category in self.chain if category.title)
 
 
 

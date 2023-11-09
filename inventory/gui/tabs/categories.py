@@ -22,11 +22,13 @@
 # ======================================================================================================================
 # Imports
 # ----------------------------------------------------------------------------------------------------------------------
-from PySide6 import QtCore, QtGui, QtWidgets
+from PySide6 import QtCore, QtWidgets
+import qtawesome
 
 from inventory.gui.base.tab_categories import Ui_TabCategories
 from inventory.gui.dialogs.category import CategoryDialog
-from inventory.gui.prompts import YesNoPrompt
+from inventory.gui.prompts import Alert, YesNoPrompt
+from inventory.gui.utilities import context_action
 from inventory.model.categories import Category
 
 
@@ -49,17 +51,51 @@ class TabCategories(QtWidgets.QWidget):
         self._sort()
 
         # Update the layout a bit for better readability.
-        self.ui.categories.setColumnWidth(0, 350)
-        self.ui.categories.expandAll()
+        self.ui.categories.setColumnWidth(0, 325)
+        self.ui.categories.setColumnWidth(1, 70)
+        self.ui.categories.setColumnWidth(2, 30)
+
+        # Add icons to the toolbar buttons.
+        self.ui.insert_child.setIcon(qtawesome.icon('mdi.file-tree'))
+        self.ui.insert_sibling.setIcon(qtawesome.icon('fa.list'))
+        self.ui.make_child.setIcon(qtawesome.icon('fa5s.indent'))
+        self.ui.make_sibling.setIcon(qtawesome.icon('fa5s.outdent'))
+        self.ui.delete_category.setIcon(qtawesome.icon('fa.trash-o'))
+        self.ui.collapse_all.setIcon(qtawesome.icon('mdi.collapse-all'))
+        self.ui.expand_all.setIcon(qtawesome.icon('mdi.expand-all'))
+
+        # Setup custom context menu for category tree.
+        self.context_menu = QtWidgets.QMenu(self)
+        self.context_delete = context_action(
+            self.context_menu, 'Delete', self._delete, 'fa.trash-o', 'Del', self.ui.categories)
+        self.context_sibling = context_action(
+            self.context_menu, 'Insert Sibling', self._insert_sibling, 'fa.list', 'Ins', self.ui.categories)
+        self.context_child = context_action(
+            self.context_menu, 'Insert Child', self._insert_child, 'mdi.file-tree', 'Ctrl+Ins', self.ui.categories)
+        self.context_menu.addSeparator()
+        self.context_indent = context_action(
+            self.context_menu, 'Make Child', self._make_child, 'fa5s.indent', 'Ctrl+]', self.ui.categories)
+        self.context_outdent = context_action(
+            self.context_menu, 'Make Sibling', self._make_sibling, 'fa5s.outdent', 'Ctrl+[', self.ui.categories)
+        self.context_menu.addSeparator()
+        self.context_collapse = context_action(
+            self.context_menu, 'Collapse All', self.ui.categories.collapseAll, 'mdi.collapse-all')
+        self.context_collapse = context_action(
+            self.context_menu, 'Expand All', self.ui.categories.expandAll, 'mdi.expand-all')
+        self.ui.categories.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.ui.categories.customContextMenuRequested.connect(self._context_menu)
 
         # Connect events.
+        self.ui.insert_child.clicked.connect(self._insert_child)
+        self.ui.insert_sibling.clicked.connect(self._insert_sibling)
+        self.ui.make_child.clicked.connect(self._make_child)
+        self.ui.make_sibling.clicked.connect(self._make_sibling)
+        self.ui.delete_category.clicked.connect(self._delete)
+        self.ui.collapse_all.clicked.connect(self.ui.categories.collapseAll)
+        self.ui.expand_all.clicked.connect(self.ui.categories.expandAll)
         self.ui.categories.doubleClicked.connect(self.edit)
         self.ui.categories.itemSelectionChanged.connect(self._selected)
-        QtGui.QShortcut(QtGui.QKeySequence("Delete"), self.ui.categories, self.delete)
-        QtGui.QShortcut(QtGui.QKeySequence("Insert"), self.ui.categories, self.insert_sibling)
-        QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Insert"), self.ui.categories, self.insert_child)
-        QtGui.QShortcut(QtGui.QKeySequence("Ctrl+]"), self.ui.categories, self.make_child)
-        QtGui.QShortcut(QtGui.QKeySequence("Ctrl+["), self.ui.categories, self.make_sibling)
+        self._selected()
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -73,9 +109,18 @@ class TabCategories(QtWidgets.QWidget):
 # ----------------------------------------------------------------------------------------------------------------------
     @staticmethod
     def _make_item(parent: QtWidgets.QTreeWidgetItem, category: Category) -> QtWidgets.QTreeWidgetItem:
-        item = QtWidgets.QTreeWidgetItem(parent, [category.title, category.inherited_designator])
+        item = QtWidgets.QTreeWidgetItem(parent, [
+            category.title,
+            category.inherited_designator,
+            str(len(category.parts)) if category.parts else ''
+        ])
         item.setData(0, QtCore.Qt.UserRole, category)
         return item
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def _context_menu(self, point: QtCore.QPoint) -> None:
+        self.context_menu.exec(self.ui.categories.mapToGlobal(point))
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -87,13 +132,21 @@ class TabCategories(QtWidgets.QWidget):
 # ----------------------------------------------------------------------------------------------------------------------
     def _selected(self) -> None:
         selected = self.ui.categories.selectedItems()
-        if not selected:
-            return
         parts = []
         for item in selected:
             category: Category = item.data(0, QtCore.Qt.UserRole)
             parts.extend(category.parts)
         self.ui.parts.setParts(parts)
+
+        self.ui.delete_category.setEnabled(bool(selected))
+        self.ui.insert_child.setEnabled(bool(selected))
+        self.ui.make_child.setEnabled(len(selected) >= 2)
+        self.ui.make_sibling.setEnabled(any([bool(item.parent()) for item in selected]))
+
+        self.context_delete.setEnabled(bool(selected))
+        self.context_child.setEnabled(bool(selected))
+        self.context_indent.setEnabled(len(selected) >= 2)
+        self.context_outdent.setEnabled(any([bool(item.parent()) for item in selected]))
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -126,17 +179,21 @@ class TabCategories(QtWidgets.QWidget):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-    def delete(self) -> None:
+    def _delete(self) -> None:
         """Remove the currently selected items."""
         selection = self.ui.categories.selectedItems()
         message = 'Are you sure you want to delete '
         if not selection:
             return
+        category: Category = selection[0].data(0, QtCore.Qt.UserRole)
+        if list(category.all_parts()):
+            return Alert(self, 'Error', 'Cannot delete categories with parts.  Please move parts first.')
         if len(selection) == 1:
-            message += selection[0].data(0, QtCore.Qt.UserRole).title
+            message += category.title
         else:
             message += f'{len(selection)} items'
-        message += '?\n\nWarning: Any and all children will be deleted too.'
+        if category.children:
+            message += '?\n\nWarning: All children will be deleted recursively too.'
         if YesNoPrompt(self, 'Please confirm', message):
             def recurse(category: Category) -> None:
                 for child in category.children:
@@ -155,7 +212,7 @@ class TabCategories(QtWidgets.QWidget):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-    def insert_sibling(self) -> None:
+    def _insert_sibling(self) -> None:
         selected = self.ui.categories.selectedItems()
         if selected:
             selected = selected[-1]
@@ -184,7 +241,7 @@ class TabCategories(QtWidgets.QWidget):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-    def insert_child(self) -> None:
+    def _insert_child(self) -> None:
         selected = self.ui.categories.selectedItems()
         if not selected:
             return
@@ -203,7 +260,7 @@ class TabCategories(QtWidgets.QWidget):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-    def make_child(self) -> None:
+    def _make_child(self) -> None:
         selected = self.ui.categories.selectedItems()
         if len(selected) <= 1:
             return
@@ -227,7 +284,7 @@ class TabCategories(QtWidgets.QWidget):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-    def make_sibling(self) -> None:
+    def _make_sibling(self) -> None:
         selected = self.ui.categories.selectedItems()
         if not selected:
             return
@@ -249,6 +306,7 @@ class TabCategories(QtWidgets.QWidget):
             selected_category.save()
 
         self._sort()
+
 
 
 
