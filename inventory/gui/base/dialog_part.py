@@ -16,10 +16,10 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QAbstractButton, QApplication, QComboBox, QDialog,
-    QDialogButtonBox, QDoubleSpinBox, QFormLayout, QGraphicsView,
-    QHBoxLayout, QLabel, QLineEdit, QPlainTextEdit,
-    QPushButton, QSizePolicy, QSpinBox, QTabWidget,
-    QVBoxLayout, QWidget)
+    QDialogButtonBox, QDoubleSpinBox, QFormLayout, QHBoxLayout,
+    QLabel, QLineEdit, QPlainTextEdit, QPushButton,
+    QSizePolicy, QSpinBox, QTabWidget, QVBoxLayout,
+    QWidget)
 
 from inventory.gui.widgets.attributes import AttributesWidget
 from inventory.gui.widgets.document_list import DocumentListWidget
@@ -263,8 +263,15 @@ class Ui_DialogPart(object):
         self.verticalLayout_3 = QVBoxLayout(self.image_widget)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.verticalLayout_3.setContentsMargins(0, 0, 0, 0)
-        self.image = QGraphicsView(self.image_widget)
+        self.image = QLabel(self.image_widget)
         self.image.setObjectName(u"image")
+        sizePolicy8 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sizePolicy8.setHorizontalStretch(1)
+        sizePolicy8.setVerticalStretch(1)
+        sizePolicy8.setHeightForWidth(self.image.sizePolicy().hasHeightForWidth())
+        self.image.setSizePolicy(sizePolicy8)
+        self.image.setScaledContents(True)
+        self.image.setAlignment(Qt.AlignCenter)
 
         self.verticalLayout_3.addWidget(self.image)
 

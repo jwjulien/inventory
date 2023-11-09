@@ -24,7 +24,7 @@
 # ----------------------------------------------------------------------------------------------------------------------
 from typing import Dict
 
-from peewee import CharField, FloatField, ForeignKeyField, IntegerField, TextField
+from peewee import BlobField, CharField, FloatField, ForeignKeyField, IntegerField, TextField
 from playhouse.fields import PickleField
 from playhouse.hybrid import hybrid_property
 
@@ -51,6 +51,7 @@ class Part(BaseModel):
     threshold = IntegerField(default=0)
     notes = TextField(default='')
     attributes: Dict[str, str] = PickleField(default=dict)
+    image = BlobField(null=True)
 
 
     # Properties

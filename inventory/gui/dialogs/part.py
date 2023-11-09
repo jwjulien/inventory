@@ -23,7 +23,8 @@
 # Imports
 # ----------------------------------------------------------------------------------------------------------------------
 from partsscale.scale import Scale, DeviceError
-from PySide6 import QtCore, QtWidgets
+from PySide6 import QtCore, QtGui, QtWidgets
+from PIL.ImageQt import ImageQt
 
 from inventory.gui.base.dialog_part import Ui_DialogPart
 from inventory.gui.dialogs.category import CategoryDialog
@@ -63,6 +64,8 @@ class PartDialog(QtWidgets.QDialog):
         self.ui.category.currentIndexChanged.connect(self._category_changed)
         self.ui.new_category.clicked.connect(self._add_category)
         self.ui.calibrate.clicked.connect(self._weigh_parts)
+        self.ui.set_image.clicked.connect(self._select_image)
+        self.ui.remove_image.clicked.connect(self._remove_image)
         self.ui.buttons.button(QtWidgets.QDialogButtonBox.StandardButton.Apply).clicked.connect(self._save)
         self.ui.buttons.button(QtWidgets.QDialogButtonBox.StandardButton.Discard).clicked.connect(self.reject)
 
@@ -94,6 +97,13 @@ class PartDialog(QtWidgets.QDialog):
             self.ui.threshold.setValue(int(part.threshold) if part.threshold else 0)
         self.ui.notes.setPlainText(part.notes)
 
+        if part.image:
+            byte_array = QtCore.QByteArray(part.image)
+            pixmap = QtGui.QPixmap()
+            pixmap.loadFromData(byte_array, "PNG")
+            self.ui.image.setPixmap(pixmap)
+            self.ui.remove_image.setEnabled(True)
+
         self.ui.locations.setPart(part)
         self.ui.materials.setPart(part)
         self.ui.suppliers.setPart(part)
@@ -115,6 +125,17 @@ class PartDialog(QtWidgets.QDialog):
         self.part.threshold = self.ui.threshold.value()
         self.part.notes = self.ui.notes.toPlainText()
         self.part.attributes = self.ui.attributes.attributes()
+
+        pixmap = self.ui.image.pixmap()
+        if pixmap:
+            byte_array = QtCore.QByteArray()
+            buffer = QtCore.QBuffer(byte_array)
+            buffer.open(QtCore.QIODevice.WriteOnly)
+            pixmap.save(buffer, "PNG")
+            self.part.image = byte_array.data()
+        else:
+            self.part.image = None
+
         self.part.save()
         self.ui.tabs.setEnabled(True)
 
@@ -162,6 +183,25 @@ class PartDialog(QtWidgets.QDialog):
         dialog = PartWeightDialog(self)
         if dialog.exec():
             self.ui.weight.setValue(dialog.weight())
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def _select_image(self) -> None:
+        """Browse and set an image for this Part."""
+        filter = 'Image FIles (*.png *.jpg *.jpeg *.bmp *.gif *.webp);;All Files (*.*)'
+        filename, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Select image...', filter=filter)
+        if filename:
+            image = ImageQt(filename)
+            pixmap = QtGui.QPixmap.fromImage(image)
+            self.ui.image.setPixmap(pixmap)
+            self.ui.remove_image.setEnabled(True)
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def _remove_image(self) -> None:
+        """Remove the currently set image for this part."""
+        self.ui.image.clear()
+        self.ui.remove_image.setEnabled(False)
 
 
 
