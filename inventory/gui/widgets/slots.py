@@ -22,6 +22,7 @@
 # ======================================================================================================================
 # Imports
 # ----------------------------------------------------------------------------------------------------------------------
+import pickle
 from typing import List
 
 from PySide6 import QtCore, QtGui, QtWidgets
@@ -33,15 +34,8 @@ from inventory.gui.utilities import context_action
 from inventory.model.parts import Part
 from inventory.model.storage import Unit, Slot
 from inventory.libraries.references import Reference, ReferenceTarget
-
-
-
-
-# ======================================================================================================================
-# Constants
-# ----------------------------------------------------------------------------------------------------------------------
-Danger = '#d9534f'
-Warning = '#f0ad4e'
+from inventory.gui.prompts import Alert
+from inventory.gui.constants import Colors
 
 
 
@@ -64,10 +58,16 @@ class SlotsWidget(QtWidgets.QWidget):
         self.context_menu = QtWidgets.QMenu(self)
         self.context_parts = context_action(self.context_menu, 'View Parts', self._show_parts, 'fa.list')
         self.context_menu.addSeparator()
+        self.context_cut = context_action(self.context_menu, 'Cut', self._cut, 'fa.cut', 'Ctrl+X', self.ui.slots)
+        self.context_copy = context_action(self.context_menu, 'Copy', self._copy, 'fa.copy', 'Ctrl+C', self.ui.slots)
+        self.context_paste = context_action(
+            self.context_menu, 'Paste', self._paste, 'fa.paste', 'Ctrl+V', self.ui.slots)
+        self.context_menu.addSeparator()
         self.context_merge = context_action(self.context_menu, 'Merge', self._merge, 'mdi.table-merge-cells')
         self.context_split = context_action(self.context_menu, 'Split', self._split, 'mdi.table-split-cell')
         self.context_menu.addSeparator()
-        self.context_remove = context_action(self.context_menu, 'Remove Slot', self._remove, 'fa.trash-o')
+        self.context_remove = context_action(
+            self.context_menu, 'Remove Slot', self._remove, 'fa.trash-o', 'Del', self.ui.slots)
         self.context_menu.addSeparator()
         self.context_print = context_action(self.context_menu, 'Print Label', self._print, 'fa.barcode')
         self.ui.slots.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
@@ -106,13 +106,7 @@ class SlotsWidget(QtWidgets.QWidget):
 
         # Fill in the assigned slot names.
         for slot in unit.slots:
-            item = self.ui.slots.item(slot.row, slot.column)
-            item.setText(slot.name)
-            item.setToolTip(slot.name)
-            item.setData(QtCore.Qt.UserRole, slot)
-            self._highlight_item(item)
-            if slot.row_span > 1 or slot.column_span > 1:
-                self.ui.slots.setSpan(slot.row, slot.column, slot.row_span, slot.column_span)
+            self._update_cell(slot)
 
         # Resize cell contents to fit - attempting make columns fit within window.
         columns = self.ui.slots.columnCount()
@@ -123,6 +117,17 @@ class SlotsWidget(QtWidgets.QWidget):
         self.ui.slots.resizeRowsToContents()
 
         self.ui.slots.blockSignals(False)
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def _update_cell(self, slot: Slot) -> None:
+        item = self.ui.slots.item(slot.row, slot.column)
+        item.setText(slot.name)
+        item.setToolTip(slot.name)
+        item.setData(QtCore.Qt.UserRole, slot)
+        self._highlight_item(item)
+        if slot.row_span > 1 or slot.column_span > 1:
+            self.ui.slots.setSpan(slot.row, slot.column, slot.row_span, slot.column_span)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -141,6 +146,68 @@ class SlotsWidget(QtWidgets.QWidget):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
+    @staticmethod
+    def _slots_to_mime(slots: List[Slot]) -> QtCore.QMimeData:
+        mime = QtCore.QMimeData()
+        mime.setData('application/slots', pickle.dumps(slots))
+        mime.setText(', '.join(slot.name for slot in slots))
+        return mime
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def _cut(self) -> None:
+        slots = self._selected_slots()
+        QtWidgets.QApplication.clipboard().setMimeData(self._slots_to_mime(slots))
+        self._remove()
+
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def _copy(self) -> None:
+        slots = self._selected_slots()
+        copies = [slot.copy() for slot in slots]
+        QtWidgets.QApplication.clipboard().setMimeData(self._slots_to_mime(copies))
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def _paste(self) -> None:
+        clipboard = QtWidgets.QApplication.clipboard()
+        mime = clipboard.mimeData()
+        data = mime.data('application/slots')
+        if data:
+            slots: List[Slot] = pickle.loads(data)
+            offset_top = min([slot.row for slot in slots])
+            offset_left = min([slot.column for slot in slots])
+
+            current = self.ui.slots.selectedItems()
+            top = min([item.row() for item in current])
+            left = min([item.column() for item in current])
+
+            # First pass: update the slot location and ensure it's not occupied.
+            for slot in slots:
+                slot.unit = self.unit
+                slot.row = slot.row - offset_top + top
+                slot.column = slot.column - offset_left + left
+
+                # Be sure to check for overlap on spanned cells too.
+                for row in range(slot.row_span):
+                    for column in range(slot.column_span):
+                        data = self.ui.slots.item(slot.row + row, slot.column + column).data(QtCore.Qt.UserRole)
+                        if data:
+                            return Alert(self, 'Paste Error', 'Unable to paste over existing slots')
+
+            # Second pass: paste the items in and save them.
+            self.ui.slots.blockSignals(True)
+            for slot in slots:
+                self._update_cell(slot)
+                slot.save(force_insert=bool(slot.id))  # Force it to be inserted if the Slot was cut (i.e. deleted).
+            self.ui.slots.blockSignals(False)
+
+            # Update the context menu availability once the paste is complete.
+            self._selected()
+
+
+# ----------------------------------------------------------------------------------------------------------------------
     def _remove(self) -> None:
         selection = self.ui.slots.selectedItems()
         for item in selection:
@@ -152,16 +219,14 @@ class SlotsWidget(QtWidgets.QWidget):
 
             # Don't allow slots to be deleted that have parts mapped to them.
             if len(slot.locations) > 0:
-                msg = QtWidgets.QMessageBox(self)
-                msg.setIcon(QtWidgets.QMessageBox.Warning)
-                msg.setWindowTitle(f'Can\'t delete {slot.name}')
-                msg.setText(f'Cannot delete {slot.name} with parts located in it.\n\nPlease remove parts first.')
-                msg.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Ok)
-                msg.exec()
+                msg = f'Cannot delete Slot with Parts still located within it.\n\Remove parts first.'
+                Alert(self, f"Can't delete {slot.name}", msg)
                 continue
 
             # Remove the slot from the GUI.
             self.ui.slots.blockSignals(True)
+            if slot.row_span > 1 or slot.column_span > 1:
+                self.ui.slots.setSpan(item.row(), item.column(), 1, 1)
             item.setText('')
             item.setBackground(QtWidgets.QTableWidgetItem('').background())
             item.setData(QtCore.Qt.UserRole, None)
@@ -231,11 +296,11 @@ class SlotsWidget(QtWidgets.QWidget):
 
         # If this item has Slot data but and empty name, highlight it in red.
         if slot and not slot.name.strip():
-            item.setBackground(QtGui.QColor(Danger))
+            item.setBackground(Colors.Danger)
 
         # If this item has Slot data but not parts, highlight it in yellow.
         elif slot and not slot.parts:
-            item.setBackground(QtGui.QColor(Warning))
+            item.setBackground(Colors.Warning)
 
         # Otherwise, restore the background to the QTableWidgetItem default background.
         else:

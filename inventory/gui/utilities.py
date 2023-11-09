@@ -33,7 +33,13 @@ import qtawesome
 # ======================================================================================================================
 # Context Menu Action Helper
 # ----------------------------------------------------------------------------------------------------------------------
-def context_action(menu: QtWidgets.QMenu, title: str, slot: Callable, icon: str = None) -> QtGui.QAction:
+def context_action(menu: QtWidgets.QMenu,
+                   title: str,
+                   slot: Callable,
+                   icon: str = None,
+                   shortcut: str = None,
+                   shortcut_widget: QtWidgets.QWidget = None
+                   ) -> QtGui.QAction:
     """Add a QAction to a QMenu with a particular focus on custom context menus.
 
     Arguments:
@@ -41,6 +47,9 @@ def context_action(menu: QtWidgets.QMenu, title: str, slot: Callable, icon: str 
         title: Textual name for the item in the context menu.
         slot: A callback method to be connected to the `triggered` slot of the QAction.
         icon: Optional qtawesome icon name.  If not provided, no icon will be displayed.
+        shortcut: Optional QKeySequence to be used as a shortcut to this action.
+        shortcut_widget: An optional widget to add the shortcut to, if provided, to enable the use of keyboard shortcuts
+            within the widget.  Really, if `shortcut` is provided, you likely want to include `shortcut_widget` too.
 
     Returns:
         The QAction instance that was created.  The action will already be added to the passed `menu`, however, if a
@@ -50,6 +59,10 @@ def context_action(menu: QtWidgets.QMenu, title: str, slot: Callable, icon: str 
     action = QtGui.QAction(title, menu)
     if icon is not None:
         action.setIcon(qtawesome.icon(icon))
+    if shortcut is not None:
+        action.setShortcut(QtGui.QKeySequence(shortcut))
+        if shortcut_widget is not None:
+            shortcut_widget.addAction(action)
     menu.addAction(action)
     action.triggered.connect(slot)
     return action

@@ -28,12 +28,14 @@
     - [ ] Disable the [Apply] and [Save] buttons in the PartsDialog until a change has been made.
     - [ ] Change the Location Widget from side buttons to context menu.
 - Storage:
-    - [ ] Give ability to move a slot to a new location/unit.
-        - [ ] Ensure that the ID is preserved as that is what is tied to the barcodes.
+    - [x] Give ability to move a slot to a new location/unit.
+        - Can be done using cut/paste - even works between units.
+        - [x] Ensure that the ID is preserved as that is what is tied to the barcodes.
     - [x] Give ability to move a part to a new slot.
         - [ ] Add ability to define new Slot from Relocate Dialog.
     - [x] Highlight slots without any parts assigned.
-    - [ ] Give ability to add/remove columns/rows in slots widget - context menu?
+    - [-] Give ability to add/remove columns/rows in slots widget - context menu?
+        - This can already be done from this Unit table.
     - [x] Rework storage tab:
         - [x] Make parts load on demand or only for slots.  They are very slow to load for areas with lots of parts.
         - [x] Give slots more screen space.  Big units with long slot names require scrolling.
@@ -41,7 +43,7 @@
             - Should help with loading times and make more reusable.
             - What about putting widgets into dialogs to make the best of both?
     - [ ] In LocationMappingDialog, swap the lengthy dropdown for a column view or some kinda of filter/autocomplete.
-    - [ ] Support cut/copy/paste for Slots within table view - will help with relocating.
+    - [x] Support cut/copy/paste for Slots within table view - will help with relocating.
 - Projects:
     - [ ] Update the part matching on BOM import to better match attributes with weighting for things like package and part number over category (as opposed to either summery vs part number matching as it's done now).
     - [ ] In project BOM view:

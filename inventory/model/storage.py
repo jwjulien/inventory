@@ -61,7 +61,7 @@ class Unit(BaseModel):
         table_name = 'units'
 
     # Columns
-    area = ForeignKeyField(Area, backref='units')
+    area: Area = ForeignKeyField(Area, backref='units')
     name = CharField(40)
     rows = IntegerField(default=1)
     columns = IntegerField(default=1)
@@ -84,12 +84,23 @@ class Slot(BaseModel):
         table_name = 'slots'
 
     # Columns
-    unit = ForeignKeyField(Unit, backref='slots')
+    unit: Unit = ForeignKeyField(Unit, backref='slots')
     name = CharField(40)
     row = IntegerField()
     column = IntegerField()
     row_span = IntegerField(default=1)
     column_span = IntegerField(default=1)
+
+
+    def copy(self) -> 'Slot':
+        return Slot(
+            unit=self.unit,
+            name=self.name,
+            row=self.row,
+            column=self.column,
+            row_span=self.row_span,
+            column_span=self.column_span
+        )
 
 
     # Properties
@@ -125,8 +136,8 @@ class Location(BaseModel):
         table_name = 'locations'
 
     # Columns
-    slot = ForeignKeyField(Slot, backref='locations')
-    part = ForeignKeyField(Part, backref='locations')
+    slot: Slot = ForeignKeyField(Slot, backref='locations')
+    part: Part = ForeignKeyField(Part, backref='locations')
     quantity = IntegerField()
     last_counted = DateTimeField(null=True)
 

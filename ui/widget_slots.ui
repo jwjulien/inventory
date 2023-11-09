@@ -28,9 +28,6 @@
    </property>
    <item>
     <widget class="QTableWidget" name="slots">
-     <property name="alternatingRowColors">
-      <bool>true</bool>
-     </property>
      <property name="selectionMode">
       <enum>QAbstractItemView::ContiguousSelection</enum>
      </property>

@@ -291,9 +291,6 @@ class Ui_DialogPart(object):
         self.documents.setObjectName(u"documents")
         sizePolicy6.setHeightForWidth(self.documents.sizePolicy().hasHeightForWidth())
         self.documents.setSizePolicy(sizePolicy6)
-        self.verticalLayout = QVBoxLayout(self.documents)
-        self.verticalLayout.setObjectName(u"verticalLayout")
-        self.verticalLayout.setContentsMargins(0, 0, 0, 0)
 
         self.verticalLayout_4.addWidget(self.documents)
 
