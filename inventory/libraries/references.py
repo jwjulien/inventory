@@ -33,7 +33,7 @@ from pylibdmtx import pylibdmtx
 from inventory.libraries.printer.labels import Dymo30346, Label
 from inventory.model.base import BaseModel
 from inventory.model.categories import Category
-from inventory.model.documents import Document, Reference as DocumentReference
+from inventory.model.documents import Document
 from inventory.model.parts import Part
 from inventory.model.projects import Project, Revision, Material
 from inventory.model.storage import Area, Unit, Slot, Location
@@ -96,8 +96,7 @@ class Reference:
             Material: ReferenceTarget.Material,
             Supplier: ReferenceTarget.Supplier,
             Product: ReferenceTarget.Product,
-            Document: ReferenceTarget.Document,
-            DocumentReference: ReferenceTarget.Reference
+            Document: ReferenceTarget.Document
         }
         return Reference(target=map[type(item)], id=item.id)
 
@@ -158,7 +157,6 @@ class Reference:
             ReferenceTarget.Supplier: Supplier,
             ReferenceTarget.Product: Product,
             ReferenceTarget.Document: Document,
-            ReferenceTarget.Reference: DocumentReference,
         }
         model = map[self.target]
         return model.get_by_id(self.id)

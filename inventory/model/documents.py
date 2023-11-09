@@ -39,33 +39,10 @@ class Document(BaseModel):
         table_name = 'documents'
 
     # Columns
-    title = CharField(40)
-    mime = CharField(20)
+    label = CharField(40)
+    filename = CharField(30)
     content = CompressedField()
-
-
-    @property
-    def extension(self) -> str:
-        extensions = {
-            'application/pdf': '.pdf',
-            'text/markdown': '.md'
-        }
-        return extensions.get(self.mime, '.txt')
-
-
-
-
-# ======================================================================================================================
-# Reference Table
-# ----------------------------------------------------------------------------------------------------------------------
-class Reference(BaseModel):
-    class Meta:
-        table_name = 'references'
-
-    # Columns
-    part = ForeignKeyField(Part, backref='references')
-    document = ForeignKeyField(Document, backref='references')
-    label = CharField(25)
+    part = ForeignKeyField(Part, backref='documents')
 
 
 

@@ -25,9 +25,11 @@
 import os
 
 from PySide6 import QtWidgets
+import requests
 
 from inventory.gui.base.dialog_document import Ui_DocumentDialog
 from inventory.model.documents import Document
+from inventory.model.parts import Part
 
 
 
@@ -36,49 +38,95 @@ from inventory.model.documents import Document
 # Document Dialog
 # ----------------------------------------------------------------------------------------------------------------------
 class DocumentDialog(QtWidgets.QDialog):
-    def __init__(self, parent, document: Document):
+    def __init__(self, parent):
         super().__init__(parent)
         self.ui = Ui_DocumentDialog()
         self.ui.setupUi(self)
 
-        self.document = document
-
         self.ui.file.setLabel('Document')
-        self.ui.file.setFilters({'Documents': '*.pdf *.md'})
-        if document.id:
-            self.ui.file.setPlaceholderText('Selecting a new file will replace the existing file')
-        else:
-            self.ui.file.setPlaceholderText('Select a file...')
-        self.ui.title.setText(document.title)
-        self.ui.mime.setCurrentText(document.mime)
+        self.ui.file.setFilters({'Common Documents': '*.pdf *.md *.txt', 'All Files': '*.*'})
+        self.ui.file.setPlaceholderText('Select a file...')
 
+        # Connect Events
         self.ui.file.changed.connect(self._file_changed)
+        self.ui.url.textChanged.connect(self._url_changed)
+        self.ui.select_file.clicked.connect(self._source_changed)
+        self.ui.select_url.clicked.connect(self._source_changed)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
     def _file_changed(self) -> None:
         self.ui.buttons.button(self.ui.buttons.StandardButton.Ok).setEnabled(self.ui.file.isValid())
-        if self.ui.file.isValid():
-            filename, extension = os.path.splitext(self.ui.file.filename())
-            if not self.ui.title.text():
-                self.ui.title.setText(os.path.basename(filename))
-            if extension == '.pdf':
-                self.ui.mime.setCurrentText('application/pdf')
-            elif extension == '.md':
-                self.ui.mime.setCurrentText('text/markdown')
+        if self.ui.file.isValid() and not self.ui.filename.text():
+            filename = self.ui.file.filename()
+            self.ui.filename.setText(os.path.basename(filename))
+            self._set_default_label(filename)
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def _url_changed(self) -> None:
+        """The user has selected a URL."""
+        if not self.ui.filename.text():
+            try:
+                filename = self.ui.url.text().rsplit('/', 1)[1]
+                self.ui.filename.setText(filename)
+                self._set_default_label(filename)
+            except IndexError:
+                pass
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def _set_default_label(self, filename: str) -> None:
+        """Attempt to set a default label for the document based upon the filename."""
+        # Don't both if there is already a label for this document.
+        if self.ui.label.currentText():
+            return
+        extension = os.path.splitext(filename)[1]
+        if extension == '.pdf':
+            self.ui.label.setCurrentText('Datasheet')
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def _source_changed(self) -> None:
+        if self.ui.select_file.isChecked():
+            self.ui.file.setEnabled(True)
+            self.ui.url.setEnabled(False)
+        else:
+            self.ui.file.setEnabled(False)
+            self.ui.url.setEnabled(True)
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def document(self, part: Part) -> Document:
+        return Document(
+            label=self.ui.label.currentText(),
+            filename=self.ui.filename.text(),
+            content=self.content(),
+            part=part
+        )
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def content(self) -> None:
+        if self.ui.select_file.isChecked():
+            with open(self.ui.file.filename(), 'rb') as handle:
+                return handle.read()
+        else:
+            url = self.ui.url.text()
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36'
+            }
+            response = requests.get(url, allow_redirects=True, headers=headers, timeout=5)
+            return response.content
 
 
 # ----------------------------------------------------------------------------------------------------------------------
     def accept(self) -> None:
-        self.document.title = self.ui.title.text()
-        self.document.mime = self.ui.mime.currentText()
-        if self.ui.file.isValid():
-            with open(self.ui.file.filename(), 'rb') as handle:
-                self.document.content = handle.read()
-
-        if self.document.title and self.document.mime and self.document.content:
-            self.document.save()
-            return super().accept()
+        try:
+            if self.content() and self.ui.filename.text() and self.ui.label.currentText():
+                super().accept()
+        except (FileNotFoundError, requests.exceptions.MissingSchema):
+            pass
 
 
 

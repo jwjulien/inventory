@@ -17,7 +17,7 @@
 # OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # ----------------------------------------------------------------------------------------------------------------------
-"""A widget for listing document references for a Part."""
+"""A widget for listing documents for a Part."""
 
 # ======================================================================================================================
 # Imports
@@ -25,13 +25,14 @@
 from tempfile import NamedTemporaryFile
 import os
 
-from PySide6 import QtCore, QtGui, QtWidgets
+from PySide6 import QtCore, QtWidgets
+import qtawesome
 
 from inventory.gui.base.widget_document_list import Ui_DocumentListWidget
-from inventory.gui.dialogs.document_browser import DocumentBrowserDialog
 from inventory.gui.dialogs.document import DocumentDialog
+from inventory.gui.utilities import context_action
 from inventory.model.parts import Part
-from inventory.model.documents import Reference
+from inventory.model.documents import Document
 
 
 
@@ -47,96 +48,83 @@ class DocumentListWidget(QtWidgets.QWidget):
 
         self.part: Part = None
 
-        self.pop_menu = QtWidgets.QMenu(self)
-        self.pop_open = QtGui.QAction('Open document', self)
-        self.pop_open.triggered.connect(self._open)
-        self.pop_menu.addAction(self.pop_open)
-        self.pop_add = QtGui.QAction('Add document', self)
-        self.pop_add.triggered.connect(self._add)
-        self.pop_menu.addAction(self.pop_add)
-        self.pop_remove = QtGui.QAction('Remove document', self)
-        self.pop_remove.triggered.connect(self._remove)
-        self.pop_menu.addAction(self.pop_remove)
-        self.pop_label = QtGui.QAction('Edit label', self)
-        self.pop_label.triggered.connect(self._edit)
-        self.pop_menu.addAction(self.pop_label)
-        self.pop_edit = QtGui.QAction('Edit document', self)
-        self.pop_edit.triggered.connect(self._edit_document)
-        self.pop_menu.addAction(self.pop_edit)
+        self.ui.add.setIcon(qtawesome.icon('fa5s.file-upload'))
 
-        self.ui.references.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.ui.references.customContextMenuRequested.connect(self._context_menu)
-        self.ui.references.itemChanged.connect(self._item_changed)
-        self.ui.references.doubleClicked.connect(self._open)
+        # Setup custom context menu
+        self.context_menu = QtWidgets.QMenu(self)
+        self.context_open = context_action(self.context_menu, 'Open Document', self._open, 'fa.external-link')
+        self.context_add = context_action(self.context_menu, 'Add document', self._add, 'fa5s.file-upload')
+        self.context_remove = context_action(self.context_menu, 'Remove document', self._remove, 'mdi.file-remove')
+        self.context_edit = context_action(self.context_menu, 'Edit label', self._edit, 'ri.file-edit-line')
+        self.ui.documents.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.ui.documents.customContextMenuRequested.connect(self._context_menu)
+
+        # Connect events
+        self.ui.documents.itemChanged.connect(self._item_changed)
+        self.ui.documents.doubleClicked.connect(self._open)
+        self.ui.add.clicked.connect(self._add)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
     def setPart(self, part: Part) -> None:
         self.part = part
 
-        self.ui.references.clear()
-        for reference in self.part.references:
-            self._list_item(reference)
+        self.ui.documents.clear()
+        for document in self.part.documents:
+            self._list_item(document)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-    def _list_item(self, reference: Reference) -> QtWidgets.QListWidgetItem:
-        item = QtWidgets.QListWidgetItem(reference.label)
+    def _list_item(self, document: Document) -> QtWidgets.QListWidgetItem:
+        item = QtWidgets.QListWidgetItem(f'{document.label} ({document.filename})')
         item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
-        item.setData(QtCore.Qt.UserRole, reference)
-        item.setToolTip(reference.document.title + reference.document.extension)
-        self.ui.references.addItem(item)
+        item.setData(QtCore.Qt.UserRole, document)
+        self.ui.documents.addItem(item)
         return item
 
 
 # ----------------------------------------------------------------------------------------------------------------------
     def _context_menu(self, point: QtCore.QPoint) -> None:
         try:
-            self._selected_reference()
+            self._selected_document()
         except AssertionError:
             selected = False
         else:
             selected = True
-        self.pop_open.setEnabled(selected)
-        self.pop_remove.setEnabled(selected)
-        self.pop_label.setEnabled(selected)
-        self.pop_edit.setEnabled(selected)
-        self.pop_menu.exec(self.ui.references.mapToGlobal(point))
+        self.context_open.setEnabled(selected)
+        self.context_remove.setEnabled(selected)
+        self.context_edit.setEnabled(selected)
+        self.context_menu.exec(self.ui.documents.mapToGlobal(point))
 
 
 # ----------------------------------------------------------------------------------------------------------------------
     def _item_changed(self, item) -> None:
-        """When the user edits a title for a document, update the label in the database."""
-        reference: Reference = item.data(QtCore.Qt.UserRole)
-        reference.label = item.text()
-        reference.save()
+        """When the user edits a label for a document, update the label in the database."""
+        document: Document = item.data(QtCore.Qt.UserRole)
+        document.label = item.text()
+        document.save()
 
 
 # ----------------------------------------------------------------------------------------------------------------------
     def _add(self) -> None:
         """Select a new document to add to the list."""
-        dialog = DocumentBrowserDialog(self)
+        dialog = DocumentDialog(self)
         if dialog.exec():
-            document = dialog.document()
-            reference = Reference(label=document.title)
-            reference.document = document
-            reference.part = self.part
-            reference.save()
-
-            item = self._list_item(reference)
-            self.ui.references.editItem(item)
+            document = dialog.document(self.part)
+            document.save()
+            self._list_item(document)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
     def _edit(self) -> None:
         """Trigger an edit for the label of the currently selected item."""
-        self.ui.references.editItem(self._selected_item())
+        self.ui.documents.editItem(self._selected_item())
 
 
 # ----------------------------------------------------------------------------------------------------------------------
     def _selected_item(self) -> QtWidgets.QListWidgetItem:
         """Return the currently selected QListWidget item."""
-        selection = self.ui.references.selectedItems()
+        selection = self.ui.documents.selectedItems()
         assert len(selection) == 1
         return selection[0]
 
@@ -144,43 +132,32 @@ class DocumentListWidget(QtWidgets.QWidget):
 # ----------------------------------------------------------------------------------------------------------------------
     def _selected_row(self) -> int:
         """Return the currently selected row index."""
-        return self.ui.references.row(self._selected_item())
+        return self.ui.documents.row(self._selected_item())
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-    def _selected_reference(self) -> Reference:
-        """Return the currently selected Reference."""
+    def _selected_document(self) -> Document:
+        """Return the currently selected Document."""
         row = self._selected_row()
-        reference: Reference = self.ui.references.item(row).data(QtCore.Qt.UserRole)
-        return reference
+        document: Document = self.ui.documents.item(row).data(QtCore.Qt.UserRole)
+        return document
 
 
 # ----------------------------------------------------------------------------------------------------------------------
     def _remove(self) -> None:
-        """Remove the currently selected Reference from this Part."""
-        reference = self._selected_reference()
-        reference.delete_instance()
-        self.ui.references.takeItem(self._selected_row())
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-    def _edit_document(self) -> None:
-        """Edit the document - possibly replacing the contents with a new upload."""
-        reference = self._selected_reference()
-        dialog = DocumentDialog(self, reference.document)
-        dialog.exec()
+        """Remove the currently selected Document from this Part."""
+        document = self._selected_document()
+        document.delete_instance()
+        self.ui.documents.takeItem(self._selected_row())
 
 
 # ----------------------------------------------------------------------------------------------------------------------
     def _open(self) -> None:
         """Ask the OS to open this document for us to view."""
-        reference = self._selected_reference()
-        with NamedTemporaryFile(prefix=reference.document.title + '_',
-                                suffix=reference.document.extension,
-                                delete=False) as handle:
-            handle.write(reference.document.content)
-
-        os.system(handle.name)
+        document = self._selected_document()
+        with NamedTemporaryFile(suffix=f'_Doc{document.id}_{document.filename}', delete=False) as temp_file:
+            temp_file.write(document.content)
+        os.system(temp_file.name)
 
 
 

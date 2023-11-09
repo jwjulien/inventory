@@ -15,8 +15,9 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QAbstractItemView, QApplication, QListWidget, QListWidgetItem,
-    QSizePolicy, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QAbstractItemView, QApplication, QGroupBox, QListWidget,
+    QListWidgetItem, QPushButton, QSizePolicy, QVBoxLayout,
+    QWidget)
 
 class Ui_DocumentListWidget(object):
     def setupUi(self, DocumentListWidget):
@@ -26,17 +27,29 @@ class Ui_DocumentListWidget(object):
         self.verticalLayout = QVBoxLayout(DocumentListWidget)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
-        self.references = QListWidget(DocumentListWidget)
-        self.references.setObjectName(u"references")
+        self.group = QGroupBox(DocumentListWidget)
+        self.group.setObjectName(u"group")
+        self.verticalLayout_2 = QVBoxLayout(self.group)
+        self.verticalLayout_2.setObjectName(u"verticalLayout_2")
+        self.documents = QListWidget(self.group)
+        self.documents.setObjectName(u"documents")
         sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.references.sizePolicy().hasHeightForWidth())
-        self.references.setSizePolicy(sizePolicy)
-        self.references.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        self.references.setAlternatingRowColors(True)
+        sizePolicy.setHeightForWidth(self.documents.sizePolicy().hasHeightForWidth())
+        self.documents.setSizePolicy(sizePolicy)
+        self.documents.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.documents.setAlternatingRowColors(True)
 
-        self.verticalLayout.addWidget(self.references)
+        self.verticalLayout_2.addWidget(self.documents)
+
+        self.add = QPushButton(self.group)
+        self.add.setObjectName(u"add")
+
+        self.verticalLayout_2.addWidget(self.add)
+
+
+        self.verticalLayout.addWidget(self.group)
 
 
         self.retranslateUi(DocumentListWidget)
@@ -46,5 +59,7 @@ class Ui_DocumentListWidget(object):
 
     def retranslateUi(self, DocumentListWidget):
         DocumentListWidget.setWindowTitle(QCoreApplication.translate("DocumentListWidget", u"Form", None))
+        self.group.setTitle(QCoreApplication.translate("DocumentListWidget", u"Documents:", None))
+        self.add.setText(QCoreApplication.translate("DocumentListWidget", u"Add Document", None))
     # retranslateUi
 

@@ -37,7 +37,7 @@ from inventory.gui.tabs.storage import TabStorage
 from inventory.gui.tabs.suppliers import TabSuppliers
 from inventory.model.base import db
 from inventory.model.categories import Category
-from inventory.model.documents import Document, Reference as DocumentReference
+from inventory.model.documents import Document
 from inventory.model.parts import Part
 from inventory.model.projects import Project, Revision, Material
 from inventory.model.storage import Area, Unit, Slot, Location
@@ -73,7 +73,7 @@ class MainWindow(QtWidgets.QMainWindow):
         db.connect()
         db.create_tables([
             Category,
-            Document, DocumentReference,
+            Document,
             Part,
             Project, Revision, Material,
             Area, Unit, Slot, Location,
