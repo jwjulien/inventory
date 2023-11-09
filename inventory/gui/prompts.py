@@ -53,9 +53,9 @@ def YesNoPrompt(parent: QtWidgets.QWidget, title: str, message: str) -> bool:
 
 
 # ======================================================================================================================
-# Confirmation Dialog
+# Alert Dialog
 # ----------------------------------------------------------------------------------------------------------------------
-def Confirmation(parent: QtWidgets.QWidget, title: str, message: str):
+def Alert(parent: QtWidgets.QWidget, title: str, message: str):
     """Show the user a message in a dialog.
 
     Arguments:

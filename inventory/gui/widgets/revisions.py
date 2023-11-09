@@ -28,8 +28,9 @@ from PySide6 import QtCore, QtWidgets
 import qtawesome
 
 from inventory.gui.base.widget_revisions import Ui_WidgetRevisions
-from inventory.model.projects import Project, Revision
 from inventory.gui.delegates.date import DateDelegate
+from inventory.gui.prompts import Alert
+from inventory.model.projects import Project, Revision
 
 
 
@@ -133,13 +134,8 @@ class RevisionsWidget(QtWidgets.QWidget):
         # orphans, we instead force them to remove the parts manually first.  Here, provide them with an error message
         # and abort.
         if revision.parts:
-            msg = QtWidgets.QMessageBox(self)
-            msg.setIcon(QtWidgets.QMessageBox.Warning)
-            msg.setWindowTitle('Error')
-            msg.setText('Cannot delete an Revision with Materials.\n\nRemove associated Materials and try again.')
-            msg.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Ok)
-            msg.exec()
-            return
+            msg = 'Cannot delete an Revision with Materials.\n\nRemove associated Materials and try again.'
+            return Alert(self, 'Error', msg)
 
         revision.delete_instance()
         self.ui.revisions.takeTopLevelItem(self.ui.revisions.indexOfTopLevelItem(item))

@@ -30,6 +30,7 @@ import timeago
 from inventory.gui.base.widget_location import Ui_LocationWidget
 from inventory.gui.dialogs.location_mapping import LocationMappingDialog
 from inventory.gui.dialogs.relocate import RelocateDialog
+from inventory.gui.prompts import Alert
 from inventory.model.storage import Location
 from inventory.model.parts import Part
 
@@ -147,12 +148,7 @@ class LocationWidget(QtWidgets.QWidget):
         for row in sorted(rows, reverse=True):
             location: Location = self.ui.locations.item(row, 0).data(QtCore.Qt.UserRole)
             if location.quantity > 0:
-                dialog = QtWidgets.QMessageBox(self)
-                dialog.setIcon(QtWidgets.QMessageBox.Warning)
-                dialog.setWindowTitle('Unable to delete location')
-                dialog.setText('Cannot delete a location with non-zero part quantity.')
-                dialog.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Ok)
-                dialog.exec()
+                Alert(self, 'Unable to delete location', 'Cannot delete a location with non-zero part quantity.')
             else:
                 location.delete_instance()
                 self.ui.locations.removeRow(row)

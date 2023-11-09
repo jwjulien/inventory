@@ -27,7 +27,7 @@ from PySide6 import QtCore, QtWidgets
 from inventory.gui.base.dialog_document_browser import Ui_DocumentBrowserDialog
 from inventory.gui.dialogs.document import DocumentDialog
 from inventory.model.documents import Document
-from inventory.gui.prompts import Confirmation
+from inventory.gui.prompts import Alert
 
 
 
@@ -91,7 +91,7 @@ class DocumentBrowserDialog(QtWidgets.QDialog):
     def _remove(self) -> None:
         document: Document = self.ui.documents.currentItem().data(QtCore.Qt.UserRole)
         if document.references:
-            Confirmation(self, 'Cannot delete document', 'Document has references to parts - please remove them first')
+            Alert(self, 'Cannot delete document', 'Document has references to parts - please remove them first')
         else:
             document.delete_instance()
             self.ui.documents.takeItem(self.ui.documents.currentRow())

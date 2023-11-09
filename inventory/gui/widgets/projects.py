@@ -28,6 +28,7 @@ from PySide6 import QtCore, QtWidgets
 import qtawesome
 
 from inventory.gui.base.widget_projects import Ui_WidgetProjects
+from inventory.gui.prompts import Alert
 from inventory.gui.wizards.bom_import import BomImportWizard
 from inventory.model.projects import Project, Revision
 
@@ -108,13 +109,8 @@ class ProjectsWidget(QtWidgets.QWidget):
         # orphans, we instead force them to remove the revisions manually first.  Here, provide them with an error message
         # and abort.
         if project.revisions:
-            msg = QtWidgets.QMessageBox(self)
-            msg.setIcon(QtWidgets.QMessageBox.Warning)
-            msg.setWindowTitle('Error')
-            msg.setText('Cannot delete an Project with Revisions.\n\nRemove associated Revisions and try again.')
-            msg.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Ok)
-            msg.exec()
-            return
+            msg = 'Cannot delete an Project with Revisions.\n\nRemove associated Revisions and try again.'
+            return Alert(self, 'Error', msg)
 
         project.delete_instance()
         self.ui.projects.takeTopLevelItem(self.ui.projects.indexOfTopLevelItem(item))

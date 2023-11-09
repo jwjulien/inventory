@@ -29,6 +29,7 @@ from PySide6 import QtCore, QtWidgets
 from inventory.gui.base.widget_units import Ui_WidgetUnits
 from inventory.gui.dialogs.parts import PartsDialog
 from inventory.gui.dialogs.print_reference import PrintReferenceDialog
+from inventory.gui.prompts import Alert
 from inventory.gui.utilities import context_action
 from inventory.model.storage import Area, Unit
 from inventory.libraries.references import Reference, ReferenceTarget
@@ -119,13 +120,7 @@ class UnitsWidget(QtWidgets.QWidget):
         # Do not let the user remove an area with units mapped to it.  As a safety measure, and to prevent orphans, we
         # instead force them to remove the units manually first.  Here, provide them with an error message and abort.
         if unit.slots:
-            msg = QtWidgets.QMessageBox(self)
-            msg.setIcon(QtWidgets.QMessageBox.Warning)
-            msg.setWindowTitle('Error')
-            msg.setText('Cannot delete an Unit with Slots.\n\nRemove associated Slots and try again.')
-            msg.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Ok)
-            msg.exec()
-            return
+            return Alert(self, 'Error', 'Cannot delete an Unit with Slots.\n\nRemove associated Slots and try again.')
 
         unit.delete_instance()
         self.ui.units.removeRow(self.ui.units.row(item))
