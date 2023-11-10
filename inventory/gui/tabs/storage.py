@@ -22,11 +22,11 @@
 # ======================================================================================================================
 # Imports
 # ----------------------------------------------------------------------------------------------------------------------
-from PySide6 import QtWidgets
 import qtawesome
 
 from inventory.gui.base.tab_storage import Ui_TabStorage
-from inventory.model.storage import Area, Unit, Slot
+from inventory.gui.tabs.base import TabWidget
+from inventory.model.storage import Area, Unit
 
 
 
@@ -34,14 +34,11 @@ from inventory.model.storage import Area, Unit, Slot
 # ======================================================================================================================
 # Tab Storage Class
 # ----------------------------------------------------------------------------------------------------------------------
-class TabStorage(QtWidgets.QWidget):
+class TabStorage(TabWidget):
     def __init__(self, parent):
         super().__init__(parent)
         self.ui = Ui_TabStorage()
         self.ui.setupUi(self)
-
-        areas = Area.select()
-        self.ui.areas.setAreas(areas)
 
         self.ui.back.setIcon(qtawesome.icon('fa.arrow-left'))
 
@@ -51,6 +48,12 @@ class TabStorage(QtWidgets.QWidget):
 
         self.ui.units.hide()
         self.show_areas()
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def refresh(self) -> None:
+        areas = Area.select()
+        self.ui.areas.setAreas(areas)
 
 
 # ----------------------------------------------------------------------------------------------------------------------

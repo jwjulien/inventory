@@ -22,11 +22,9 @@
 # ======================================================================================================================
 # Imports
 # ----------------------------------------------------------------------------------------------------------------------
-from PySide6 import QtWidgets
-
 from inventory.gui.base.tab_parts import Ui_TabParts
+from inventory.gui.tabs.base import TabWidget
 from inventory.model.parts import Part
-from inventory.model.storage import Location
 
 
 
@@ -34,12 +32,15 @@ from inventory.model.storage import Location
 # ======================================================================================================================
 # Tab Lost Widget
 # ----------------------------------------------------------------------------------------------------------------------
-class TabLost(QtWidgets.QWidget):
+class TabLost(TabWidget):
     def __init__(self, parent):
         super().__init__(parent)
         self.ui = Ui_TabParts()
         self.ui.setupUi(self)
 
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def refresh(self):
         # Setup model with all of the parts.
         parts = Part.select()
         lost_parts = [part for part in parts if not part.locations]

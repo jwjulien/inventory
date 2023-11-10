@@ -31,12 +31,15 @@
     - [x] Add URL fetch for part images to allow getting them from Mouser...
         - [x] Is it possible to support drag and drop from the internets?
     - [x] Add a drag/drop for documents that matches what I just did for Part images!
+    - [ ] Is there a way to paginate/lazy load Parts such that they are only loaded from DB as needed?
 - Storage:
     - [x] Give ability to move a slot to a new location/unit.
         - Can be done using cut/paste - even works between units.
         - [x] Ensure that the ID is preserved as that is what is tied to the barcodes.
     - [x] Give ability to move a part to a new slot.
         - [ ] Add ability to define new Slot from Relocate Dialog.
+        - [ ] Switch lengthy dropdown to tree or alternate widget.
+            - [ ] What about adding a custom widget for selecting/adding a slot (to be shared with location_mapping)?
     - [x] Highlight slots without any parts assigned.
     - [-] Give ability to add/remove columns/rows in slots widget - context menu?
         - This can already be done from this Unit table.
@@ -56,5 +59,5 @@
 - New tabs/features:
     - [ ] A feature to view parts from a supplier that are single-sourced (with quantities visible).
         - Such that when looking to fill up an order with a supplier, with whom I place infrequent orders, it might be easy to find additional items to stock up on or to tip over the free shipping threshold.
-    - [ ] Need to refresh parts when switching tabs.
-        - [ ] Lazy load them too, then.  May speed up loading time.
+    - [x] Need to refresh parts when switching tabs.
+        - [x] Lazy load them too, then.

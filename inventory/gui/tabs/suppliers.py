@@ -29,6 +29,7 @@ from PySide6 import QtCore, QtWidgets
 
 from inventory.gui.base.tab_suppliers import Ui_TabSuppliers
 from inventory.gui.dialogs.supplier import SupplierDialog
+from inventory.gui.tabs.base import TabWidget
 from inventory.model.suppliers import Supplier
 from inventory.model.parts import Part
 
@@ -38,18 +39,11 @@ from inventory.model.parts import Part
 # ======================================================================================================================
 # Tab Supplier
 # ----------------------------------------------------------------------------------------------------------------------
-class TabSuppliers(QtWidgets.QWidget):
+class TabSuppliers(TabWidget):
     def __init__(self, parent):
         super().__init__(parent)
         self.ui = Ui_TabSuppliers()
         self.ui.setupUi(self)
-
-        # Add suppliers to the list widget.
-        suppliers: List[Supplier] = Supplier.select()
-        for supplier in suppliers:
-            self._add_item(supplier)
-
-        self.ui.suppliers.sortItems(QtCore.Qt.AscendingOrder)
 
         self.context_menu = QtWidgets.QMenu(self)
         website = self.context_menu.addAction("Visit Website")
@@ -61,6 +55,20 @@ class TabSuppliers(QtWidgets.QWidget):
         self.ui.suppliers.itemSelectionChanged.connect(self._selected)
         self.ui.add.clicked.connect(self._add)
         self.ui.remove.clicked.connect(self._remove)
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def refresh(self) -> None:
+        # Remove existing items from the list.
+        while self.ui.suppliers.count():
+            self.ui.suppliers.takeItem(0)
+
+        # Add suppliers to the list widget.
+        suppliers: List[Supplier] = Supplier.select()
+        for supplier in suppliers:
+            self._add_item(supplier)
+
+        self.ui.suppliers.sortItems(QtCore.Qt.AscendingOrder)
 
 
 # ----------------------------------------------------------------------------------------------------------------------

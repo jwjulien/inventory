@@ -1,5 +1,5 @@
 # ======================================================================================================================
-#      File:  /inventory/gui/tabs/parts.py
+#      File:  /inventory/gui/tabs/base.py
 #   Project:  Inventory
 #    Author:  Jared Julien <jaredjulien@exsystems.net>
 # Copyright:  (c) 2023 Jared Julien, eX Systems
@@ -17,34 +17,28 @@
 # OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # ----------------------------------------------------------------------------------------------------------------------
-"""Main window part list tab."""
+"""An abstract base class for widgets that implement tabs in the main window."""
 
 # ======================================================================================================================
 # Imports
 # ----------------------------------------------------------------------------------------------------------------------
-from inventory.gui.base.tab_parts import Ui_TabParts
-from inventory.gui.tabs.base import TabWidget
-from inventory.model.parts import Part
+from abc import ABC, abstractmethod
+
+from PySide6 import QtWidgets
 
 
 
 
 # ======================================================================================================================
-# Tab Parts Widget
+# Tab Widget
 # ----------------------------------------------------------------------------------------------------------------------
-class TabParts(TabWidget):
-    def __init__(self, parent):
-        super().__init__(parent)
-        self.ui = Ui_TabParts()
-        self.ui.setupUi(self)
-
-
-# ----------------------------------------------------------------------------------------------------------------------
+class TabWidget(QtWidgets.QWidget):
+    @abstractmethod
     def refresh(self) -> None:
-        """Called by the main window to (re)load parts when the tab is activated."""
-        # Setup model with all of the parts.
-        parts = Part.select()
-        self.ui.parts.setParts(parts)
+        """Called whenever the tab is activated.
+
+        Override this method and implement whatever logic needs to be called to load data from the database.
+        """
 
 
 

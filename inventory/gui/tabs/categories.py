@@ -28,6 +28,7 @@ import qtawesome
 from inventory.gui.base.tab_categories import Ui_TabCategories
 from inventory.gui.dialogs.category import CategoryDialog
 from inventory.gui.prompts import Alert, YesNoPrompt
+from inventory.gui.tabs.base import TabWidget
 from inventory.gui.utilities import context_action
 from inventory.model.categories import Category
 
@@ -37,18 +38,11 @@ from inventory.model.categories import Category
 # ======================================================================================================================
 # Tab Categories Widget
 # ----------------------------------------------------------------------------------------------------------------------
-class TabCategories(QtWidgets.QWidget):
+class TabCategories(TabWidget):
     def __init__(self, parent):
         super().__init__(parent)
         self.ui = Ui_TabCategories()
         self.ui.setupUi(self)
-
-        # Load categories into TreeWidget.
-        roots = Category.select().where(Category.parent == None)
-        for root in roots:
-            self.ui.categories.addTopLevelItem(self._load_tree(root, None))
-
-        self._sort()
 
         # Update the layout a bit for better readability.
         self.ui.categories.setColumnWidth(0, 325)
@@ -96,6 +90,25 @@ class TabCategories(QtWidgets.QWidget):
         self.ui.categories.doubleClicked.connect(self.edit)
         self.ui.categories.itemSelectionChanged.connect(self._selected)
         self._selected()
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def refresh(self) -> None:
+        """Called by the main window to (re) load categories when the tab is activated."""
+        # Remove any existing items from the tree.
+        while self.ui.categories.topLevelItemCount():
+            self.ui.categories.takeTopLevelItem(0)
+
+        # Clear out displayed parts.
+        self.ui.parts.setParts(None)
+
+        # Load categories into TreeWidget.
+        roots = Category.select().where(Category.parent == None)
+        for root in roots:
+            self.ui.categories.addTopLevelItem(self._load_tree(root, None))
+
+        # Sort the categories that were just loaded.
+        self._sort()
 
 
 # ----------------------------------------------------------------------------------------------------------------------

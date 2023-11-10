@@ -81,20 +81,23 @@ class MainWindow(QtWidgets.QMainWindow):
         ])
 
         # Setup tabs.
-        self.ui.tab_parts = TabParts(self)
-        self.ui.tabs.addTab(self.ui.tab_parts, 'All Parts')
-        self.ui.tab_categories = TabCategories(self)
-        self.ui.tabs.addTab(self.ui.tab_categories, 'By Category')
-        self.ui.tab_projects = TabProjects(self)
-        self.ui.tabs.addTab(self.ui.tab_projects, 'By Project')
-        self.ui.tab_storage = TabStorage(self)
-        self.ui.tabs.addTab(self.ui.tab_storage, 'By Location')
-        self.ui.tab_suppliers = TabSuppliers(self)
-        self.ui.tabs.addTab(self.ui.tab_suppliers, 'By Supplier')
-        self.ui.tab_lost = TabLost(self)
-        self.ui.tabs.addTab(self.ui.tab_lost, 'Lost Parts')
-        tooltip = 'Shows parts that have not been assigned to any location(s) yet.'
-        self.ui.tabs.setTabToolTip(self.ui.tabs.indexOf(self.ui.tab_lost), tooltip)
+        self.tab_parts = TabParts(self)
+        self.ui.tabs.addTab(self.tab_parts, 'All Parts')
+        self.tab_categories = TabCategories(self)
+        self.ui.tabs.addTab(self.tab_categories, 'By Category')
+        self.tab_projects = TabProjects(self)
+        self.ui.tabs.addTab(self.tab_projects, 'By Project')
+        self.tab_storage = TabStorage(self)
+        self.ui.tabs.addTab(self.tab_storage, 'By Location')
+        self.tab_suppliers = TabSuppliers(self)
+        self.ui.tabs.addTab(self.tab_suppliers, 'By Supplier')
+        self.tab_lost = TabLost(self)
+        self.ui.tabs.addTab(self.tab_lost, 'Lost Parts')
+        tooltip = 'Assist with storing parts that have not been assigned to any location(s) yet.'
+        self.ui.tabs.setTabToolTip(self.ui.tabs.indexOf(self.tab_lost), tooltip)
+        self.ui.tabs.currentChanged.connect(self._tab_changed)
+        self.ui.tabs.setCurrentWidget(self.tab_parts)
+        self._tab_changed()
 
         # Setup a thread pool for background tasks.
         self.threadpool = QtCore.QThreadPool(self)
@@ -103,6 +106,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self._setup_scanner()
 
 
+# ----------------------------------------------------------------------------------------------------------------------
+    def _tab_changed(self) -> None:
+        tab = self.ui.tabs.currentWidget()
+        tab.refresh()
+
+
+# ----------------------------------------------------------------------------------------------------------------------
     def _setup_scanner(self):
         # TODO: This VID/PID should be configurable.
         # VENDOR_ID = 0x0581
@@ -116,6 +126,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.threadpool.start(self.scanner_worker)
 
 
+# ----------------------------------------------------------------------------------------------------------------------
     def _tag_scanned(self, code: str) -> None:
         print('Received code:', code)
         try:
@@ -127,6 +138,7 @@ class MainWindow(QtWidgets.QMainWindow):
         print(thing.id, type(thing))
 
 
+# ----------------------------------------------------------------------------------------------------------------------
     def closeEvent(self, event: QtGui.QCloseEvent) -> None:
         self.scanner_worker.stop()
         return super().closeEvent(event)

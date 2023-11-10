@@ -31,6 +31,7 @@ import qtawesome
 from inventory.gui.base.tab_projects import Ui_TabProjects
 from inventory.gui.dialogs.part import PartDialog
 from inventory.gui.dialogs.part_select import PartSelectDialog
+from inventory.gui.tabs.base import TabWidget
 from inventory.model.projects import Project, Revision, Material
 from inventory.model.parts import Part
 
@@ -40,14 +41,11 @@ from inventory.model.parts import Part
 # ======================================================================================================================
 # Project Tab Class
 # ----------------------------------------------------------------------------------------------------------------------
-class TabProjects(QtWidgets.QWidget):
+class TabProjects(TabWidget):
     def __init__(self, parent):
         super().__init__(parent)
         self.ui = Ui_TabProjects()
         self.ui.setupUi(self)
-
-        projects: List[Project] = Project.select()
-        self.ui.projects.setProjects(projects)
 
         self.ui.revisions.setEnabled(False)
         self.ui.back.setIcon(qtawesome.icon('fa5s.chevron-left'))
@@ -88,6 +86,13 @@ class TabProjects(QtWidgets.QWidget):
         self.ui.materials.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.ui.materials.customContextMenuRequested.connect(
             lambda point: self.pop_menu.exec(self.ui.materials.mapToGlobal(point)))
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def refresh(self) -> None:
+        """Called by the main window when the tab is selected to (re)load project info from the database."""
+        projects: List[Project] = Project.select()
+        self.ui.projects.setProjects(projects)
 
 
 # ----------------------------------------------------------------------------------------------------------------------

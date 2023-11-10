@@ -62,9 +62,10 @@ class PartsWidget(QtWidgets.QWidget):
         self.clear()
 
         # Insert the new parts into the table.
-        for row, part in enumerate(parts):
-            self._insert_row(row)
-            self._update_row(row, part)
+        if parts:
+            for row, part in enumerate(parts):
+                self._insert_row(row)
+                self._update_row(row, part)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
