@@ -56,7 +56,8 @@ class DocumentListWidget(QtWidgets.QWidget):
         self.context_menu = QtWidgets.QMenu(self)
         self.context_open = context_action(self.context_menu, 'Open Document', self._open, 'fa.external-link')
         self.context_add = context_action(self.context_menu, 'Add document', self._add, 'fa5s.file-upload')
-        self.context_remove = context_action(self.context_menu, 'Remove document', self._remove, 'mdi.file-remove')
+        self.context_remove = context_action(
+            self.context_menu, 'Remove document', self._remove, 'mdi.file-remove', 'Del', self.ui.documents)
         self.context_edit = context_action(self.context_menu, 'Edit label', self._edit, 'ri.file-edit-line')
         self.ui.documents.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.ui.documents.customContextMenuRequested.connect(self._context_menu)
