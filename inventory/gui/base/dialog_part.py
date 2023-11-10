@@ -16,10 +16,10 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QAbstractButton, QApplication, QComboBox, QDialog,
-    QDialogButtonBox, QDoubleSpinBox, QFormLayout, QFrame,
-    QHBoxLayout, QLabel, QLineEdit, QPlainTextEdit,
-    QPushButton, QSizePolicy, QSpinBox, QTabWidget,
-    QVBoxLayout, QWidget)
+    QDialogButtonBox, QDoubleSpinBox, QFormLayout, QHBoxLayout,
+    QLabel, QLineEdit, QPlainTextEdit, QPushButton,
+    QSizePolicy, QSpinBox, QTabWidget, QVBoxLayout,
+    QWidget)
 
 from inventory.gui.widgets.attributes import AttributesWidget
 from inventory.gui.widgets.document_list import DocumentListWidget
@@ -32,7 +32,7 @@ class Ui_DialogPart(object):
     def setupUi(self, DialogPart):
         if not DialogPart.objectName():
             DialogPart.setObjectName(u"DialogPart")
-        DialogPart.resize(1208, 650)
+        DialogPart.resize(1071, 650)
         self.horizontalLayout_7 = QHBoxLayout(DialogPart)
         self.horizontalLayout_7.setObjectName(u"horizontalLayout_7")
         self.left = QWidget(DialogPart)
@@ -272,7 +272,6 @@ class Ui_DialogPart(object):
         sizePolicy8.setHeightForWidth(self.image.sizePolicy().hasHeightForWidth())
         self.image.setSizePolicy(sizePolicy8)
         self.image.setAcceptDrops(True)
-        self.image.setFrameShape(QFrame.Panel)
         self.image.setAlignment(Qt.AlignCenter)
 
         self.verticalLayout_3.addWidget(self.image)

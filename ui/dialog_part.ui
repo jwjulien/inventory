@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1208</width>
+    <width>1071</width>
     <height>650</height>
    </rect>
   </property>
@@ -358,9 +358,6 @@ Set to zero to disable reorder (i.e. non-stocked) or set to one to reorder when 
            </property>
            <property name="acceptDrops">
             <bool>true</bool>
-           </property>
-           <property name="frameShape">
-            <enum>QFrame::Panel</enum>
            </property>
            <property name="alignment">
             <set>Qt::AlignCenter</set>

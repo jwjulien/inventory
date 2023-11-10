@@ -99,7 +99,7 @@
      </column>
      <column>
       <property name="text">
-       <string>Worth</string>
+       <string>Value</string>
       </property>
      </column>
     </widget>

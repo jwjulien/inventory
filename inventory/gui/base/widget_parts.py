@@ -93,6 +93,6 @@ class Ui_WidgetParts(object):
         ___qtablewidgetitem5 = self.parts.horizontalHeaderItem(5)
         ___qtablewidgetitem5.setText(QCoreApplication.translate("WidgetParts", u"Price", None));
         ___qtablewidgetitem6 = self.parts.horizontalHeaderItem(6)
-        ___qtablewidgetitem6.setText(QCoreApplication.translate("WidgetParts", u"Worth", None));
+        ___qtablewidgetitem6.setText(QCoreApplication.translate("WidgetParts", u"Value", None));
     # retranslateUi
 
