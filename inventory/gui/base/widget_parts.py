@@ -29,6 +29,12 @@ class Ui_WidgetParts(object):
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.clear = QPushButton(WidgetParts)
+        self.clear.setObjectName(u"clear")
+        self.clear.setEnabled(False)
+
+        self.horizontalLayout.addWidget(self.clear)
+
         self.filter = QLineEdit(WidgetParts)
         self.filter.setObjectName(u"filter")
 
@@ -78,6 +84,7 @@ class Ui_WidgetParts(object):
 
     def retranslateUi(self, WidgetParts):
         WidgetParts.setWindowTitle(QCoreApplication.translate("WidgetParts", u"Form", None))
+        self.clear.setText(QCoreApplication.translate("WidgetParts", u"Clear", None))
         self.filter.setPlaceholderText(QCoreApplication.translate("WidgetParts", u"Filter parts...", None))
         self.add.setText(QCoreApplication.translate("WidgetParts", u"Add Part", None))
         ___qtablewidgetitem = self.parts.horizontalHeaderItem(0)

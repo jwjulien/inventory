@@ -25,6 +25,7 @@
 from typing import List
 
 from PySide6 import QtCore, QtWidgets
+import qtawesome
 
 from inventory.gui.base.widget_parts import Ui_WidgetParts
 from inventory.gui.dialogs.part import PartDialog
@@ -50,11 +51,16 @@ class PartsWidget(QtWidgets.QWidget):
         header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
         header.setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
 
+        # Add icons to buttons.
+        self.ui.clear.setIcon(qtawesome.icon('mdi.filter-off'))
+        self.ui.add.setIcon(qtawesome.icon('fa.microchip'))
+
         # Connect events.
         self.ui.add.clicked.connect(self.add)
         self.ui.parts.doubleClicked.connect(self.edit)
         self.ui.filter.textChanged.connect(self.filter)
         self.ui.parts.itemSelectionChanged.connect(self._part_selected)
+        self.ui.clear.clicked.connect(lambda: self.setFilter(''))
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -163,7 +169,10 @@ class PartsWidget(QtWidgets.QWidget):
 
         Note: There is room for significant improvement here, such as using AND/OR/XOR operators within the filter text.
         """
-        filter_text = [f'*{word}*' for word in self.ui.filter.text().split(' ')]
+        text = self.ui.filter.text()
+        self.ui.clear.setEnabled(bool(text))
+
+        filter_text = [f'*{word}*' for word in text.split(' ')]
         filter_res = [QtCore.QRegularExpression().fromWildcard(text, QtCore.Qt.CaseInsensitive) for text in filter_text]
         for row in range(self.ui.parts.rowCount()):
             # Gather the text from each of the columns that we want to filter on.
