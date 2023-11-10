@@ -1,5 +1,5 @@
 - Miscellaneous:
-    - [ ] Make scanner actually search for what it scans.
+    - [x] Make scanner actually search for what it scans.
     - [x] Setup printer with dialog to handle printing labels:
         - [x] For storage locations.
         - [x] Develop better scheme using 1" labels and some flavor of 2D barcode.

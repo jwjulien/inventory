@@ -120,6 +120,12 @@ class SlotsWidget(QtWidgets.QWidget):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
+    def select(self, slot: Slot) -> None:
+        item = self.ui.slots.item(slot.row, slot.column)
+        item.setSelected(True)
+
+
+# ----------------------------------------------------------------------------------------------------------------------
     def _update_cell(self, slot: Slot) -> None:
         item = self.ui.slots.item(slot.row, slot.column)
         item.setText(slot.name)

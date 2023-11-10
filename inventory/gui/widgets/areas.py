@@ -75,6 +75,15 @@ class AreasWidget(QtWidgets.QWidget):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
+    def select(self, area: Area) -> None:
+        for row in range(self.ui.areas.count()):
+            item = self.ui.areas.item(row)
+            if area == item.data(QtCore.Qt.UserRole):
+                item.setSelected(True)
+                break
+
+
+# ----------------------------------------------------------------------------------------------------------------------
     def _context_menu(self, point: QtCore.QPoint) -> None:
         selected = bool(self.ui.areas.selectedItems())
         self.context_remove.setEnabled(selected)

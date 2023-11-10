@@ -89,6 +89,15 @@ class UnitsWidget(QtWidgets.QWidget):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
+    def select(self, unit: Unit) -> None:
+        for row in range(self.ui.units.rowCount()):
+            item = self.ui.units.item(row, 0)
+            if unit == item.data(QtCore.Qt.UserRole):
+                item.setSelected(True)
+                break
+
+
+# ----------------------------------------------------------------------------------------------------------------------
     def _context_menu(self, point: QtCore.QPoint) -> None:
         selected = bool(self.ui.units.selectedItems())
         self.context_remove.setEnabled(selected)

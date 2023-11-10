@@ -29,12 +29,15 @@ from importlib import metadata
 from PySide6 import QtCore, QtGui, QtWidgets
 
 from inventory.gui.base.main_window import Ui_MainWindow
+from inventory.gui.dialogs.part import PartDialog
 from inventory.gui.tabs.categories import TabCategories
 from inventory.gui.tabs.lost import TabLost
 from inventory.gui.tabs.parts import TabParts
 from inventory.gui.tabs.projects import TabProjects
 from inventory.gui.tabs.storage import TabStorage
 from inventory.gui.tabs.suppliers import TabSuppliers
+from inventory.libraries.scanner import ScannerWorker
+from inventory.libraries.references import Reference, ReferenceTarget
 from inventory.model.base import db
 from inventory.model.categories import Category
 from inventory.model.documents import Document
@@ -42,8 +45,6 @@ from inventory.model.parts import Part
 from inventory.model.projects import Project, Revision, Material
 from inventory.model.storage import Area, Unit, Slot, Location
 from inventory.model.suppliers import Supplier, Product
-from inventory.libraries.scanner import ScannerWorker
-from inventory.libraries.references import Reference
 
 
 
@@ -136,6 +137,19 @@ class MainWindow(QtWidgets.QMainWindow):
             raise
         thing = reference.lookup()
         print(thing.id, type(thing))
+        if reference.target == ReferenceTarget.Part:
+            part = reference.lookup()
+            dialog = PartDialog(self, part)
+            dialog.exec()
+        elif reference.target == ReferenceTarget.Area:
+            self.ui.tabs.setCurrentWidget(self.tab_storage)
+            self.tab_storage.set_area(reference.lookup())
+        elif reference.target == ReferenceTarget.Unit:
+            self.ui.tabs.setCurrentWidget(self.tab_storage)
+            self.tab_storage.set_unit(reference.lookup())
+        elif reference.target == ReferenceTarget.Slot:
+            self.ui.tabs.setCurrentWidget(self.tab_storage)
+            self.tab_storage.set_slot(reference.lookup())
 
 
 # ----------------------------------------------------------------------------------------------------------------------

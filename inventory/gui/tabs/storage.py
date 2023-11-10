@@ -26,7 +26,7 @@ import qtawesome
 
 from inventory.gui.base.tab_storage import Ui_TabStorage
 from inventory.gui.tabs.base import TabWidget
-from inventory.model.storage import Area, Unit
+from inventory.model.storage import Area, Unit, Slot
 
 
 
@@ -42,12 +42,12 @@ class TabStorage(TabWidget):
 
         self.ui.back.setIcon(qtawesome.icon('fa.arrow-left'))
 
-        self.ui.areas.selected.connect(self.area_selected)
-        self.ui.units.selected.connect(self.unit_selected)
-        self.ui.back.clicked.connect(self.show_areas)
+        self.ui.areas.selected.connect(self._area_selected)
+        self.ui.units.selected.connect(self._unit_selected)
+        self.ui.back.clicked.connect(self._show_areas)
 
         self.ui.units.hide()
-        self.show_areas()
+        self._show_areas()
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -57,24 +57,42 @@ class TabStorage(TabWidget):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-    def show_areas(self) -> None:
+    def _show_areas(self) -> None:
         self.ui.stack.setCurrentWidget(self.ui.page_areas)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-    def area_selected(self, area: Area) -> None:
+    def _area_selected(self, area: Area) -> None:
         self.ui.units.show()
         self.ui.units.setUnits(area, area.units)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-    def unit_selected(self, unit: Unit) -> None:
+    def _unit_selected(self, unit: Unit) -> None:
         if unit is not None:
             self.ui.title.setText(f'{unit.area.name} > {unit.name}')
             self.ui.stack.setCurrentWidget(self.ui.page_slots)
             self.ui.slots.setUnit(unit)
         else:
             self.show_areas()
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def set_area(self, area: Area) -> None:
+        self.ui.areas.select(area)
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def set_unit(self, unit: Unit) -> None:
+        self.set_area(unit.area)
+        self.ui.units.select(unit)
+        self._unit_selected(unit)
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def set_slot(self, slot: Slot) -> None:
+        self.set_unit(slot.unit)
+        self.ui.slots.select(slot)
 
 
 
