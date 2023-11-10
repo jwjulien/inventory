@@ -134,25 +134,35 @@ class MainWindow(QtWidgets.QMainWindow):
         try:
             reference = Reference.from_str(code, label='scanner')
         except ValueError:
-            # When we don't know what this is, lets attempt to search instead.
+            # Attempt to decode older barcodes first.
+            if code.startswith('AREA-'):
+                reference = Reference(ReferenceTarget.Area, int(code.split('-', 1)[1]), 'scanner')
+            elif code.startswith('UNIT-'):
+                reference = Reference(ReferenceTarget.Unit, int(code.split('-', 1)[1]), 'scanner')
+            elif code.startswith('SLOT-'):
+                reference = Reference(ReferenceTarget.Slot, int(code.split('-', 1)[1]), 'scanner')
+            else:
+                reference = Reference(ReferenceTarget.Unknown, None, 'scanner')
+
+        if reference.target == ReferenceTarget.Part:
+            part = reference.lookup()
+            dialog = PartDialog(self, part)
+            dialog.exec()
+        elif reference.target == ReferenceTarget.Area:
+            self.ui.tabs.setCurrentWidget(self.tab_storage)
+            self.tab_storage.set_area(reference.lookup())
+        elif reference.target == ReferenceTarget.Unit:
+            self.ui.tabs.setCurrentWidget(self.tab_storage)
+            self.tab_storage.set_unit(reference.lookup())
+        elif reference.target == ReferenceTarget.Slot:
+            self.ui.tabs.setCurrentWidget(self.tab_storage)
+            self.tab_storage.set_slot(reference.lookup())
+        else:
+            # When that fails and we don't know what this is, lets attempt to show a Part instead.
+            print('No match for scanned code:', code)
             self.ui.tabs.setCurrentWidget(self.tab_parts)
             self.tab_parts.ui.parts.setFilter(code)
-        else:
-            if reference.target == ReferenceTarget.Part:
-                part = reference.lookup()
-                dialog = PartDialog(self, part)
-                dialog.exec()
-            elif reference.target == ReferenceTarget.Area:
-                self.ui.tabs.setCurrentWidget(self.tab_storage)
-                self.tab_storage.set_area(reference.lookup())
-            elif reference.target == ReferenceTarget.Unit:
-                self.ui.tabs.setCurrentWidget(self.tab_storage)
-                self.tab_storage.set_unit(reference.lookup())
-            elif reference.target == ReferenceTarget.Slot:
-                self.ui.tabs.setCurrentWidget(self.tab_storage)
-                self.tab_storage.set_slot(reference.lookup())
-            else:
-                print('Scanned Reference without handler:', reference)
+            return
 
 
 # ----------------------------------------------------------------------------------------------------------------------

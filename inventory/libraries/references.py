@@ -47,6 +47,7 @@ from inventory.model.suppliers import Supplier, Product
 # ----------------------------------------------------------------------------------------------------------------------
 class ReferenceTarget(IntEnum):
     """Indicates the target of a reference."""
+    Unknown = 0x00   # Not a valid reference.
     Part = 0x10      # Link directly to a specific part.
     Category = 0x20  # Reference to a part Category.
     Area = 0x30      # Reference to a storage Area.
