@@ -58,13 +58,13 @@ class LocationWidget(QtWidgets.QWidget):
 
         # Setup context menu.
         self.context = QtWidgets.QMenu(self)
+        self.context_add = context_action(
+            self.context, 'Add Location', self._add, 'fa.plus', 'Insert', self.ui.locations)
+        self.context.addSeparator()
         self.context_edit = context_action(
             self.context, 'Edit Location', self._edit, 'fa.pencil', 'F2', self.ui.locations)
         self.context_remove = context_action(
             self.context, 'Remove Location', self._remove, 'fa.times', 'Delete', self.ui.locations)
-        self.context.addSeparator()
-        self.context_add = context_action(
-            self.context, 'Add Location', self._add, 'fa.plus', 'Insert', self.ui.locations)
         self.context_relocate = context_action(
             self.context, 'Relocate...', self._relocate, 'fa.arrows-alt', 'Ctrl+R', self.ui.locations)
         self.context_print = context_action(self.context, 'Print Label', self._print_slot, 'fa.barcode')
@@ -75,6 +75,7 @@ class LocationWidget(QtWidgets.QWidget):
         # Connect events.
         self.ui.locations.itemSelectionChanged.connect(self._selected)
         self.ui.locations.doubleClicked.connect(self._edit)
+        self._selected()
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -126,6 +127,7 @@ class LocationWidget(QtWidgets.QWidget):
         selected = self.ui.locations.selectedItems()
         self.context_edit.setEnabled(bool(selected))
         self.context_remove.setEnabled(bool(selected))
+        self.context_print.setEnabled(bool(selected))
 
         quantity = sum([self.ui.locations.item(item.row(), 0).data(QtCore.Qt.UserRole).quantity for item in selected])
         self.context_relocate.setEnabled(quantity > 0)
