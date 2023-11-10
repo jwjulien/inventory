@@ -38,7 +38,7 @@ class Ui_DocumentListWidget(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.documents.sizePolicy().hasHeightForWidth())
         self.documents.setSizePolicy(sizePolicy)
-        self.documents.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.documents.setEditTriggers(QAbstractItemView.EditKeyPressed|QAbstractItemView.SelectedClicked)
         self.documents.setAlternatingRowColors(True)
 
         self.verticalLayout_2.addWidget(self.documents)

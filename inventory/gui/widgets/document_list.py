@@ -27,6 +27,7 @@ import os
 
 from PySide6 import QtCore, QtWidgets
 import qtawesome
+import requests
 
 from inventory.gui.base.widget_document_list import Ui_DocumentListWidget
 from inventory.gui.dialogs.document import DocumentDialog
@@ -49,6 +50,7 @@ class DocumentListWidget(QtWidgets.QWidget):
         self.part: Part = None
 
         self.ui.add.setIcon(qtawesome.icon('fa5s.file-upload'))
+        self.setAcceptDrops(True)
 
         # Setup custom context menu
         self.context_menu = QtWidgets.QMenu(self)
@@ -76,7 +78,8 @@ class DocumentListWidget(QtWidgets.QWidget):
 
 # ----------------------------------------------------------------------------------------------------------------------
     def _list_item(self, document: Document) -> QtWidgets.QListWidgetItem:
-        item = QtWidgets.QListWidgetItem(f'{document.label} ({document.filename})')
+        item = QtWidgets.QListWidgetItem(document.label)
+        item.setToolTip(document.filename)
         item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
         item.setData(QtCore.Qt.UserRole, document)
         self.ui.documents.addItem(item)
@@ -158,6 +161,56 @@ class DocumentListWidget(QtWidgets.QWidget):
         with NamedTemporaryFile(suffix=f'_Doc{document.id}_{document.filename}', delete=False) as temp_file:
             temp_file.write(document.content)
         os.system(temp_file.name)
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def dragEnterEvent(self, event):
+        if event.mimeData().hasUrls:
+            event.accept()
+        else:
+            event.ignore()
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def dragMoveEvent(self, event):
+        if event.mimeData().hasUrls:
+            event.setDropAction(QtCore.Qt.CopyAction)
+            event.accept()
+        else:
+            event.ignore()
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def dropEvent(self, event):
+        if event.mimeData().hasUrls:
+            event.setDropAction(QtCore.Qt.CopyAction)
+            event.accept()
+            for url in event.mimeData().urls():
+                if url.isLocalFile():
+                    filename = url.toLocalFile()
+                    with open(filename, 'rb') as handle:
+                        content = handle.read()
+                    filename = os.path.basename(filename)
+                else:
+                    url = url.url()
+                    filename = url.rsplit('/', 1)[1]
+                    headers = {
+                        'User-Agent': 'Mozilla/5.0 (Linux; Linux i641 x86_64) Gecko/20130401 Firefox/67.1'
+                    }
+                    response = requests.get(url, headers=headers, timeout=5)
+                    response.raise_for_status()
+                    content = response.content
+                document = Document(
+                    part=self.part,
+                    filename=filename,
+                    label=filename,
+                    content=content
+                )
+                document.save()
+                item = self._list_item(document)
+            self.ui.documents.editItem(item)
+        else:
+            event.ignore()
 
 
 
