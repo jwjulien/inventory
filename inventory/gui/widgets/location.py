@@ -29,9 +29,11 @@ import timeago
 
 from inventory.gui.base.widget_location import Ui_LocationWidget
 from inventory.gui.dialogs.location_mapping import LocationMappingDialog
+from inventory.gui.dialogs.print_reference import PrintReferenceDialog
 from inventory.gui.dialogs.relocate import RelocateDialog
 from inventory.gui.prompts import Alert, YesNoPrompt
 from inventory.gui.utilities import context_action
+from inventory.libraries.references import Reference, ReferenceTarget
 from inventory.model.storage import Location
 from inventory.model.parts import Part
 
@@ -65,6 +67,7 @@ class LocationWidget(QtWidgets.QWidget):
             self.context, 'Add Location', self._add, 'fa.plus', 'Insert', self.ui.locations)
         self.context_relocate = context_action(
             self.context, 'Relocate...', self._relocate, 'fa.arrows-alt', 'Ctrl+R', self.ui.locations)
+        self.context_print = context_action(self.context, 'Print Label', self._print_slot, 'fa.barcode')
         self.ui.locations.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.ui.locations.customContextMenuRequested.connect(
             lambda point: self.context.exec(self.ui.locations.mapToGlobal(point)))
@@ -227,6 +230,16 @@ class LocationWidget(QtWidgets.QWidget):
                 if YesNoPrompt(self, 'Remove old location information?', text):
                     old_location.delete_instance()
                     self.ui.locations.removeRow(row)
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def _print_slot(self) -> None:
+        selected = self.ui.locations.selectedItems()
+        if selected:
+            location: Location = self.ui.locations.item(selected[0].row(), 0).data(QtCore.Qt.UserRole)
+            reference = Reference(ReferenceTarget.Slot, location.slot.id, location.slot.name)
+            dialog = PrintReferenceDialog(self, reference)
+            dialog.exec()
 
 
 
