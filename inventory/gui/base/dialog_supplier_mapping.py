@@ -59,6 +59,7 @@ class Ui_DialogSupplierMapping(object):
 
         self.formLayout.setWidget(1, QFormLayout.FieldRole, self.number)
 
+        QWidget.setTabOrder(self.supplier, self.number)
 
         self.retranslateUi(DialogSupplierMapping)
         self.buttonBox.accepted.connect(DialogSupplierMapping.accept)

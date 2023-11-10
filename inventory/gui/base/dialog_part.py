@@ -312,6 +312,18 @@ class Ui_DialogPart(object):
 
         self.horizontalLayout_7.addWidget(self.right)
 
+        QWidget.setTabOrder(self.category, self.new_category)
+        QWidget.setTabOrder(self.new_category, self.value)
+        QWidget.setTabOrder(self.value, self.part_number)
+        QWidget.setTabOrder(self.part_number, self.footprint)
+        QWidget.setTabOrder(self.footprint, self.price)
+        QWidget.setTabOrder(self.price, self.weight)
+        QWidget.setTabOrder(self.weight, self.calibrate)
+        QWidget.setTabOrder(self.calibrate, self.threshold)
+        QWidget.setTabOrder(self.threshold, self.notes)
+        QWidget.setTabOrder(self.notes, self.tabs)
+        QWidget.setTabOrder(self.tabs, self.set_image)
+        QWidget.setTabOrder(self.set_image, self.remove_image)
 
         self.retranslateUi(DialogPart)
         self.buttons.accepted.connect(DialogPart.accept)

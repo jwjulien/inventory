@@ -66,6 +66,10 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>supplier</tabstop>
+  <tabstop>number</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

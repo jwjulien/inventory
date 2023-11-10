@@ -450,6 +450,21 @@ Set to zero to disable reorder (i.e. non-stocked) or set to one to reorder when 
    <header>inventory.gui.widgets.droppable_label</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>category</tabstop>
+  <tabstop>new_category</tabstop>
+  <tabstop>value</tabstop>
+  <tabstop>part_number</tabstop>
+  <tabstop>footprint</tabstop>
+  <tabstop>price</tabstop>
+  <tabstop>weight</tabstop>
+  <tabstop>calibrate</tabstop>
+  <tabstop>threshold</tabstop>
+  <tabstop>notes</tabstop>
+  <tabstop>tabs</tabstop>
+  <tabstop>set_image</tabstop>
+  <tabstop>remove_image</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
