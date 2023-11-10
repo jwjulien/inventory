@@ -40,6 +40,7 @@ class, defined in [[inventory/libraries/printer/labels]].
 # Imports
 # ----------------------------------------------------------------------------------------------------------------------
 from enum import Enum
+from typing import Dict, Tuple
 
 import usb
 
@@ -92,11 +93,31 @@ class PrintDensity(Enum):
 
 
 # ======================================================================================================================
+# Device Cache
+# ----------------------------------------------------------------------------------------------------------------------
+device_cache: Dict[Tuple[int, int], usb.Device] = {}
+
+
+
+
+# ======================================================================================================================
+# Get Device Method
+# ----------------------------------------------------------------------------------------------------------------------
+def get_device(vid: int, pid: int) -> usb.Device:
+    key = (vid, pid)
+    if key not in device_cache:
+        device_cache[key] = usb.core.find(idVendor=vid, idProduct=pid)
+    return device_cache.get(key)
+
+
+
+
+# ======================================================================================================================
 # Printer Base Class
 # ----------------------------------------------------------------------------------------------------------------------
 class Printer:
     def __init__(self):
-        self._device = usb.core.find(idVendor=self.VID, idProduct=self.PID)
+        self._device = get_device(self.VID, self.PID)
         if not self._device:
             raise PrinterNotFound
 
