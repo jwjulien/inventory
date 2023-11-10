@@ -25,9 +25,10 @@
 import pickle
 from typing import List
 
-from PySide6 import QtCore, QtGui, QtWidgets
+from PySide6 import QtCore, QtWidgets
 
 from inventory.gui.base.widget_slots import Ui_WidgetSlots
+from inventory.gui.dialogs.part import PartDialog
 from inventory.gui.dialogs.parts import PartsDialog
 from inventory.gui.dialogs.print_reference import PrintReferenceDialog
 from inventory.gui.utilities import context_action
@@ -57,6 +58,7 @@ class SlotsWidget(QtWidgets.QWidget):
         # Setup custom context menu.
         self.context_menu = QtWidgets.QMenu(self)
         self.context_parts = context_action(self.context_menu, 'View Parts', self._show_parts, 'fa.list')
+        self.context_edit = context_action(self.context_menu, 'Edit', self._edit, 'fa.pencil', 'F2', self.ui.slots)
         self.context_menu.addSeparator()
         self.context_cut = context_action(self.context_menu, 'Cut', self._cut, 'fa.cut', 'Ctrl+X', self.ui.slots)
         self.context_copy = context_action(self.context_menu, 'Copy', self._copy, 'fa.copy', 'Ctrl+C', self.ui.slots)
@@ -67,7 +69,7 @@ class SlotsWidget(QtWidgets.QWidget):
         self.context_split = context_action(self.context_menu, 'Split', self._split, 'mdi.table-split-cell')
         self.context_menu.addSeparator()
         self.context_remove = context_action(
-            self.context_menu, 'Remove Slot', self._remove, 'fa.trash-o', 'Del', self.ui.slots)
+            self.context_menu, 'Remove Slot', self._remove, 'fa.trash-o', 'Delete', self.ui.slots)
         self.context_menu.addSeparator()
         self.context_print = context_action(self.context_menu, 'Print Label', self._print, 'fa.barcode')
         self.ui.slots.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
@@ -78,6 +80,7 @@ class SlotsWidget(QtWidgets.QWidget):
         self.ui.slots.horizontalHeader().sectionResized.connect(self.ui.slots.resizeRowsToContents)
         self.ui.slots.itemSelectionChanged.connect(self._selected)
         self.ui.slots.itemChanged.connect(self._changed)
+        self.ui.slots.doubleClicked.connect(self._show_parts)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -214,6 +217,14 @@ class SlotsWidget(QtWidgets.QWidget):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
+    def _edit(self) -> None:
+        """Edit the currently selected cell."""
+        selected = self.ui.slots.selectedIndexes()
+        if selected:
+            self.ui.slots.edit(selected[-1])
+
+
+# ----------------------------------------------------------------------------------------------------------------------
     def _remove(self) -> None:
         selection = self.ui.slots.selectedItems()
         for item in selection:
@@ -258,7 +269,10 @@ class SlotsWidget(QtWidgets.QWidget):
     def _show_parts(self) -> None:
         parts = self._selected_parts()
         if parts:
-            dialog = PartsDialog(self, parts)
+            if len(parts) == 1:
+                dialog = PartDialog(self, parts[0])
+            else:
+                dialog = PartsDialog(self, parts)
             dialog.exec()
 
 

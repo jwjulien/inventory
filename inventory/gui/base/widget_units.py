@@ -36,6 +36,7 @@ class Ui_WidgetUnits(object):
         __qtablewidgetitem2 = QTableWidgetItem()
         self.units.setHorizontalHeaderItem(2, __qtablewidgetitem2)
         self.units.setObjectName(u"units")
+        self.units.setEditTriggers(QAbstractItemView.AnyKeyPressed|QAbstractItemView.EditKeyPressed)
         self.units.setAlternatingRowColors(True)
         self.units.setSelectionMode(QAbstractItemView.SingleSelection)
         self.units.horizontalHeader().setStretchLastSection(True)

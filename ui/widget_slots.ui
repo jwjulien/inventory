@@ -28,6 +28,9 @@
    </property>
    <item>
     <widget class="QTableWidget" name="slots">
+     <property name="editTriggers">
+      <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::EditKeyPressed</set>
+     </property>
      <property name="selectionMode">
       <enum>QAbstractItemView::ContiguousSelection</enum>
      </property>

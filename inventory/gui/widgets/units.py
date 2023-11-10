@@ -56,19 +56,24 @@ class UnitsWidget(QtWidgets.QWidget):
         header.setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
 
         # Setup custom context menu.
-        self.context_menu = QtWidgets.QMenu(self)
-        self.context_view = context_action(self.context_menu, 'View Slots', self._show_slots, 'fa.arrow-right')
-        self.context_parts = context_action(self.context_menu, 'View All Parts', self._show_parts, 'fa.list')
-        self.context_menu.addSeparator()
-        self.context_add = context_action(self.context_menu, 'Add Unit', self._add, 'fa.plus')
-        self.context_remove = context_action(self.context_menu, 'Remove Unit', self._remove, 'fa.trash-o')
-        self.context_menu.addSeparator()
-        self.context_print = context_action(self.context_menu, 'Print Label', self._print, 'fa.barcode')
+        self.context = QtWidgets.QMenu(self)
+        self.context_view = context_action(
+            self.context, 'View Slots', self._show_slots, 'fa.arrow-right', 'Enter', self.ui.units)
+        self.context_edit = context_action(self.context, 'Edit', self._edit, 'fa.pencil', 'F2', self.ui.units)
+        self.context_parts = context_action(self.context, 'View All Parts', self._show_parts, 'fa.list')
+        self.context.addSeparator()
+        self.context_add = context_action(self.context, 'Add Unit', self._add, 'fa.plus')
+        self.context_remove = context_action(self.context, 'Remove Unit', self._remove, 'fa.trash-o')
+        self.context.addSeparator()
+        self.context_print = context_action(self.context, 'Print Label', self._print, 'fa.barcode')
         self.ui.units.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.ui.units.customContextMenuRequested.connect(self._context_menu)
+        self.ui.units.customContextMenuRequested.connect(
+            lambda point: self.context.exec(self.ui.units.mapToGlobal(point)))
 
         # Connect events.
         self.ui.units.itemChanged.connect(self._changed)
+        self.ui.units.itemSelectionChanged.connect(self._selected)
+        self.ui.units.doubleClicked.connect(self._show_slots)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -98,12 +103,12 @@ class UnitsWidget(QtWidgets.QWidget):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-    def _context_menu(self, point: QtCore.QPoint) -> None:
+    def _selected(self) -> None:
         selected = bool(self.ui.units.selectedItems())
         self.context_remove.setEnabled(selected)
         self.context_view.setEnabled(selected)
         self.context_print.setEnabled(selected)
-        self.context_menu.exec(self.ui.units.mapToGlobal(point))
+
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -115,6 +120,14 @@ class UnitsWidget(QtWidgets.QWidget):
         row = self._append_unit(unit)
         self.ui.units.blockSignals(False)
         self.ui.units.edit(self.ui.units.indexFromItem(self.ui.units.item(row, 0)))
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def _edit(self) -> None:
+        """Edit the currently selected cell."""
+        selected = self.ui.units.selectedIndexes()
+        if selected:
+            self.ui.units.edit(selected[-1])
 
 
 # ----------------------------------------------------------------------------------------------------------------------

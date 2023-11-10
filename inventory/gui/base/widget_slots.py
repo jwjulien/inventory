@@ -28,6 +28,7 @@ class Ui_WidgetSlots(object):
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
         self.slots = QTableWidget(WidgetSlots)
         self.slots.setObjectName(u"slots")
+        self.slots.setEditTriggers(QAbstractItemView.AnyKeyPressed|QAbstractItemView.EditKeyPressed)
         self.slots.setSelectionMode(QAbstractItemView.ContiguousSelection)
         self.slots.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
         self.slots.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
