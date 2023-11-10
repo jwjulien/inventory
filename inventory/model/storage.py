@@ -22,6 +22,7 @@
 # ======================================================================================================================
 # Import Statements
 # ----------------------------------------------------------------------------------------------------------------------
+from datetime import datetime
 from typing import List, Tuple
 
 from peewee import CharField, DateTimeField, ForeignKeyField, IntegerField
@@ -41,7 +42,8 @@ class Area(BaseModel):
         table_name = 'areas'
 
     # Columns
-    name = CharField(40)
+    name: str = CharField(40)
+    units: List['Unit']
 
 
     # Properties
@@ -62,9 +64,11 @@ class Unit(BaseModel):
 
     # Columns
     area: Area = ForeignKeyField(Area, backref='units')
-    name = CharField(40)
-    rows = IntegerField(default=1)
-    columns = IntegerField(default=1)
+    name: str = CharField(40)
+    rows: int = IntegerField(default=1)
+    columns: int = IntegerField(default=1)
+
+    slots: List['Slot']
 
 
     # Properties
@@ -85,11 +89,13 @@ class Slot(BaseModel):
 
     # Columns
     unit: Unit = ForeignKeyField(Unit, backref='slots')
-    name = CharField(40)
-    row = IntegerField()
-    column = IntegerField()
-    row_span = IntegerField(default=1)
-    column_span = IntegerField(default=1)
+    name: str = CharField(40)
+    row: int = IntegerField()
+    column: int = IntegerField()
+    row_span: int = IntegerField(default=1)
+    column_span: int = IntegerField(default=1)
+
+    locations: List['Location']
 
 
     def copy(self) -> 'Slot':
@@ -138,8 +144,8 @@ class Location(BaseModel):
     # Columns
     slot: Slot = ForeignKeyField(Slot, backref='locations')
     part: Part = ForeignKeyField(Part, backref='locations')
-    quantity = IntegerField()
-    last_counted = DateTimeField(null=True)
+    quantity: int = IntegerField()
+    last_counted: datetime = DateTimeField(null=True)
 
 
     @property

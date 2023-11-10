@@ -46,7 +46,7 @@
         - [x] Does it make more sense to migrate Areas, Slots, etc. to dialogs instead of widgets?
             - Should help with loading times and make more reusable.
             - What about putting widgets into dialogs to make the best of both?
-    - [ ] In LocationMappingDialog, swap the lengthy dropdown for a column view or some kinda of filter/autocomplete.
+    - [x] In LocationMappingDialog, swap the lengthy dropdown for a column view or some kinda of filter/autocomplete.
     - [x] Support cut/copy/paste for Slots within table view - will help with relocating.
 - Projects:
     - [ ] Update the part matching on BOM import to better match attributes with weighting for things like package and part number over category (as opposed to either summery vs part number matching as it's done now).
