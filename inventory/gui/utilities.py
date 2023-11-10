@@ -24,7 +24,7 @@
 # ----------------------------------------------------------------------------------------------------------------------
 from typing import Callable
 
-from PySide6 import QtGui, QtWidgets
+from PySide6 import QtCore, QtGui, QtWidgets
 import qtawesome
 
 
@@ -62,6 +62,7 @@ def context_action(menu: QtWidgets.QMenu,
     if shortcut is not None:
         action.setShortcut(QtGui.QKeySequence(shortcut))
         if shortcut_widget is not None:
+            action.setShortcutContext(QtCore.Qt.WidgetWithChildrenShortcut)
             shortcut_widget.addAction(action)
     menu.addAction(action)
     action.triggered.connect(slot)

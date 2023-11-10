@@ -359,6 +359,9 @@ Set to zero to disable reorder (i.e. non-stocked) or set to one to reorder when 
            <property name="acceptDrops">
             <bool>true</bool>
            </property>
+           <property name="frameShape">
+            <enum>QFrame::Panel</enum>
+           </property>
            <property name="alignment">
             <set>Qt::AlignCenter</set>
            </property>

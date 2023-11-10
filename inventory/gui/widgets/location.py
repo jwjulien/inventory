@@ -30,7 +30,8 @@ import timeago
 from inventory.gui.base.widget_location import Ui_LocationWidget
 from inventory.gui.dialogs.location_mapping import LocationMappingDialog
 from inventory.gui.dialogs.relocate import RelocateDialog
-from inventory.gui.prompts import Alert
+from inventory.gui.prompts import Alert, YesNoPrompt
+from inventory.gui.utilities import context_action
 from inventory.model.storage import Location
 from inventory.model.parts import Part
 
@@ -53,13 +54,24 @@ class LocationWidget(QtWidgets.QWidget):
         header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
         header.setSectionResizeMode(2, QtWidgets.QHeaderView.Stretch)
 
+        # Setup context menu.
+        self.context = QtWidgets.QMenu(self)
+        self.context_edit = context_action(
+            self.context, 'Edit Location', self._edit, 'fa.pencil', 'F2', self.ui.locations)
+        self.context_remove = context_action(
+            self.context, 'Remove Location', self._remove, 'fa.times', 'Delete', self.ui.locations)
+        self.context.addSeparator()
+        self.context_add = context_action(
+            self.context, 'Add Location', self._add, 'fa.plus', 'Insert', self.ui.locations)
+        self.context_relocate = context_action(
+            self.context, 'Relocate...', self._relocate, 'fa.arrows-alt', 'Ctrl+R', self.ui.locations)
+        self.ui.locations.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.ui.locations.customContextMenuRequested.connect(
+            lambda point: self.context.exec(self.ui.locations.mapToGlobal(point)))
+
         # Connect events.
         self.ui.locations.itemSelectionChanged.connect(self._selected)
-        self.ui.locations.doubleClicked.connect(self.edit)
-        self.ui.map.clicked.connect(self.map)
-        self.ui.remove.clicked.connect(self.remove)
-        self.ui.relocate.clicked.connect(self.relocate)
-
+        self.ui.locations.doubleClicked.connect(self._edit)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -109,19 +121,15 @@ class LocationWidget(QtWidgets.QWidget):
 # ----------------------------------------------------------------------------------------------------------------------
     def _selected(self) -> None:
         selected = self.ui.locations.selectedItems()
-        self.ui.remove.setEnabled(bool(selected))
+        self.context_edit.setEnabled(bool(selected))
+        self.context_remove.setEnabled(bool(selected))
 
-        quantity = 0
-        rows = list(set([item.row() for item in selected]))
-        if len(rows) == 1:
-            row = rows[0]
-            location = self.ui.locations.item(row, 0).data(QtCore.Qt.UserRole)
-            quantity = location.quantity
-        self.ui.relocate.setEnabled(quantity > 0)
+        quantity = sum([self.ui.locations.item(item.row(), 0).data(QtCore.Qt.UserRole).quantity for item in selected])
+        self.context_relocate.setEnabled(quantity > 0)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-    def edit(self) -> None:
+    def _edit(self) -> None:
         selected = self.ui.locations.selectedItems()
         if not selected:
             return
@@ -134,7 +142,7 @@ class LocationWidget(QtWidgets.QWidget):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-    def map(self) -> None:
+    def _add(self) -> None:
         location = Location(part=self.part)
         if LocationMappingDialog(self, location).exec():
             row = self._insert_row()
@@ -142,7 +150,7 @@ class LocationWidget(QtWidgets.QWidget):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-    def remove(self) -> None:
+    def _remove(self) -> None:
         selected = self.ui.locations.selectedItems()
         rows = set([item.row() for item in selected])
         for row in sorted(rows, reverse=True):
@@ -155,7 +163,7 @@ class LocationWidget(QtWidgets.QWidget):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-    def relocate(self) -> None:
+    def _relocate(self) -> None:
         """Prompt the user to select a new location for the parts located in the selected location.
 
         If accepted, then move the quantity from selected location to new location.
@@ -215,22 +223,10 @@ class LocationWidget(QtWidgets.QWidget):
 
             # If there are no parts left at the old location then lets ask the user if they want to get rid of it.
             if old_location.quantity == 0:
-                msg = QtWidgets.QMessageBox(self)
-                msg.setWindowTitle('Remove old location information?')
-                text = f'There are no items left at:\n{old_location.name}\nWould you like to remove the old location?'
-                msg.setText(text)
-                msg.setStandardButtons(
-                    QtWidgets.QMessageBox.StandardButton.Yes |
-                    QtWidgets.QMessageBox.StandardButton.No
-                )
-                if msg.exec() == QtWidgets.QMessageBox.StandardButton.Yes:
+                text = f'There are no items left at:\n  {old_location.name}\nWould you like to remove the old location?'
+                if YesNoPrompt(self, 'Remove old location information?', text):
                     old_location.delete_instance()
                     self.ui.locations.removeRow(row)
-
-
-
-
-
 
 
 
