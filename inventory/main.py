@@ -24,6 +24,7 @@
 # ----------------------------------------------------------------------------------------------------------------------
 import sys
 
+import click
 from PySide6 import QtWidgets
 import qdarktheme
 import qtawesome
@@ -36,7 +37,9 @@ from inventory.gui.main_window import MainWindow
 # ======================================================================================================================
 # Main Function
 # ----------------------------------------------------------------------------------------------------------------------
-def main() -> int:
+@click.command()
+@click.option('-p', '--prod', 'production', is_flag=True, help='switch to production mode')
+def main(production: bool) -> int:
     # Set colors for QtAwesome icons before the main window is instantiated.
     qtawesome.set_defaults(
         color='#E0E1E3',
@@ -48,7 +51,7 @@ def main() -> int:
     sys.argv += ['-platform', 'windows:darkmode=2']
     app = QtWidgets.QApplication(sys.argv)
     qdarktheme.setup_theme('auto', additional_qss="QToolTip { border: 0px; }")
-    window = MainWindow()
+    window = MainWindow(production)
     window.show()
     return app.exec()
 

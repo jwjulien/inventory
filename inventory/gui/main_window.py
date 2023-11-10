@@ -53,15 +53,17 @@ from inventory.model.suppliers import Supplier, Product
 # Main Window Class
 # ----------------------------------------------------------------------------------------------------------------------
 class MainWindow(QtWidgets.QMainWindow):
-    def __init__(self):
+    def __init__(self, production: bool):
         super().__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
+        db.database = 'parts.prod.sqlite' if production else 'parts.dev.sqlite'
+
         # Setup window title with name and version info from package metadata.
         name = 'inventory'
         version = metadata.version(name)
-        self.setWindowTitle(f'{name.title()} - Version {version}')
+        self.setWindowTitle(f'{name.title()} - Version {version} - {db.database}')
 
         # Setup icon and indicate to Windows that it should be shown in the taskbar.
         icon = os.path.join('inventory', 'assets', 'icons', 'boxes.png')
