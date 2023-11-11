@@ -64,7 +64,7 @@ class TabStorage(TabWidget):
 # ----------------------------------------------------------------------------------------------------------------------
     def _area_selected(self, area: Area) -> None:
         self.ui.units.show()
-        self.ui.units.setUnits(area, area.units)
+        self.ui.units.setArea(area)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -74,7 +74,7 @@ class TabStorage(TabWidget):
             self.ui.stack.setCurrentWidget(self.ui.page_slots)
             self.ui.slots.setUnit(unit)
         else:
-            self.show_areas()
+            self._show_areas()
 
 
 # ----------------------------------------------------------------------------------------------------------------------

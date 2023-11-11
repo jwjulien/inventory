@@ -34,7 +34,7 @@
     - [ ] Is there a way to paginate/lazy load Parts such that they are only loaded from DB as needed?
 - Storage:
     - [x] Give ability to move a slot to a new location/unit.
-        - Can be done using cut/paste - even works between units.
+        - Cut/paste doesn't work because `remove` isn't supported when parts are assigned to Location.
         - [x] Ensure that the ID is preserved as that is what is tied to the barcodes.
     - [x] Give ability to move a part to a new slot.
         - [ ] Add ability to define new Slot from Relocate Dialog.

@@ -77,7 +77,7 @@ class UnitsWidget(QtWidgets.QWidget):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-    def setUnits(self, area: Area, units: List[Unit]) -> None:
+    def setArea(self, area: Area) -> None:
         self.area = area
 
         self.ui.units.blockSignals(True)
@@ -87,7 +87,7 @@ class UnitsWidget(QtWidgets.QWidget):
             self.ui.units.removeRow(0)
 
         # Insert the new units into the list.
-        for unit in sorted(units, key=lambda unit: unit.name):
+        for unit in sorted(area.units, key=lambda unit: unit.name):
             self._append_unit(unit)
 
         self.ui.units.blockSignals(False)
@@ -99,7 +99,17 @@ class UnitsWidget(QtWidgets.QWidget):
             item = self.ui.units.item(row, 0)
             if unit == item.data(QtCore.Qt.UserRole):
                 item.setSelected(True)
+                self.selected.emit(unit)
                 break
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def unit(self) -> None:
+        """Return the currently selected Unit or None if none are selected."""
+        selected = self.ui.units.selectedItems()
+        if selected:
+            return selected[0].data(QtCore.Qt.UserRole)
+        return None
 
 
 # ----------------------------------------------------------------------------------------------------------------------

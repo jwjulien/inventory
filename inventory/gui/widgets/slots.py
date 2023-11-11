@@ -45,6 +45,8 @@ from inventory.gui.constants import Colors
 # Slots Widget Class
 # ----------------------------------------------------------------------------------------------------------------------
 class SlotsWidget(QtWidgets.QWidget):
+    selectionChanged = QtCore.Signal()
+
     def __init__(self, parent):
         super().__init__(parent)
         self.ui = Ui_WidgetSlots()
@@ -53,28 +55,29 @@ class SlotsWidget(QtWidgets.QWidget):
         self.unit: Unit = None
 
         # Setup column spacing in table.
+        self.ui.slots.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
         self.ui.slots.setWordWrap(True)
 
         # Setup custom context menu.
-        self.context_menu = QtWidgets.QMenu(self)
-        self.context_parts = context_action(self.context_menu, 'View Parts', self._show_parts, 'fa.list')
-        self.context_edit = context_action(self.context_menu, 'Edit', self._edit, 'fa.pencil', 'F2', self.ui.slots)
-        self.context_menu.addSeparator()
-        self.context_cut = context_action(self.context_menu, 'Cut', self._cut, 'fa.cut', 'Ctrl+X', self.ui.slots)
-        self.context_copy = context_action(self.context_menu, 'Copy', self._copy, 'fa.copy', 'Ctrl+C', self.ui.slots)
+        self.context = QtWidgets.QMenu(self)
+        self.context_parts = context_action(self.context, 'View Parts', self._show_parts, 'fa.list')
+        self.context_edit = context_action(self.context, 'Edit', self._edit, 'fa.pencil', 'F2', self.ui.slots)
+        self.context.addSeparator()
+        self.context_cut = context_action(self.context, 'Cut', self._cut, 'fa.cut', 'Ctrl+X', self.ui.slots)
+        self.context_copy = context_action(self.context, 'Copy', self._copy, 'fa.copy', 'Ctrl+C', self.ui.slots)
         self.context_paste = context_action(
-            self.context_menu, 'Paste', self._paste, 'fa.paste', 'Ctrl+V', self.ui.slots)
-        self.context_menu.addSeparator()
-        self.context_merge = context_action(self.context_menu, 'Merge', self._merge, 'mdi.table-merge-cells')
-        self.context_split = context_action(self.context_menu, 'Split', self._split, 'mdi.table-split-cell')
-        self.context_menu.addSeparator()
+            self.context, 'Paste', self._paste, 'fa.paste', 'Ctrl+V', self.ui.slots)
+        self.context.addSeparator()
+        self.context_merge = context_action(self.context, 'Merge', self._merge, 'mdi.table-merge-cells')
+        self.context_split = context_action(self.context, 'Split', self._split, 'mdi.table-split-cell')
+        self.context.addSeparator()
+        self.context_move = context_action(self.context, 'Move Slot', self._move, 'fa5s.expand-arrows-alt')
         self.context_remove = context_action(
-            self.context_menu, 'Remove Slot', self._remove, 'fa.trash-o', 'Delete', self.ui.slots)
-        self.context_menu.addSeparator()
-        self.context_print = context_action(self.context_menu, 'Print Label', self._print, 'fa.barcode')
+            self.context, 'Remove Slot', self._remove, 'fa.trash-o', 'Delete', self.ui.slots)
+        self.context.addSeparator()
+        self.context_print = context_action(self.context, 'Print Label', self._print, 'fa.barcode')
         self.ui.slots.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.ui.slots.customContextMenuRequested.connect(
-            lambda point: self.context_menu.exec(self.ui.slots.mapToGlobal(point)))
+        self.ui.slots.customContextMenuRequested.connect(lambda p: self.context.exec(self.ui.slots.mapToGlobal(p)))
 
         # Connect events.
         self.ui.slots.horizontalHeader().sectionResized.connect(self.ui.slots.resizeRowsToContents)
@@ -111,12 +114,7 @@ class SlotsWidget(QtWidgets.QWidget):
         for slot in unit.slots:
             self._update_cell(slot)
 
-        # Resize cell contents to fit - attempting make columns fit within window.
-        columns = self.ui.slots.columnCount()
-        if columns:
-            width = self.ui.slots.width() / columns
-            for column in range(columns):
-                self.ui.slots.setColumnWidth(column, width)
+        # Resize rows to fit wrapped text.
         self.ui.slots.resizeRowsToContents()
 
         self.ui.slots.blockSignals(False)
@@ -129,7 +127,22 @@ class SlotsWidget(QtWidgets.QWidget):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-    def _update_cell(self, slot: Slot) -> None:
+    def selectedIndex(self) -> QtCore.QModelIndex:
+        """Return the QModelIndex of the currently selected cell when one cell is selected, otherwise None."""
+        selected = self.ui.slots.selectedIndexes()
+        if len(selected) == 1:
+            return selected[0]
+        return None
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def slotAt(self, row: int, column: int) -> Slot:
+        item = self.ui.slots.item(row, column)
+        return item.data(QtCore.Qt.UserRole)
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def _update_cell(self, slot: Slot) -> QtWidgets.QTableWidgetItem:
         item = self.ui.slots.item(slot.row, slot.column)
         item.setText(slot.name)
         item.setToolTip(slot.name)
@@ -137,6 +150,7 @@ class SlotsWidget(QtWidgets.QWidget):
         self._highlight_item(item)
         if slot.row_span > 1 or slot.column_span > 1:
             self.ui.slots.setSpan(slot.row, slot.column, slot.row_span, slot.column_span)
+        return item
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -225,6 +239,42 @@ class SlotsWidget(QtWidgets.QWidget):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
+    def _move(self) -> None:
+        """Move this slot to a new, open location while preserving it's ID/Reference."""
+        # This is a tad hacky, but the dialog also uses this widget which causes a circular import if included at the
+        # top of this module.
+        from inventory.gui.dialogs.slot_select import SlotSelectDialog
+
+        selected = self.ui.slots.selectedItems()
+        if len(selected) == 1:
+            item = selected[0]
+            source: Slot = item.data(QtCore.Qt.UserRole)
+            dialog = SlotSelectDialog(self, source)
+            if dialog.exec():
+                # Copy info about the selected destination into the source Slot.
+                destination = dialog.slot()
+                source.unit = destination.unit
+                source.row = destination.row
+                source.column = destination.column
+                source.row_span = destination.row_span
+                source.column_span = destination.column_span
+                source.save()
+
+                self.ui.slots.blockSignals(True)
+
+                # Remove this slot from the current cell.
+                self._clear_cell(item)
+
+                # If the destination is wining this Unit, then show it.
+                if source.unit == self.unit:
+                    item = self._update_cell(source)
+                    self.ui.slots.clearSelection()
+                    item.setSelected(True)
+
+                self.ui.slots.blockSignals(False)
+
+
+# ----------------------------------------------------------------------------------------------------------------------
     def _remove(self) -> None:
         selection = self.ui.slots.selectedItems()
         for item in selection:
@@ -242,16 +292,22 @@ class SlotsWidget(QtWidgets.QWidget):
 
             # Remove the slot from the GUI.
             self.ui.slots.blockSignals(True)
-            if slot.row_span > 1 or slot.column_span > 1:
-                self.ui.slots.setSpan(item.row(), item.column(), 1, 1)
-            item.setText('')
-            item.setBackground(QtWidgets.QTableWidgetItem('').background())
-            item.setData(QtCore.Qt.UserRole, None)
-            self._highlight_item(item)
+            self._clear_cell(item)
             self.ui.slots.blockSignals(False)
 
             # Remove the slot from the database.
             slot.delete_instance()
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def _clear_cell(self, item: QtWidgets.QTableWidgetItem) -> None:
+        slot: Slot = item.data(QtCore.Qt.UserRole)
+        if slot.row_span > 1 or slot.column_span > 1:
+            self.ui.slots.setSpan(item.row(), item.column(), 1, 1)
+        item.setText('')
+        item.setBackground(QtWidgets.QTableWidgetItem('').background())
+        item.setData(QtCore.Qt.UserRole, None)
+        self._highlight_item(item)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -291,7 +347,9 @@ class SlotsWidget(QtWidgets.QWidget):
                 return True
             return False
         self.context_split.setEnabled(len(items) == 1 and is_spanned(items[0]))
+        self.context_move.setEnabled(bool(slots))
         self.context_remove.setEnabled(bool(slots))
+        self.selectionChanged.emit()
 
 
 # ----------------------------------------------------------------------------------------------------------------------
