@@ -115,6 +115,11 @@ class PartDialog(QtWidgets.QDialog):
         self.ui.suppliers.setPart(part)
         self.ui.documents.setPart(part)
 
+        projects = set([material.revision.project.title for material in part.materials])
+        self.ui.tabs.setTabText(0, f'Locations ({len(part.locations)})')
+        self.ui.tabs.setTabText(1, f'Projects ({len(projects)})')
+        self.ui.tabs.setTabText(2, f'Suppliers ({len(part.products)})')
+
 
 # ----------------------------------------------------------------------------------------------------------------------
     def _save(self) -> None:
