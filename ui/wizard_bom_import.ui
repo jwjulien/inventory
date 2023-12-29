@@ -17,7 +17,7 @@
    <item>
     <widget class="QStackedWidget" name="stack">
      <property name="currentIndex">
-      <number>0</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="page_browse">
       <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -229,12 +229,12 @@
          </column>
          <column>
           <property name="text">
-           <string>Part Summary</string>
+           <string>Matched Part Summary</string>
           </property>
          </column>
          <column>
           <property name="text">
-           <string>Part Number</string>
+           <string>Matched Part Number</string>
           </property>
          </column>
         </widget>

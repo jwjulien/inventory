@@ -62,6 +62,11 @@ class Ui_SlotSelectDialog(object):
         self.verticalLayout_3.setContentsMargins(0, 0, 0, 0)
         self.slots = SlotsWidget(self.page_slot)
         self.slots.setObjectName(u"slots")
+        sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(1)
+        sizePolicy.setVerticalStretch(1)
+        sizePolicy.setHeightForWidth(self.slots.sizePolicy().hasHeightForWidth())
+        self.slots.setSizePolicy(sizePolicy)
 
         self.verticalLayout_3.addWidget(self.slots)
 

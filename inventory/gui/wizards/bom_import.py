@@ -23,6 +23,7 @@
 # Imports
 # ----------------------------------------------------------------------------------------------------------------------
 from dataclasses import dataclass
+import os
 import re
 from typing import Iterator, List
 
@@ -315,7 +316,9 @@ class BomImportWizard(QtWidgets.QDialog):
                 self.ui.radio_revision_new.setChecked(True)
                 self._create_new_revision()
                 self.ui.revision_editor.setText(self.bom.revision)
-                self.ui.revision_date.setDate(QtCore.QDate.currentDate())
+                timestamp = os.path.getmtime(self.ui.file_select.filename())
+                date = QtCore.QDateTime.fromSecsSinceEpoch(int(timestamp))
+                self.ui.revision_date.setDate(date.date())
                 self.ui.revision_editor.setFocus()
 
         elif index == 2: # Revision Selection -> Material Mapping

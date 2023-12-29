@@ -56,8 +56,11 @@
     - [ ] In project BOM view:
         - [ ] Allow remapping a part for a given designator.
         - [ ] Support a custom context menu for removing a Material and remapping a part.
+    - [x] Use the modified time from the BOM file to set the revision date on BOM import.
+    - [ ] Add option to filter existing entries from BOM import (for updates/re-import).
 - New tabs/features:
     - [ ] A feature to view parts from a supplier that are single-sourced (with quantities visible).
         - Such that when looking to fill up an order with a supplier, with whom I place infrequent orders, it might be easy to find additional items to stock up on or to tip over the free shipping threshold.
     - [x] Need to refresh parts when switching tabs.
+    - [x] Setup filename widget to allow drag and drop of files from Explorer.
         - [x] Lazy load them too, then.

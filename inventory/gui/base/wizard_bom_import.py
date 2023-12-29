@@ -203,7 +203,7 @@ class Ui_BomImportWizard(object):
 
         self.retranslateUi(BomImportWizard)
 
-        self.stack.setCurrentIndex(0)
+        self.stack.setCurrentIndex(3)
 
 
         QMetaObject.connectSlotsByName(BomImportWizard)
@@ -224,8 +224,8 @@ class Ui_BomImportWizard(object):
         self.revision_editor.setPlaceholderText(QCoreApplication.translate("BomImportWizard", u"Revision name", None))
         self.bom_title.setText(QCoreApplication.translate("BomImportWizard", u"BOM Title", None))
         ___qtreewidgetitem = self.materials.headerItem()
-        ___qtreewidgetitem.setText(4, QCoreApplication.translate("BomImportWizard", u"Part Number", None));
-        ___qtreewidgetitem.setText(3, QCoreApplication.translate("BomImportWizard", u"Part Summary", None));
+        ___qtreewidgetitem.setText(4, QCoreApplication.translate("BomImportWizard", u"Matched Part Number", None));
+        ___qtreewidgetitem.setText(3, QCoreApplication.translate("BomImportWizard", u"Matched Part Summary", None));
         ___qtreewidgetitem.setText(2, QCoreApplication.translate("BomImportWizard", u"BOM Part Number", None));
         ___qtreewidgetitem.setText(1, QCoreApplication.translate("BomImportWizard", u"BOM Description", None));
         ___qtreewidgetitem.setText(0, QCoreApplication.translate("BomImportWizard", u"Designator", None));

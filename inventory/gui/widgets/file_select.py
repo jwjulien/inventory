@@ -52,6 +52,8 @@ class FileSelectWidget(QtWidgets.QWidget):
             'All Files': '*.*'
         }
 
+        self.setAcceptDrops(True)
+
         # Connect events.
         self.ui.browse.clicked.connect(self._browse)
         self.ui.editor.textChanged.connect(self._changed)
@@ -203,6 +205,38 @@ class FileSelectWidget(QtWidgets.QWidget):
         # Only emit the selected Signal when the selected file is valid.
         if valid:
             self.selected.emit(self.filename())
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def dragEnterEvent(self, event):
+        if event.mimeData().hasUrls:
+            event.accept()
+        else:
+            event.ignore()
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def dragMoveEvent(self, event):
+        if event.mimeData().hasUrls:
+            event.setDropAction(QtCore.Qt.CopyAction)
+            event.accept()
+        else:
+            event.ignore()
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+    def dropEvent(self, event):
+        if event.mimeData().hasUrls:
+            event.setDropAction(QtCore.Qt.CopyAction)
+            urls = event.mimeData().urls()
+            if len(urls) == 1:
+                url = urls[0]
+                if url.isLocalFile():
+                    event.accept()
+                    filename = url.toLocalFile()
+                    self.setFilename(filename)
+                    return
+        event.ignore()
 
 
 
